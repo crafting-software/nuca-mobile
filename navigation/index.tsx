@@ -1,7 +1,7 @@
-import { DefaultTheme, NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React from 'react';
 import { Modal } from 'react-native';
+import { DefaultTheme, NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { AuthenticationScreen } from '../screens/AuthenticationScreen';
 import { MainScreen } from '../screens/MainScreen';
 import { NotFoundScreen } from '../screens/NotFoundScreen';
