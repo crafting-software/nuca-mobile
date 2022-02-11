@@ -40,27 +40,7 @@ export default () => {
       <SafeAreaProvider>
         <Navigation />
         <StatusBar />
-        <View style={styles.container}>
-          <Button
-            icon="camera"
-            mode="contained"
-            onPress={() => console.log('Pressed')}
-          >
-            Press me
-          </Button>
-          <Caption>Open up App.tsx to start working on your app!</Caption>
-          <StatusBar style="auto" />
-        </View>
       </SafeAreaProvider>
     </PaperProvider>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
