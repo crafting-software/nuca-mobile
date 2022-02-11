@@ -1,7 +1,7 @@
 import AppLoading from 'expo-app-loading';
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, KeyboardAvoidingView } from 'react-native';
 import {
   Provider as PaperProvider,
   Button,
@@ -34,6 +34,12 @@ export default () => {
   if (!fontsLoaded) return <AppLoading />;
 
   const theme = getTheme();
+
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+    },
+  });
 
   return (
     <PaperProvider theme={theme}>
