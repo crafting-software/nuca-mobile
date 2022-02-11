@@ -2,7 +2,7 @@ import * as LocationProvider from 'expo-location';
 import React, { createContext, useState } from 'react';
 import { DefaultProps } from '../libs/common';
 import { Hotspot, mockData as HotspotMockData } from '../models/Hotspot';
-import { Location } from '../models/Position';
+import { Location } from '../models/Location';
 
 export interface MainControllerValue {
   readonly hotspots: Hotspot[];
@@ -10,6 +10,8 @@ export interface MainControllerValue {
   readonly registerHotspot: (hotspot: Hotspot) => void;
 
   readonly getCurrentLocation: () => Promise<Location>;
+
+  readonly getCurrentLocationAndAddress: () => Promise<Location>;
 }
 
 export const MainController = createContext<MainControllerValue>(
@@ -30,17 +32,59 @@ export const MainControllerProvider = ({ children }: DefaultProps) => {
     }
 
     let location = await LocationProvider.getCurrentPositionAsync({});
-    alert(JSON.stringify(location));
+
     return {
-      address: 'unknown',
+      address: '',
       latitude: location.coords.latitude,
       longitude: location.coords.longitude,
     };
   };
 
+  const getCurrentLocationAndAddress = async (): Promise<Location> => {
+    const currentLocation = await getCurrentLocation();
+    let place = await LocationProvider.reverseGeocodeAsync({
+      latitude: currentLocation.latitude,
+      longitude: currentLocation.longitude,
+    });
+
+    let street;
+    place.find(p => {
+      street = p.street;
+    });
+    street = street ?? '';
+
+    let streetNumber;
+    place.find(p => {
+      streetNumber = p.streetNumber;
+    });
+    streetNumber = streetNumber ?? '';
+
+    let city;
+    place.find(p => {
+      city = p.city;
+    });
+    city = city ?? '';
+
+    let postalCode;
+    place.find(p => {
+      postalCode = p.postalCode;
+    });
+    postalCode = postalCode ?? '';
+
+    currentLocation.address =
+      `${street} ${streetNumber}, ${city}, ${postalCode}`.trim();
+
+    return currentLocation;
+  };
+
   return (
     <MainController.Provider
-      value={{ hotspots, registerHotspot, getCurrentLocation }}
+      value={{
+        hotspots,
+        registerHotspot,
+        getCurrentLocation,
+        getCurrentLocationAndAddress,
+      }}
     >
       {children}
     </MainController.Provider>
