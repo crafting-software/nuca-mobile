@@ -1,5 +1,11 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Image, KeyboardAvoidingView } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+} from 'react-native';
 import { Button, Title, useTheme, TextInput } from 'react-native-paper';
 import catLady from '../assets/cat-lady.png';
 import { RootStackScreenProps } from '../types';
@@ -55,7 +61,10 @@ export const AuthenticationScreen = ({
 
   const styles = getStyles(theme);
   return (
-    <KeyboardAvoidingView style={styles.container}>
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    >
       <Image style={styles.image} source={catLady} resizeMode="contain" />
       <Title style={styles.title}>Intră în cont</Title>
       <TextInput
