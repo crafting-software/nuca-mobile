@@ -68,6 +68,7 @@ export const AuthenticationScreen = ({
       <Image style={styles.image} source={catLady} resizeMode="contain" />
       <Title style={styles.title}>Intră în cont</Title>
       <TextInput
+        outlineColor={theme.colors.disabled}
         mode="outlined"
         style={styles.input}
         placeholder="Utilizator"
@@ -77,6 +78,7 @@ export const AuthenticationScreen = ({
         left={<TextInput.Icon name="account" color={theme.colors.primary} />}
       />
       <TextInput
+        outlineColor={theme.colors.disabled}
         mode="outlined"
         secureTextEntry
         style={styles.input}
