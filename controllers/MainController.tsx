@@ -37,13 +37,14 @@ export const MainControllerProvider = ({ children }: DefaultProps) => {
 
     let location = await LocationProvider.getCurrentPositionAsync({});
 
+    alert(`LOCATION OBJECT IS ${JSON.stringify(location)}`);
     setCurrentLocation({
       address: '',
       latitude: location.coords.latitude,
       longitude: location.coords.longitude,
     });
 
-    alert(JSON.stringify(currentLocation));
+    alert(`LOCATION IS ${JSON.stringify(currentLocation)}`);
   };
 
   const findCurrentLocationAndAddress = async () => {
@@ -58,6 +59,8 @@ export const MainControllerProvider = ({ children }: DefaultProps) => {
       latitude: currentLocation!.latitude,
       longitude: currentLocation!.longitude,
     });
+
+    alert(`GEOCODE OBJECT IS ${JSON.stringify(place)}`);
 
     let street;
     place.find(p => {
@@ -87,6 +90,8 @@ export const MainControllerProvider = ({ children }: DefaultProps) => {
       `${street} ${streetNumber}, ${city}, ${postalCode}`.trim();
 
     setCurrentLocation(currentLocation);
+
+    alert(`LOCATION AND ADDRESS ARE ${JSON.stringify(currentLocation)}`);
   };
 
   return (
