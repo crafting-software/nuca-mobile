@@ -1,6 +1,7 @@
 import React, { useContext } from 'react';
 import { StyleSheet, View } from 'react-native';
 import MapView, { LatLng, Marker, Region } from 'react-native-maps';
+import { FAB } from 'react-native-paper';
 import {
   MainController,
   MainControllerProvider,
@@ -33,6 +34,11 @@ const MainScreenContent = () => {
           />
         ))}
       </MapView>
+      <FAB
+        style={styles.currentLocationFab}
+        icon="plus"
+        onPress={() => mainController.getCurrentLocation()}
+      ></FAB>
     </View>
   );
 };
@@ -73,5 +79,11 @@ const styles = StyleSheet.create({
   map: {
     width: '100%',
     height: '100%',
+  },
+  currentLocationFab: {
+    position: 'absolute',
+    margin: 30,
+    right: 0,
+    bottom: 0,
   },
 });
