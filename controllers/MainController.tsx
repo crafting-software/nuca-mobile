@@ -6,12 +6,11 @@ import { Location } from '../models/Location';
 
 export interface MainControllerValue {
   readonly hotspots: Hotspot[];
-
   readonly registerHotspot: (hotspot: Hotspot) => void;
 
-  readonly getCurrentLocation: () => Promise<Location>;
-
-  readonly getCurrentLocationAndAddress: () => Promise<Location>;
+  readonly currentLocation: Location;
+  readonly findCurrentLocation: () => void;
+  readonly findCurrentLocationAndAddress: () => void;
 }
 
 export const MainController = createContext<MainControllerValue>(
@@ -20,12 +19,17 @@ export const MainController = createContext<MainControllerValue>(
 
 export const MainControllerProvider = ({ children }: DefaultProps) => {
   const [hotspots, setHotspots] = useState<Hotspot[]>(HotspotMockData);
+  const [currentLocation, setCurrentLocation] = useState<Location>({
+    address: '',
+    latitude: -1,
+    longitude: -1,
+  });
 
   const registerHotspot = (newHotspot: Hotspot) => {
     setHotspots([...hotspots, newHotspot]);
   };
 
-  const getCurrentLocation = async (): Promise<Location> => {
+  const findCurrentLocation = async () => {
     let { status } = await LocationProvider.requestForegroundPermissionsAsync();
     if (status !== 'granted') {
       alert('Permission to access location was denied');
@@ -33,18 +37,26 @@ export const MainControllerProvider = ({ children }: DefaultProps) => {
 
     let location = await LocationProvider.getCurrentPositionAsync({});
 
-    return {
+    setCurrentLocation({
       address: '',
       latitude: location.coords.latitude,
       longitude: location.coords.longitude,
-    };
+    });
+
+    alert(JSON.stringify(currentLocation));
   };
 
-  const getCurrentLocationAndAddress = async (): Promise<Location> => {
-    const currentLocation = await getCurrentLocation();
+  const findCurrentLocationAndAddress = async () => {
+    await findCurrentLocation();
+
+    if (currentLocation === null) {
+      alert('Location and address could not be retrieved');
+      return;
+    }
+
     let place = await LocationProvider.reverseGeocodeAsync({
-      latitude: currentLocation.latitude,
-      longitude: currentLocation.longitude,
+      latitude: currentLocation!.latitude,
+      longitude: currentLocation!.longitude,
     });
 
     let street;
@@ -71,19 +83,20 @@ export const MainControllerProvider = ({ children }: DefaultProps) => {
     });
     postalCode = postalCode ?? '';
 
-    currentLocation.address =
+    currentLocation!.address =
       `${street} ${streetNumber}, ${city}, ${postalCode}`.trim();
 
-    return currentLocation;
+    setCurrentLocation(currentLocation);
   };
 
   return (
     <MainController.Provider
       value={{
         hotspots,
+        currentLocation,
         registerHotspot,
-        getCurrentLocation,
-        getCurrentLocationAndAddress,
+        findCurrentLocation,
+        findCurrentLocationAndAddress,
       }}
     >
       {children}

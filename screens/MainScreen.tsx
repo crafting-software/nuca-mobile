@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import MapView, { LatLng, Marker, Region } from 'react-native-maps';
 import { FAB } from 'react-native-paper';
 import {
@@ -8,12 +8,24 @@ import {
 } from '../controllers/MainController';
 import { Hotspot } from '../models/Hotspot';
 
+const getInitialRegion = (): Region => {
+  return {
+    latitude: 46.77293258116839,
+    longitude: 23.587688864363546,
+    latitudeDelta: 0.0922,
+    longitudeDelta: 0.0421,
+  };
+};
+
+let currentRegion = getInitialRegion();
+
 const MainScreenContent = () => {
   const mainController = useContext(MainController);
 
   return (
     <View style={styles.container}>
       <MapView
+        region={currentRegion}
         initialRegion={getInitialRegion()}
         style={styles.map}
         onLongPress={e =>
@@ -37,8 +49,11 @@ const MainScreenContent = () => {
       <FAB
         style={styles.currentLocationFab}
         icon="plus"
-        onPress={() => mainController.getCurrentLocationAndAddress()}
+        onPress={() => mainController.findCurrentLocation()}
       ></FAB>
+      <Text style={styles.currentLocationLabel}>
+        {mainController.currentLocation.address}
+      </Text>
     </View>
   );
 };
@@ -60,15 +75,6 @@ function createHotspot(coordinate: LatLng): Hotspot {
   };
 }
 
-const getInitialRegion = (): Region => {
-  return {
-    latitude: 46.77293258116839,
-    longitude: 23.587688864363546,
-    latitudeDelta: 0.0922,
-    longitudeDelta: 0.0421,
-  };
-};
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -83,6 +89,15 @@ const styles = StyleSheet.create({
   currentLocationFab: {
     position: 'absolute',
     margin: 30,
+    right: 0,
+    bottom: 0,
+  },
+  currentLocationLabel: {
+    fontSize: 20,
+    backgroundColor: 'orange',
+    width: '100%',
+    position: 'absolute',
+    marginBottom: 100,
     right: 0,
     bottom: 0,
   },
