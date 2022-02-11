@@ -37,7 +37,7 @@ const MainScreenContent = () => {
       <FAB
         style={styles.currentLocationFab}
         icon="plus"
-        onPress={() => mainController.getCurrentLocation()}
+        onPress={() => mainController.getCurrentLocationAndAddress()}
       ></FAB>
     </View>
   );
