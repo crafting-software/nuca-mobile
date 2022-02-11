@@ -1,0 +1,18 @@
+name: PR checks
+on: [pull_request]
+jobs:
+  code-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "The job was automatically triggered by a ${{ github.event_name }} event. It will checkout the code and run prettier/lint/tsc checks on it."
+      - name: Check out repository code
+        uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+          check-latest: true
+      - name: install deps and run checks
+        run: |
+          npm install
+          npm run check
+          echo "This job's status is ${{ job.status }}."
