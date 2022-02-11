@@ -1,4 +1,5 @@
-import React, { useContext } from 'react';
+import * as LocationProvider from 'expo-location';
+import { useContext, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import MapView, { LatLng, Marker, Region } from 'react-native-maps';
 import { FAB } from 'react-native-paper';
@@ -19,8 +20,27 @@ const getInitialRegion = (): Region => {
 
 let currentRegion = getInitialRegion();
 
+const findCurrentLocation = async () => {
+  const { status } = await LocationProvider.requestForegroundPermissionsAsync();
+  if (status !== 'granted') {
+    alert('Permission to access location was denied');
+  }
+
+  const location = await LocationProvider.getCurrentPositionAsync({});
+
+  const place = await LocationProvider.reverseGeocodeAsync(location.coords);
+
+  let address;
+  place.find(a => {
+    address = a;
+  });
+
+  return JSON.stringify(address);
+};
+
 const MainScreenContent = () => {
   const mainController = useContext(MainController);
+  const [address, setAddress] = useState('');
 
   return (
     <View style={styles.container}>
@@ -49,11 +69,12 @@ const MainScreenContent = () => {
       <FAB
         style={styles.currentLocationFab}
         icon="plus"
-        onPress={() => mainController.findCurrentLocationAndAddress()}
+        onPress={async () => {
+          const ad = await findCurrentLocation();
+          setAddress(ad);
+        }}
       ></FAB>
-      <Text style={styles.currentLocationLabel}>
-        {mainController.currentLocation.address}
-      </Text>
+      <Text style={styles.currentLocationLabel}>{address}</Text>
     </View>
   );
 };
