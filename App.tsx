@@ -1,13 +1,8 @@
 import AppLoading from 'expo-app-loading';
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { StyleSheet, KeyboardAvoidingView } from 'react-native';
-import {
-  Provider as PaperProvider,
-  Button,
-  Caption,
-  Text,
-} from 'react-native-paper';
+import { StyleSheet } from 'react-native';
+import { Provider as PaperProvider } from 'react-native-paper';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import {
   useFonts,
