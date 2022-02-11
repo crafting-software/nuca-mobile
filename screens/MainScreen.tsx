@@ -23,8 +23,6 @@ const getInitialRegion = (): Region => {
   };
 };
 
-let currentRegion = getInitialRegion();
-
 const findCurrentLocation = async (): Promise<Location> => {
   const { status } = await LocationProvider.requestForegroundPermissionsAsync();
   if (status !== 'granted') {
@@ -69,10 +67,18 @@ const MainScreenContent = () => {
   const mainController = useContext(MainController);
   const [location, setLocation] = useState<Location>(defaultLocation);
 
+  const [region, setRegion] = useState({
+    latitude: 37.78825,
+    longitude: -122.4324,
+    latitudeDelta: 0.0922,
+    longitudeDelta: 0.0421,
+  });
+
   return (
     <View style={styles.container}>
       <MapView
-        region={currentRegion}
+        region={region}
+        onRegionChange={setRegion}
         initialRegion={getInitialRegion()}
         style={styles.map}
         onLongPress={e =>
@@ -98,8 +104,13 @@ const MainScreenContent = () => {
         icon="plus"
         onPress={async () => {
           const location = await findCurrentLocation();
-          alert(JSON.stringify(location));
           setLocation(location);
+          setRegion({
+            latitude: location.latitude,
+            longitude: location.longitude,
+            latitudeDelta: 0,
+            longitudeDelta: 0,
+          });
         }}
       ></FAB>
       <Text style={styles.currentLocationLabel}>
