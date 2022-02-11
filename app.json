@@ -1,10 +1,11 @@
 {
   "expo": {
-    "name": "nuca-mobile-2",
-    "slug": "nuca-mobile-2",
+    "name": "nuca-mobile",
+    "slug": "nuca-mobile",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
+    "scheme": "nuca-mobile",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
