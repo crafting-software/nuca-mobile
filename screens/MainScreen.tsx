@@ -1,4 +1,5 @@
-import React, { useContext } from 'react';
+import * as LocationProvider from 'expo-location';
+import React, { useContext, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import MapView, { LatLng, Marker, Region } from 'react-native-maps';
 import { FAB } from 'react-native-paper';
@@ -7,6 +8,11 @@ import {
   MainControllerProvider,
 } from '../controllers/MainController';
 import { Hotspot } from '../models/Hotspot';
+import {
+  defaultLocation,
+  getAddressDisplayText,
+  Location,
+} from '../models/Location';
 
 const getInitialRegion = (): Region => {
   return {
@@ -19,8 +25,49 @@ const getInitialRegion = (): Region => {
 
 let currentRegion = getInitialRegion();
 
+const findCurrentLocation = async (): Promise<Location> => {
+  const { status } = await LocationProvider.requestForegroundPermissionsAsync();
+  if (status !== 'granted') {
+    alert('Permission to access location was denied');
+  }
+
+  const location = await LocationProvider.getCurrentPositionAsync({});
+
+  const place = await LocationProvider.reverseGeocodeAsync(location.coords);
+
+  let street;
+  place.find(p => {
+    street = p.street;
+  });
+
+  let streetNumber;
+  place.find(p => {
+    streetNumber = p.streetNumber;
+  });
+
+  let city;
+  place.find(p => {
+    city = p.city;
+  });
+
+  let postalCode;
+  place.find(p => {
+    postalCode = p.postalCode;
+  });
+
+  return {
+    latitude: location.coords.latitude,
+    longitude: location.coords.longitude,
+    city: city ?? '',
+    postalCode: postalCode ?? '',
+    street: street ?? '',
+    streetNumber: streetNumber ?? '',
+  };
+};
+
 const MainScreenContent = () => {
   const mainController = useContext(MainController);
+  const [location, setLocation] = useState<Location>(defaultLocation);
 
   return (
     <View style={styles.container}>
@@ -49,10 +96,14 @@ const MainScreenContent = () => {
       <FAB
         style={styles.currentLocationFab}
         icon="plus"
-        onPress={() => mainController.findCurrentLocationAndAddress()}
+        onPress={async () => {
+          const location = await findCurrentLocation();
+          alert(JSON.stringify(location));
+          setLocation(location);
+        }}
       ></FAB>
       <Text style={styles.currentLocationLabel}>
-        {mainController.currentLocation.address}
+        {getAddressDisplayText(location)}
       </Text>
     </View>
   );
