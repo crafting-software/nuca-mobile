@@ -1,0 +1,7 @@
+{
+  "tabWidth": 2,
+  "singleQuote": true,
+  "importOrder": ["react", "^@(.*)$", "^[./]"],
+  "importOrderSeparation": false,
+  "arrowParens": "avoid"
+}
