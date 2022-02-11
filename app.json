@@ -16,13 +16,19 @@
     },
     "assetBundlePatterns": ["**/*"],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "App requires geolocation to retrieve the current location in order to be easier to mark the hotspots.",
+        "NSLocationAlwaysUsageDescription": "App requires geolocation to retrieve the current location in order to be easier to mark the hotspots.",
+        "NSLocationWhenInUseUsageDescription": "App requires geolocation to retrieve the current location in order to be easier to mark the hotspots."
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
-      }
+      },
+      "permissions": ["ACCESS_COARSE_LOCATION", "ACCESS_FINE_LOCATION"]
     },
     "web": {
       "favicon": "./assets/favicon.png"
