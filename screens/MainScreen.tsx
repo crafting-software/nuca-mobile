@@ -1,19 +1,27 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { StyleSheet, View } from 'react-native';
-import MapView, { Marker, Region } from 'react-native-maps';
-import { Hotspot, mockData as HotspotMockData } from '../models/Hotspot';
+import MapView, { LatLng, Marker, Region } from 'react-native-maps';
+import {
+  MainController,
+  MainControllerProvider,
+} from '../controllers/MainController';
+import { Hotspot } from '../models/Hotspot';
 
-export const hotspots: Hotspot[] = HotspotMockData;
+const MainScreenContent = () => {
+  const mainController = useContext(MainController);
 
-export const MainScreen = () => {
   return (
     <View style={styles.container}>
       <MapView
         initialRegion={getInitialRegion()}
         style={styles.map}
-        onLongPress={e => alert(JSON.stringify(e.nativeEvent.position.x))}
+        onLongPress={e =>
+          mainController.registerHotspot(
+            createHotspot(e.nativeEvent.coordinate)
+          )
+        }
       >
-        {hotspots.map((hotspot, index) => (
+        {mainController.hotspots.map((hotspot, index) => (
           <Marker
             key={index}
             coordinate={{
@@ -28,6 +36,23 @@ export const MainScreen = () => {
     </View>
   );
 };
+
+export const MainScreen = () => {
+  return (
+    <MainControllerProvider>
+      <MainScreenContent />
+    </MainControllerProvider>
+  );
+};
+
+function createHotspot(coordinate: LatLng): Hotspot {
+  return {
+    name: 'new hotspot',
+    description: 'new hotspot description',
+    latitude: coordinate.latitude,
+    longitude: coordinate.longitude,
+  };
+}
 
 const getInitialRegion = (): Region => {
   return {
