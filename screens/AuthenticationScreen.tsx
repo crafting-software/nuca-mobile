@@ -1,17 +1,11 @@
 import React, { useState } from 'react';
-<<<<<<< HEAD
-import { Image, KeyboardAvoidingView, StyleSheet } from 'react-native';
-import { Button, TextInput, Title, useTheme } from 'react-native-paper';
-=======
 import {
-  View,
-  StyleSheet,
   Image,
   KeyboardAvoidingView,
   Platform,
+  StyleSheet,
 } from 'react-native';
-import { Button, Title, useTheme, TextInput } from 'react-native-paper';
->>>>>>> master
+import { Button, TextInput, Title, useTheme } from 'react-native-paper';
 import catLady from '../assets/cat-lady.png';
 import { RootStackScreenProps } from '../types';
 
