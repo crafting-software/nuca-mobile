@@ -3,6 +3,7 @@ import React, { useContext, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import MapView, { LatLng, Marker, Region } from 'react-native-maps';
 import { FAB } from 'react-native-paper';
+import { Appbar } from '../components/Appbar';
 import {
   MainController,
   MainControllerProvider,
@@ -44,47 +45,46 @@ export const MapScreen = () => {
 
   return (
     <MainControllerProvider>
-      <View style={styles.container}>
-        <MapView
-          region={region}
-          onRegionChange={setRegion}
-          style={styles.map}
-          onLongPress={e =>
-            mainController.registerHotspot(
-              createHotspot(e.nativeEvent.coordinate)
-            )
-          }
-        >
-          {mainController.hotspots.map(h => (
-            <Marker
-              key={`${h.latitude} ${h.longitude}`}
-              coordinate={{
-                latitude: h.latitude,
-                longitude: h.longitude,
-              }}
-              title={h.name}
-              description={h.description}
-            />
-          ))}
-        </MapView>
-        <FAB
-          style={styles.currentLocationFab}
-          icon="plus"
-          onPress={async () => {
-            const location = await findCurrentLocation();
-            setLocation(location);
-            setRegion({
-              latitude: location.latitude,
-              longitude: location.longitude,
-              latitudeDelta: 0,
-              longitudeDelta: 0,
-            });
-          }}
-        ></FAB>
-        <Text style={styles.currentLocationLabel}>
-          {!!location && getFormattedAddress(location)}
-        </Text>
-      </View>
+      <Appbar />
+      <MapView
+        region={region}
+        onRegionChange={setRegion}
+        style={styles.map}
+        onLongPress={e =>
+          mainController.registerHotspot(
+            createHotspot(e.nativeEvent.coordinate)
+          )
+        }
+      >
+        {mainController.hotspots.map(h => (
+          <Marker
+            key={`${h.latitude} ${h.longitude}`}
+            coordinate={{
+              latitude: h.latitude,
+              longitude: h.longitude,
+            }}
+            title={h.name}
+            description={h.description}
+          />
+        ))}
+      </MapView>
+      <FAB
+        style={styles.currentLocationFab}
+        icon="plus"
+        onPress={async () => {
+          const location = await findCurrentLocation();
+          setLocation(location);
+          setRegion({
+            latitude: location.latitude,
+            longitude: location.longitude,
+            latitudeDelta: 0,
+            longitudeDelta: 0,
+          });
+        }}
+      ></FAB>
+      <Text style={styles.currentLocationLabel}>
+        {!!location && getFormattedAddress(location)}
+      </Text>
     </MainControllerProvider>
   );
 };
@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
   },
   map: {
     width: '100%',
-    height: '100%',
+    flex: 1,
   },
   currentLocationFab: {
     position: 'absolute',

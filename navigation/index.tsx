@@ -1,7 +1,8 @@
-import React from 'react';
+import { useContext } from 'react';
 import { Modal } from 'react-native';
 import { DefaultTheme, NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { AuthContext } from '../context';
 import { AuthenticationScreen } from '../screens/AuthenticationScreen';
 import { MapScreen } from '../screens/MapScreen';
 import { NotFoundScreen } from '../screens/NotFoundScreen';
@@ -22,28 +23,35 @@ export default function Navigation() {
  */
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
-const RootNavigator = () => (
-  <Stack.Navigator>
-    <Stack.Screen
-      name="Authentication"
-      component={AuthenticationScreen}
-      options={{ headerShown: false }}
-    />
+const RootNavigator = () => {
+  const { auth } = useContext(AuthContext);
+  const isAuthenticated = !!auth.token;
+  return (
+    <Stack.Navigator>
+      {isAuthenticated ? (
+        <>
+          <Stack.Screen
+            name="Main"
+            component={MapScreen}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="NotFound"
+            component={NotFoundScreen}
+            options={{ title: 'Oops!', headerShown: false }}
+          />
+        </>
+      ) : (
+        <Stack.Screen
+          name="Authentication"
+          component={AuthenticationScreen}
+          options={{ headerShown: false }}
+        />
+      )}
 
-    <Stack.Screen
-      name="NotFound"
-      component={NotFoundScreen}
-      options={{ title: 'Oops!' }}
-    />
-
-    <Stack.Screen
-      name="Main"
-      component={MapScreen}
-      options={{ headerShown: false }}
-    />
-
-    <Stack.Group screenOptions={{ presentation: 'modal' }}>
-      <Stack.Screen name="Modal" component={Modal} />
-    </Stack.Group>
-  </Stack.Navigator>
-);
+      <Stack.Group screenOptions={{ presentation: 'modal' }}>
+        <Stack.Screen name="Modal" component={Modal} />
+      </Stack.Group>
+    </Stack.Navigator>
+  );
+};

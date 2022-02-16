@@ -1,4 +1,4 @@
-import React, { createContext, useState } from 'react';
+import { createContext, useState } from 'react';
 import { DefaultProps } from '../libs/common';
 import { Hotspot, mockData as hotspotMockData } from '../models/Hotspot';
 
