@@ -1,18 +1,19 @@
-import React, { createContext, useState } from 'react';
+import { createContext, useState } from 'react';
 import { DefaultProps } from '../libs/common';
-import { Hotspot, mockData as HotspotMockData } from '../models/Hotspot';
+import { Hotspot, mockData as hotspotMockData } from '../models/Hotspot';
 
-export interface MainControllerValue {
-  readonly hotspots: Hotspot[];
-  readonly registerHotspot: (hotspot: Hotspot) => void;
-}
+export type MainControllerValue = {
+  hotspots: Hotspot[];
+  registerHotspot: (hotspot: Hotspot) => void;
+};
 
-export const MainController = createContext<MainControllerValue>(
-  {} as MainControllerValue
-);
+export const MainController = createContext<MainControllerValue>({
+  hotspots: [],
+  registerHotspot: () => {},
+});
 
 export const MainControllerProvider = ({ children }: DefaultProps) => {
-  const [hotspots, setHotspots] = useState<Hotspot[]>(HotspotMockData);
+  const [hotspots, setHotspots] = useState<Hotspot[]>(hotspotMockData);
 
   const registerHotspot = (newHotspot: Hotspot) => {
     setHotspots([...hotspots, newHotspot]);

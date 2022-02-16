@@ -3,83 +3,52 @@ import React, { useContext, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import MapView, { LatLng, Marker, Region } from 'react-native-maps';
 import { FAB } from 'react-native-paper';
+import { Appbar } from '../components/Appbar';
 import {
   MainController,
   MainControllerProvider,
 } from '../controllers/MainController';
 import { Hotspot } from '../models/Hotspot';
-import {
-  defaultLocation,
-  getAddressDisplayText,
-  Location,
-} from '../models/Location';
+import { getFormattedAddress, Location } from '../models/Location';
 
-const getInitialRegion = (): Region => {
-  return {
-    latitude: 46.77293258116839,
-    longitude: 23.587688864363546,
-    latitudeDelta: 0.0922,
-    longitudeDelta: 0.0421,
-  };
+const intialRegion: Region = {
+  latitude: 46.77293258116839,
+  longitude: 23.587688864363546,
+  latitudeDelta: 0.0922,
+  longitudeDelta: 0.0421,
 };
 
 const findCurrentLocation = async (): Promise<Location> => {
   const { status } = await LocationProvider.requestForegroundPermissionsAsync();
   if (status !== 'granted') {
-    alert('Permission to access location was denied');
+    alert('Permission to access location was denied.');
   }
 
-  const location = await LocationProvider.getCurrentPositionAsync({});
-
-  const place = await LocationProvider.reverseGeocodeAsync(location.coords);
-
-  let street;
-  place.find(p => {
-    street = p.street;
-  });
-
-  let streetNumber;
-  place.find(p => {
-    streetNumber = p.streetNumber;
-  });
-
-  let city;
-  place.find(p => {
-    city = p.city;
-  });
-
-  let postalCode;
-  place.find(p => {
-    postalCode = p.postalCode;
-  });
-
-  return {
-    latitude: location.coords.latitude,
-    longitude: location.coords.longitude,
-    city: city ?? '',
-    postalCode: postalCode ?? '',
-    street: street ?? '',
-    streetNumber: streetNumber ?? '',
+  const position = await LocationProvider.getCurrentPositionAsync();
+  let location: Location = {
+    ...position.coords,
   };
+
+  const place = await LocationProvider.reverseGeocodeAsync(position.coords);
+  place.find(address => {
+    location = { ...address, ...location };
+  });
+
+  return location;
 };
 
-const MainScreenContent = () => {
+export const MapScreen = () => {
   const mainController = useContext(MainController);
-  const [location, setLocation] = useState<Location>(defaultLocation);
+  const [location, setLocation] = useState<Location>();
 
-  const [region, setRegion] = useState({
-    latitude: 37.78825,
-    longitude: -122.4324,
-    latitudeDelta: 0.0922,
-    longitudeDelta: 0.0421,
-  });
+  const [region, setRegion] = useState(intialRegion);
 
   return (
-    <View style={styles.container}>
+    <MainControllerProvider>
+      <Appbar />
       <MapView
         region={region}
         onRegionChange={setRegion}
-        initialRegion={getInitialRegion()}
         style={styles.map}
         onLongPress={e =>
           mainController.registerHotspot(
@@ -87,15 +56,15 @@ const MainScreenContent = () => {
           )
         }
       >
-        {mainController.hotspots.map((hotspot, index) => (
+        {mainController.hotspots.map(h => (
           <Marker
-            key={index}
+            key={`${h.latitude} ${h.longitude}`}
             coordinate={{
-              latitude: hotspot.latitude,
-              longitude: hotspot.longitude,
+              latitude: h.latitude,
+              longitude: h.longitude,
             }}
-            title={hotspot.name}
-            description={hotspot.description}
+            title={h.name}
+            description={h.description}
           />
         ))}
       </MapView>
@@ -114,16 +83,8 @@ const MainScreenContent = () => {
         }}
       ></FAB>
       <Text style={styles.currentLocationLabel}>
-        {getAddressDisplayText(location)}
+        {!!location && getFormattedAddress(location)}
       </Text>
-    </View>
-  );
-};
-
-export const MainScreen = () => {
-  return (
-    <MainControllerProvider>
-      <MainScreenContent />
     </MainControllerProvider>
   );
 };
@@ -140,13 +101,12 @@ function createHotspot(coordinate: LatLng): Hotspot {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
   },
   map: {
     width: '100%',
-    height: '100%',
+    flex: 1,
   },
   currentLocationFab: {
     position: 'absolute',
