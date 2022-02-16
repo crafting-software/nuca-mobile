@@ -4,7 +4,6 @@ import { Hotspot, mockData as HotspotMockData } from '../models/Hotspot';
 
 export interface MainControllerValue {
   readonly hotspots: Hotspot[];
-
   readonly registerHotspot: (hotspot: Hotspot) => void;
 }
 
@@ -20,7 +19,12 @@ export const MainControllerProvider = ({ children }: DefaultProps) => {
   };
 
   return (
-    <MainController.Provider value={{ hotspots, registerHotspot }}>
+    <MainController.Provider
+      value={{
+        hotspots,
+        registerHotspot,
+      }}
+    >
       {children}
     </MainController.Provider>
   );
