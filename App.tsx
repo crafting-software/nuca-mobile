@@ -11,7 +11,7 @@ import {
   Nunito_700Bold,
   Nunito_400Regular_Italic,
 } from '@expo-google-fonts/nunito';
-import { AuthContext, ContextProvider } from './context';
+import { AuthContextProvider, MapContextProvider } from './context';
 import Navigation from './navigation/index';
 import { getTheme } from './theme';
 
@@ -30,13 +30,15 @@ export default () => {
   const theme = getTheme();
 
   return (
-    <ContextProvider>
-      <PaperProvider theme={theme}>
-        <SafeAreaProvider>
-          <Navigation />
-          <StatusBar />
-        </SafeAreaProvider>
-      </PaperProvider>
-    </ContextProvider>
+    <AuthContextProvider>
+      <MapContextProvider>
+        <PaperProvider theme={theme}>
+          <SafeAreaProvider>
+            <Navigation />
+            <StatusBar />
+          </SafeAreaProvider>
+        </PaperProvider>
+      </MapContextProvider>
+    </AuthContextProvider>
   );
 };

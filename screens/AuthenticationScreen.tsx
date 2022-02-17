@@ -1,11 +1,12 @@
 import AppLoading from 'expo-app-loading';
 import * as SecureStore from 'expo-secure-store';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import {
   Image,
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
+  TextInput as NativeTextInput,
 } from 'react-native';
 import { Button, TextInput, Title, useTheme } from 'react-native-paper';
 import catLady from '../assets/cat-lady.png';
@@ -104,6 +105,7 @@ export const AuthenticationScreen = ({
 
   const theme = useTheme();
   const styles = getStyles(theme);
+  const passRef = useRef<NativeTextInput>(null);
 
   return (
     <KeyboardAvoidingView
@@ -125,8 +127,10 @@ export const AuthenticationScreen = ({
         returnKeyType="next"
         error={isInvalidUserName}
         onChange={() => setIsInvalidUserName(false)}
+        onSubmitEditing={() => passRef.current?.focus()}
       />
       <TextInput
+        ref={passRef}
         disabled={inProgress}
         outlineColor={theme.colors.disabled}
         mode="outlined"
