@@ -1,6 +1,6 @@
 import * as LocationProvider from 'expo-location';
 import React, { useContext, useRef, useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View, Image } from 'react-native';
 import MapView, { EdgeInsets, Marker, Region } from 'react-native-maps';
 import { Caption, FAB, TextInput, Title, useTheme } from 'react-native-paper';
 import { Theme } from 'react-native-paper/lib/typescript/types';
@@ -86,9 +86,14 @@ export const MapScreen = () => {
               }}
               title={h.name}
               description={h.description}
-              image={getHotspotMarker(h)}
               onPress={() => navigation.navigate('Modal')}
-            />
+            >
+              <Image
+                source={getHotspotMarker(h)}
+                style={styles.marker}
+                resizeMode="contain"
+              />
+            </Marker>
           ))}
         </MapView>
         <TextInput
@@ -214,5 +219,9 @@ const getStyles = (theme: Theme, insets: EdgeInsets) =>
       shadowColor: theme.colors.text,
       shadowOffset: { width: 2, height: 4 },
       shadowOpacity: 0.2,
+    },
+    marker: {
+      width: 40,
+      height: 40,
     },
   });
