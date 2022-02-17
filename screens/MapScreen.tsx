@@ -1,17 +1,15 @@
 import * as LocationProvider from 'expo-location';
 import React, { useContext, useRef, useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import MapView, { EdgeInsets, LatLng, Marker, Region } from 'react-native-maps';
+import MapView, { EdgeInsets, Marker, Region } from 'react-native-maps';
 import { Caption, FAB, TextInput, Title, useTheme } from 'react-native-paper';
 import { Theme } from 'react-native-paper/lib/typescript/types';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
 import currentLocationIcon from '../assets/current-location.png';
 import { Appbar } from '../components/Appbar';
-import {
-  MainController,
-  MainControllerProvider,
-} from '../controllers/MainController';
-import { Hotspot } from '../models/Hotspot';
+import { MapContext } from '../context';
+import { getHotspotMarker } from '../models/Hotspot';
 import { getFormattedAddress, Location } from '../models/Location';
 
 const intialRegion: Region = {
@@ -41,9 +39,10 @@ const findCurrentLocation = async (): Promise<Location> => {
 };
 
 export const MapScreen = () => {
-  const mainController = useContext(MainController);
+  const { hotspots } = useContext(MapContext);
   const [location, setLocation] = useState<Location>();
   const mapRef = useRef<MapView>(null);
+  const navigation = useNavigation();
 
   const searchForAddress = async (address: string): Promise<void> => {
     try {
@@ -67,7 +66,7 @@ export const MapScreen = () => {
   const styles = getStyles(theme, insets);
 
   return (
-    <MainControllerProvider>
+    <>
       <Appbar />
       <View style={styles.mapContainer}>
         <MapView
@@ -77,13 +76,8 @@ export const MapScreen = () => {
           initialRegion={intialRegion}
           showsUserLocation
           style={styles.map}
-          onLongPress={e =>
-            mainController.registerHotspot(
-              createHotspot(e.nativeEvent.coordinate)
-            )
-          }
         >
-          {mainController.hotspots.map(h => (
+          {hotspots.map(h => (
             <Marker
               key={`${h.latitude} ${h.longitude}`}
               coordinate={{
@@ -92,6 +86,8 @@ export const MapScreen = () => {
               }}
               title={h.name}
               description={h.description}
+              image={getHotspotMarker(h)}
+              onPress={() => navigation.navigate('Modal')}
             />
           ))}
         </MapView>
@@ -140,18 +136,9 @@ export const MapScreen = () => {
       <Text style={styles.currentLocationLabel}>
         {!!location && getFormattedAddress(location)}
       </Text>
-    </MainControllerProvider>
+    </>
   );
 };
-
-function createHotspot(coordinate: LatLng): Hotspot {
-  return {
-    name: 'new hotspot',
-    description: 'new hotspot description',
-    latitude: coordinate.latitude,
-    longitude: coordinate.longitude,
-  };
-}
 
 const getStyles = (theme: Theme, insets: EdgeInsets) =>
   StyleSheet.create({

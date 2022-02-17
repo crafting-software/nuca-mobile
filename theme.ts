@@ -48,7 +48,7 @@ export const getTheme = () => ({
     text: '#191F24',
     disabled: '#CEDADE',
     placeholder: '#575F65',
-    error: '#FF0000',
+    error: '#FF2C52',
   },
   fonts: configureFonts(fontConfig),
 });
