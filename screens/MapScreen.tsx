@@ -108,7 +108,9 @@ export const MapScreen = () => {
       <TouchableOpacity
         style={styles.addLocationButton}
         activeOpacity={0.9}
-        onPress={() => {}}
+        onPress={() => {
+          navigation.navigate('AddHotspot');
+        }}
       >
         <View style={styles.addLocationButtonLabelContainer}>
           <Caption style={styles.addLocationButtonLabel}>

@@ -14,6 +14,7 @@ export type RootStackParamList = {
   Authentication: undefined;
   Main: undefined;
   Modal: undefined;
+  AddHotspot: undefined;
   NotFound: undefined;
 };
 
