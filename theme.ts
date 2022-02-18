@@ -1,4 +1,4 @@
-import { DefaultTheme, configureFonts } from 'react-native-paper';
+import { configureFonts, DefaultTheme } from 'react-native-paper';
 import { Fonts } from 'react-native-paper/lib/typescript/types';
 
 export const fontDefinition = {
@@ -49,6 +49,9 @@ export const getTheme = () => ({
     disabled: '#CEDADE',
     placeholder: '#575F65',
     error: '#FF2C52',
+    onSurface: '#D9F7FF',
+    notification: '#61AFC5',
+    backdrop: '#FFC700',
   },
   fonts: configureFonts(fontConfig),
 });

@@ -87,7 +87,7 @@ export const MapScreen = () => {
               title={h.name}
               description={h.description}
               image={getHotspotMarker(h)}
-              onPress={() => navigation.navigate('Modal2')}
+              onPress={() => navigation.navigate('Modal')}
             />
           ))}
         </MapView>
