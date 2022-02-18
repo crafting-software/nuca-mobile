@@ -5,6 +5,7 @@ import { AuthContext } from '../context';
 import { AuthenticationScreen } from '../screens/AuthenticationScreen';
 import { MapScreen } from '../screens/MapScreen';
 import ModalScreen from '../screens/ModalScreen';
+import { ModalScreen2 } from '../screens/ModalScreen2';
 import { NotFoundScreen } from '../screens/NotFoundScreen';
 import { RootStackParamList } from '../types';
 import LinkingConfiguration from './LinkingConfiguration';
@@ -51,6 +52,9 @@ const RootNavigator = () => {
 
       <Stack.Group screenOptions={{ presentation: 'modal' }}>
         <Stack.Screen name="Modal" component={ModalScreen} />
+      </Stack.Group>
+      <Stack.Group screenOptions={{ presentation: 'fullScreenModal' }}>
+        <Stack.Screen name="Modal2" component={ModalScreen2} />
       </Stack.Group>
     </Stack.Navigator>
   );
