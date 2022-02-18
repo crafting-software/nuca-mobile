@@ -22,7 +22,9 @@ import catLadyImage from '../assets/cat-lady2.png';
 import currentLocationIcon from '../assets/current-location.png';
 import mapPinIcon from '../assets/map-pin.png';
 import { Appbar } from '../components/Appbar';
+import { InputField } from '../components/InputField';
 import { HotspotStatus } from '../models/Hotspot';
+import { Location } from '../models/Location';
 
 ('react-native-paper-dropdown');
 
@@ -81,6 +83,9 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
       width: '50%',
       flexDirection: 'row',
     },
+    inputField: {
+      marginTop: 20,
+    },
     textInputTitle: {
       color: theme.colors.text,
       fontSize: 12,
@@ -99,6 +104,7 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
     },
     catsCountContainer: {
       flexDirection: 'row',
+      marginTop: 20,
     },
     catsCountLeftItem: {
       width: '50%',
@@ -161,6 +167,7 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
       backgroundColor: 'white',
       borderWidth: 1,
       borderColor: theme.colors.disabled,
+      marginTop: 5,
     },
     statusButtonText: {
       fontSize: 15,
@@ -185,8 +192,10 @@ export const AddHotspotScreen = () => {
   const theme = useTheme();
   const styles = getStyles(theme);
 
+  const [location, setLocation] = useState<Location>();
   const [status, setStatus] = useState<HotspotStatus>();
   const [showStatusDropDown, setShowStatusDropDown] = useState(false);
+
   const statusList: HotspotStatus[] = [
     HotspotStatus.toDo,
     HotspotStatus.inProgress,
@@ -206,15 +215,9 @@ export const AddHotspotScreen = () => {
               </Text>
             </View>
 
-            <TextInput
+            <InputField
               placeholder="Caută"
-              autoComplete={false}
-              mode="outlined"
-              numberOfLines={1}
-              outlineColor={theme.colors.disabled}
-              style={[styles.textInput, { marginTop: 30 }]}
-              returnKeyType="next"
-              right={
+              rightIcon={
                 <TextInput.Icon
                   name="magnify"
                   color={theme.colors.text}
@@ -223,6 +226,7 @@ export const AddHotspotScreen = () => {
                   }}
                 />
               }
+              inputFieldStyle={{ marginTop: 30 }}
             />
 
             <View style={styles.locationButtonsContainer}>
@@ -253,15 +257,10 @@ export const AddHotspotScreen = () => {
               </View>
             </View>
 
-            <Text style={styles.textInputTitle}>NUME</Text>
-            <TextInput
+            <InputField
+              label="Nume"
               placeholder="Nume"
-              autoComplete={false}
-              mode="outlined"
-              numberOfLines={1}
-              outlineColor={theme.colors.disabled}
-              style={styles.textInput}
-              returnKeyType="next"
+              inputFieldStyle={{ marginTop: 70 }}
             />
 
             <Text style={styles.textInputTitle}>STATUS</Text>
@@ -280,7 +279,7 @@ export const AddHotspotScreen = () => {
                   style={{ marginRight: 40 }}
                 />
               )}
-              onSelect={(selectedItem, index) => {
+              onSelect={(selectedItem, _index) => {
                 setStatus(selectedItem);
               }}
               buttonTextAfterSelection={(selectedItem, _index) =>
@@ -291,81 +290,48 @@ export const AddHotspotScreen = () => {
               }
             />
 
-            <Text style={styles.textInputTitle}>OBSERVAȚII</Text>
-            <TextInput
+            <InputField
               multiline={true}
+              label="Observații"
               placeholder="Scrie aici"
-              autoComplete={false}
-              mode="outlined"
-              outlineColor={theme.colors.disabled}
-              style={[styles.textInput, { height: 100 }]}
-              returnKeyType="next"
-              numberOfLines={3}
+              inputFieldStyle={styles.inputField}
+              textInputStyle={{ height: 100 }}
             />
 
             <View style={styles.catsCountContainer}>
               <View style={styles.catsCountLeftItem}>
-                <Text style={styles.textInputTitle}>PISICI NESTERILIZATE</Text>
-                <TextInput
+                <InputField
+                  label="Pisici nesterilizate"
                   placeholder="0"
-                  autoComplete={false}
-                  mode="outlined"
-                  numberOfLines={1}
                   editable={false}
-                  outlineColor={theme.colors.disabled}
-                  style={styles.textInput}
-                  returnKeyType="next"
                 />
               </View>
               <View style={styles.catsCountRightItem}>
-                <Text style={styles.textInputTitle}>PISICI STERILIZATE</Text>
-                <TextInput
+                <InputField
+                  label="Pisici sterilizate"
                   placeholder="0"
-                  autoComplete={false}
-                  mode="outlined"
-                  numberOfLines={1}
                   editable={false}
-                  outlineColor={theme.colors.disabled}
-                  style={styles.textInput}
-                  returnKeyType="next"
                 />
               </View>
             </View>
 
-            <Text style={styles.textInputTitle}>PERSOANA DE CONTACT</Text>
-            <TextInput
-              placeholder="Persoana de contact"
-              autoComplete={false}
-              mode="outlined"
-              numberOfLines={1}
-              outlineColor={theme.colors.disabled}
-              style={styles.textInput}
-              returnKeyType="next"
+            <InputField
+              label="Persoana de contact"
+              placeholder="Nume persoana de contact"
+              inputFieldStyle={styles.inputField}
             />
 
-            <Text style={styles.textInputTitle}>
-              TELEFON PERSOANA DE CONTACT
-            </Text>
-            <TextInput
-              placeholder="Telefon"
-              autoComplete={false}
+            <InputField
+              label="Telefon persoana de contact"
+              placeholder="Telefon persoana de contact"
               keyboardType="phone-pad"
-              mode="outlined"
-              numberOfLines={1}
-              outlineColor={theme.colors.disabled}
-              style={styles.textInput}
-              returnKeyType="next"
+              inputFieldStyle={styles.inputField}
             />
 
-            <Text style={styles.textInputTitle}>VOLUNTAR</Text>
-            <TextInput
-              placeholder="Nume voluntar"
-              autoComplete={false}
-              mode="outlined"
-              numberOfLines={1}
-              outlineColor={theme.colors.disabled}
-              style={styles.textInput}
-              returnKeyType="next"
+            <InputField
+              label="Voluntar"
+              placeholder="Voluntar"
+              inputFieldStyle={styles.inputField}
             />
 
             <Divider style={[styles.divider, { marginTop: 54 }]} />
