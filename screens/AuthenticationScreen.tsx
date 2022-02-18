@@ -8,10 +8,17 @@ import {
   StyleSheet,
   TextInput as NativeTextInput,
 } from 'react-native';
-import { Button, TextInput, Title, useTheme } from 'react-native-paper';
+import {
+  Button,
+  Snackbar,
+  TextInput,
+  Title,
+  useTheme,
+} from 'react-native-paper';
 import catLady from '../assets/cat-lady.png';
 import { AuthContext } from '../context';
 import { RootStackScreenProps } from '../types';
+import { signIn as serverSignIn } from '../utils/sign-in';
 
 const getStyles = (theme: ReactNativePaper.Theme) =>
   StyleSheet.create({
@@ -54,11 +61,17 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
     },
   });
 
-export const AuthenticationScreen = ({
-  navigation,
-}: RootStackScreenProps<'Authentication'>) => {
+export const AuthenticationScreen = () => {
   const { auth, setAuth } = useContext(AuthContext);
   if (auth.inProgress) return <AppLoading />;
+
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [inProgress, setInProgress] = useState(false);
+  const [loginFailedVisible, setLoginFailedVisible] = useState(false);
+
+  const [isInvalidUserName, setIsInvalidUserName] = useState(false);
+  const [isInvalidPassword, setIsInvalidPassword] = useState(false);
 
   useEffect(() => {
     const restoreAuth = async () => {
@@ -66,41 +79,39 @@ export const AuthenticationScreen = ({
         const authString = await SecureStore.getItemAsync('auth');
 
         if (!authString) {
-          setAuth({ token: '', userName: '', inProgress: false });
+          setAuth({ token: '', username: '', inProgress: false });
         } else {
-          const { token, userName } = JSON.parse(authString);
-          setAuth({ token, userName, inProgress: false });
+          const { token, username } = JSON.parse(authString);
+          setAuth({ token, username, inProgress: false });
         }
       } catch (e) {
         alert('restoring auth token failed');
-        setAuth({ token: '', userName: '', inProgress: false });
+        setAuth({ token: '', username: '', inProgress: false });
       }
     };
 
     restoreAuth();
   }, []);
 
-  const [userName, setUserName] = useState('');
-  const [password, setPassword] = useState('');
-  const [inProgress, setInProgress] = useState(false);
-
-  const [isInvalidUserName, setIsInvalidUserName] = useState(false);
-  const [isInvalidPassword, setIsInvalidPassword] = useState(false);
-
   const signIn = async () => {
-    if (!userName) setIsInvalidUserName(true);
+    if (!username) setIsInvalidUserName(true);
     if (!password) setIsInvalidPassword(true);
 
-    if (!userName || !password) return;
+    if (!username || !password) return;
 
     setInProgress(true);
-    // TODO: call real login here
-    await new Promise(r => setTimeout(r, 2000));
-    await SecureStore.setItemAsync(
-      'auth',
-      JSON.stringify({ userName, token: password })
-    );
-    setAuth({ userName, token: password, inProgress: false });
+    const { success, message, token } = await serverSignIn(username, password);
+
+    if (success) {
+      await SecureStore.setItemAsync(
+        'auth',
+        JSON.stringify({ username, token })
+      );
+      setAuth({ username, token, inProgress: false });
+    } else {
+      setLoginFailedVisible(true);
+      setInProgress(false);
+    }
   };
 
   const theme = useTheme();
@@ -116,12 +127,13 @@ export const AuthenticationScreen = ({
       <Title style={styles.title}>Intră în cont</Title>
       <TextInput
         disabled={inProgress}
+        autoCapitalize="none"
         outlineColor={theme.colors.disabled}
         mode="outlined"
         style={styles.input}
         placeholder="Utilizator"
-        value={userName}
-        onChangeText={setUserName}
+        value={username}
+        onChangeText={setUsername}
         autoComplete={false}
         left={<TextInput.Icon name="account" color={theme.colors.primary} />}
         returnKeyType="next"
@@ -132,6 +144,7 @@ export const AuthenticationScreen = ({
       <TextInput
         ref={passRef}
         disabled={inProgress}
+        autoCapitalize="none"
         outlineColor={theme.colors.disabled}
         mode="outlined"
         secureTextEntry
@@ -159,6 +172,12 @@ export const AuthenticationScreen = ({
       >
         Intră în cont
       </Button>
+      <Snackbar
+        visible={loginFailedVisible}
+        onDismiss={() => setLoginFailedVisible(false)}
+      >
+        Autentificare nereușită!
+      </Snackbar>
     </KeyboardAvoidingView>
   );
 };

@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction, createContext } from 'react';
 
 export type Auth = {
-  userName?: string;
+  username?: string;
   inProgress: boolean;
   token?: string;
 };
