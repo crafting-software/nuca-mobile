@@ -6,7 +6,7 @@ import {
   Text,
   View,
 } from 'react-native';
-import { Avatar, Button, useTheme } from 'react-native-paper';
+import { Avatar, Button, Caption, useTheme } from 'react-native-paper';
 import catLady3 from '../assets/cat-lady3.png';
 
 const imageAspectRatio = 1080 / 872;
@@ -90,6 +90,44 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
       width: '100%',
       height: '1000%',
     },
+    statusView: {
+      padding: 14,
+      backgroundColor: theme.colors.backdrop,
+      justifyContent: 'center',
+      alignItems: 'center',
+      borderRadius: theme.roundness,
+      height: 100,
+      flex: 1,
+      margin: 5,
+      marginLeft: 0,
+      width: 50,
+    },
+    informationView: {
+      padding: 14,
+      backgroundColor: theme.colors.onSurface,
+      alignItems: 'center',
+      borderRadius: theme.roundness,
+      height: 100,
+      flex: 1,
+      margin: 5,
+      justifyContent: 'space-between',
+      flexDirection: 'column',
+    },
+    informationTitle: {
+      color: theme.colors.notification,
+      fontSize: 12,
+      fontFamily: 'Nunito_700Bold',
+      textAlign: 'center',
+      flexWrap: 'wrap',
+      textTransform: 'uppercase',
+    },
+    informationSubtitle: {
+      color: theme.colors.text,
+      fontSize: 14,
+      fontFamily: 'Nunito_700Bold',
+      textTransform: 'uppercase',
+      textAlign: 'center',
+    },
   });
 
 export default function ModalScreen() {
@@ -135,23 +173,8 @@ export default function ModalScreen() {
                 marginTop: 24,
               }}
             >
-              <View
-                style={{
-                  padding: 14,
-                  // paddingLeft: 12,
-                  // paddingRight: 6,
-                  backgroundColor: theme.colors.backdrop,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  borderRadius: theme.roundness,
-                  height: 100,
-                  flex: 1,
-                  margin: 5,
-                  marginLeft: 0,
-                  width: 50,
-                }}
-              >
-                <Text
+              <View style={styles.statusView}>
+                <Caption
                   style={{
                     color: theme.colors.text,
                     fontSize: 12,
@@ -159,73 +182,32 @@ export default function ModalScreen() {
                   }}
                 >
                   IN LUCRU
-                </Text>
+                </Caption>
               </View>
-              <View
-                style={{
-                  padding: 14,
-                  backgroundColor: theme.colors.onSurface,
-                  // justifyContent: 'center',
-                  alignItems: 'center',
-                  borderRadius: theme.roundness,
-                  height: 100,
-                  flex: 1,
-                  margin: 5,
-                  justifyContent: 'space-between',
-                  flexDirection: 'column',
-                }}
-              >
-                <Text
-                  style={{
-                    color: theme.colors.notification,
-                    fontSize: 12,
-                    fontFamily: 'Nunito_700Bold',
-                    textAlign: 'center',
-                    flexWrap: 'wrap',
-                    textTransform: 'uppercase',
-                  }}
-                >
-                  pisici sterilizate
-                </Text>
-                <Text
-                  style={{
-                    color: theme.colors.text,
-                    fontSize: 20,
-                    fontFamily: 'Nunito_700Bold',
-                    textAlign: 'center',
-                    flexWrap: 'wrap',
-                    textTransform: 'uppercase',
-                  }}
-                >
-                  2{' '}
-                </Text>
-              </View>
-              <View
-                style={{
-                  padding: 14,
-                  backgroundColor: theme.colors.onSurface,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  borderRadius: theme.roundness,
-                  height: 100,
-                  flex: 1,
-                  margin: 5,
-                  marginRight: 0,
-                }}
-              >
-                <Text
-                  style={{
-                    color: theme.colors.notification,
-                    fontSize: 12,
-                    fontFamily: 'Nunito_700Bold',
-                    textAlign: 'center',
-                    flexWrap: 'wrap',
-                    textTransform: 'uppercase',
-                  }}
-                >
-                  {'pisici \nnesterilizate'}
-                </Text>
-              </View>
+              <InforamtionView
+                title={'pisici \nnesterilizate'}
+                subTitle={'2'}
+              ></InforamtionView>
+              <InforamtionView
+                title={'pisici sterilizate'}
+                subTitle={'0 \n 678'}
+              ></InforamtionView>
+            </View>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                marginTop: 24,
+              }}
+            >
+              <InforamtionView
+                title={'Contact'}
+                subTitle={'Ion Iliescu \n 0784354312'}
+              ></InforamtionView>
+              <InforamtionView
+                title={'Voluntar'}
+                subTitle={'Vadim \n 0746784323'}
+              ></InforamtionView>
             </View>
             <View style={styles.catCategoryContainer}>
               <Avatar.Icon
@@ -267,3 +249,20 @@ export default function ModalScreen() {
     </View>
   );
 }
+
+interface InformationProps {
+  readonly title: string;
+  readonly subTitle: string;
+}
+
+export const InforamtionView = (props: InformationProps) => {
+  const theme = useTheme();
+  const styles = getStyles(theme);
+
+  return (
+    <View style={styles.informationView}>
+      <Caption style={styles.informationTitle}>{props.title}</Caption>
+      <Caption style={styles.informationSubtitle}>{props.subTitle}</Caption>
+    </View>
+  );
+};
