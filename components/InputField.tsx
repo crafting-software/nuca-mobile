@@ -4,12 +4,11 @@ import {
   ReturnKeyTypeOptions,
   StyleProp,
   StyleSheet,
-  Text,
   TextStyle,
   View,
   ViewStyle,
 } from 'react-native';
-import { TextInput, useTheme } from 'react-native-paper';
+import { Caption, TextInput, useTheme } from 'react-native-paper';
 
 export type InputFieldProps = {
   label?: string;
@@ -30,14 +29,12 @@ export const InputField = (props: InputFieldProps) => {
   const styles = StyleSheet.create({
     title: {
       color: theme.colors.text,
-      fontSize: 12,
       fontFamily: 'Nunito_700Bold',
       textTransform: 'uppercase',
     },
     input: {
-      fontSize: 15,
       fontFamily: 'Nunito_400Regular',
-      backgroundColor: 'white',
+      backgroundColor: theme.colors.background,
       height: 60,
       paddingVertical: 2,
       paddingHorizontal: 8,
@@ -48,7 +45,9 @@ export const InputField = (props: InputFieldProps) => {
   return (
     <View style={props.inputFieldStyle}>
       {props.label ? (
-        <Text style={[styles.title, props.labelStyle]}>{props.label}</Text>
+        <Caption style={[styles.title, props.labelStyle]}>
+          {props.label}
+        </Caption>
       ) : (
         <></>
       )}

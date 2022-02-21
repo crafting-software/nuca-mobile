@@ -5,15 +5,16 @@ import {
   Image,
   ScrollView,
   StyleSheet,
-  Text,
   TouchableOpacity,
   View,
 } from 'react-native';
 import {
   Avatar,
   Button,
+  Caption,
   Divider,
   FAB,
+  Headline,
   TextInput,
   useTheme,
 } from 'react-native-paper';
@@ -26,12 +27,10 @@ import { InputField } from '../components/InputField';
 import { HotspotStatus } from '../models/Hotspot';
 import { Location } from '../models/Location';
 
-('react-native-paper-dropdown');
-
 const getStyles = (theme: ReactNativePaper.Theme) =>
   StyleSheet.create({
     container: {
-      backgroundColor: 'white',
+      backgroundColor: theme.colors.background,
       height: '100%',
       width: '100%',
     },
@@ -43,12 +42,18 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
       alignItems: 'center',
     },
     screenTitleIcon: {
-      fontSize: 30,
+      fontSize: 28,
       fontFamily: 'Nunito_700Bold',
       color: theme.colors.text,
     },
     screenTitleLabel: {
       fontSize: 18,
+      marginStart: 8,
+      textAlignVertical: 'bottom',
+      fontFamily: 'Nunito_700Bold',
+      color: theme.colors.text,
+    },
+    screenTitleLabelTitle: {
       marginStart: 8,
       textAlignVertical: 'bottom',
       fontFamily: 'Nunito_700Bold',
@@ -92,15 +97,6 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
       marginTop: 20,
       fontFamily: 'Nunito_700Bold',
       textTransform: 'uppercase',
-    },
-    textInput: {
-      fontSize: 15,
-      fontFamily: 'Nunito_400Regular',
-      backgroundColor: 'white',
-      height: 60,
-      paddingVertical: 2,
-      paddingHorizontal: 8,
-      borderRadius: theme.roundness,
     },
     catsCountContainer: {
       flexDirection: 'row',
@@ -164,7 +160,7 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
       width: '100%',
       borderRadius: theme.roundness,
       height: 60,
-      backgroundColor: 'white',
+      backgroundColor: theme.colors.background,
       borderWidth: 1,
       borderColor: theme.colors.disabled,
       marginTop: 5,
@@ -209,10 +205,10 @@ export const AddHotspotScreen = () => {
         <>
           <View style={styles.form}>
             <View style={styles.screenTitleContainer}>
-              <Text style={styles.screenTitleIcon}>+</Text>
-              <Text style={styles.screenTitleLabel}>
+              <Headline style={styles.screenTitleIcon}>+</Headline>
+              <Caption style={styles.screenTitleLabel}>
                 Adaugă zonă de interes
-              </Text>
+              </Caption>
             </View>
 
             <InputField
@@ -239,7 +235,9 @@ export const AddHotspotScreen = () => {
                     style={styles.locationButtonIcon}
                     source={mapPinIcon}
                   />
-                  <Text style={styles.locationButtonLabel}>ALEGE PE HARTĂ</Text>
+                  <Caption style={styles.locationButtonLabel}>
+                    ALEGE PE HARTĂ
+                  </Caption>
                 </TouchableOpacity>
               </View>
 
@@ -252,7 +250,9 @@ export const AddHotspotScreen = () => {
                     style={styles.locationButtonIcon}
                     source={currentLocationIcon}
                   />
-                  <Text style={styles.locationButtonLabel}>LOCAȚIA MEA</Text>
+                  <Caption style={styles.locationButtonLabel}>
+                    LOCAȚIA MEA
+                  </Caption>
                 </TouchableOpacity>
               </View>
             </View>
@@ -263,7 +263,7 @@ export const AddHotspotScreen = () => {
               inputFieldStyle={{ marginTop: 70 }}
             />
 
-            <Text style={styles.textInputTitle}>STATUS</Text>
+            <Caption style={styles.textInputTitle}>STATUS</Caption>
             <SelectDropdown
               defaultButtonText="Alege status"
               data={statusList}
@@ -345,9 +345,9 @@ export const AddHotspotScreen = () => {
                 style={styles.catCategoryTitleIcon}
               />
 
-              <Text style={styles.catCategoryTitleLabel}>
+              <Caption style={styles.catCategoryTitleLabel}>
                 Pisici nesterilizate
-              </Text>
+              </Caption>
 
               <FAB
                 color={theme.colors.background}
@@ -369,9 +369,9 @@ export const AddHotspotScreen = () => {
                 style={styles.catCategoryTitleIcon}
               />
 
-              <Text style={styles.catCategoryTitleLabel}>
+              <Caption style={styles.catCategoryTitleLabel}>
                 Pisici sterilizate
-              </Text>
+              </Caption>
 
               <FAB
                 color={theme.colors.background}

@@ -26,7 +26,7 @@ export const Appbar = () => {
     <PaperAppbar
       style={{
         paddingTop: top,
-        backgroundColor: 'white',
+        backgroundColor: theme.colors.background,
         ...styles.bar,
       }}
     >
