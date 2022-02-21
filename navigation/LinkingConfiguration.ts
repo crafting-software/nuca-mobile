@@ -13,6 +13,7 @@ const linking: LinkingOptions<RootStackParamList> = {
     screens: {
       Authentication: 'authentication',
       Main: 'main',
+      AddHotspot: 'addHotspot',
       Modal: 'modal',
       NotFound: '*',
     },
