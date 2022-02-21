@@ -1,11 +1,11 @@
 import * as SecureStore from 'expo-secure-store';
 import { useContext, useState } from 'react';
-import { StyleSheet, Image } from 'react-native';
+import { Image, StyleSheet } from 'react-native';
 import {
   Appbar as PaperAppbar,
-  useTheme,
-  Menu,
   Divider,
+  Menu,
+  useTheme,
 } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import logo from '../assets/logo.png';

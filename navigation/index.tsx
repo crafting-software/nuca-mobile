@@ -2,6 +2,7 @@ import { useContext } from 'react';
 import { DefaultTheme, NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { AuthContext } from '../context';
+import { AddHotspotScreen } from '../screens/AddHotspotScreen';
 import { AuthenticationScreen } from '../screens/AuthenticationScreen';
 import { MapScreen } from '../screens/MapScreen';
 import ModalScreen from '../screens/ModalScreen';
@@ -33,6 +34,11 @@ const RootNavigator = () => {
           <Stack.Screen
             name="Main"
             component={MapScreen}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="AddHotspot"
+            component={AddHotspotScreen}
             options={{ headerShown: false }}
           />
           <Stack.Screen
