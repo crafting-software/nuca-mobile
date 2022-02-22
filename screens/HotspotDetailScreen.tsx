@@ -1,11 +1,4 @@
-import {
-  Dimensions,
-  Image,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { Dimensions, Image, ScrollView, StyleSheet, View } from 'react-native';
 import { Avatar, Button, Caption, useTheme } from 'react-native-paper';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import catLady3 from '../assets/cat-lady3.png';
@@ -67,6 +60,10 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
       fontSize: 16,
       marginBottom: 24,
     },
+    imageView: {
+      height: Dimensions.get('window').height * 0.4,
+      marginTop: 32,
+    },
     image: {
       width: '100%',
       maxHeight: scaledHeight,
@@ -111,6 +108,10 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
       textAlign: 'center',
       flexWrap: 'wrap',
     },
+    informationContainer: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+    },
     informationView: {
       paddingTop: 14,
       paddingBottom: 14,
@@ -137,6 +138,10 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
       fontFamily: 'Nunito_700Bold',
       textAlign: 'center',
     },
+    addressContainer: { flexDirection: 'row', paddingTop: 18 },
+    addressView: { width: '60%', justifyContent: 'flex-start' },
+    editView: { width: '40%', justifyContent: 'flex-start' },
+    contentCotainer: { padding: 20 },
   });
 
 export const HotspotDetailScreen = ({
@@ -149,99 +154,80 @@ export const HotspotDetailScreen = ({
   return (
     <View style={styles.container}>
       <ScrollView style={styles.scrollView}>
-        <>
-          <View style={{ padding: 20 }}>
-            <View style={{ flexDirection: 'row', paddingTop: 18 }}>
-              <View style={{ width: '60%', justifyContent: 'flex-start' }}>
-                <Text style={styles.addressTitle}>
-                  Aleea Bârsei 3 Cluj-Napoca, 400605
-                </Text>
-              </View>
-              <View style={{ width: '40%', justifyContent: 'flex-start' }}>
-                <Button
-                  style={styles.button}
-                  contentStyle={styles.buttonContent}
-                  labelStyle={styles.buttonLabel}
-                  icon="pencil-outline"
-                  mode="contained"
-                >
-                  Editează
-                </Button>
-              </View>
+        <View style={styles.contentCotainer}>
+          <View style={styles.addressContainer}>
+            <View style={styles.addressView}>
+              <Caption style={styles.addressTitle}>
+                Aleea Bârsei 3 Cluj-Napoca, 400605
+              </Caption>
             </View>
-            <Text style={styles.subTitle}>
-              Aleea Bârsei 3, în spatele blocului
-            </Text>
-            <View style={styles.separator} />
-            <Text style={styles.notes}>Observatii: {hotspot.description}</Text>
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-              }}
-            >
-              <StatusView {...hotspot}></StatusView>
-              <InforamtionView
-                title={'pisici \nnesterilizate'}
-                subTitle={'2'}
-              ></InforamtionView>
-              <InforamtionView
-                title={'pisici sterilizate'}
-                subTitle={'0'}
-              ></InforamtionView>
-            </View>
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-              }}
-            >
-              <InforamtionView
-                title={'Contact'}
-                subTitle={'Ion Iliescu \n 0784354312'}
-              ></InforamtionView>
-              <InforamtionView
-                title={'Voluntar'}
-                subTitle={'Vadim \n 0746784323'}
-              ></InforamtionView>
-            </View>
-            <View style={styles.catCategoryContainer}>
-              <Avatar.Icon
-                size={24}
-                icon="close"
-                color={theme.colors.background}
-                style={styles.catCategoryTitleIcon}
-              />
-              <Text style={styles.catCategoryTitleLabel}>
-                Pisici nesterilizate
-              </Text>
-            </View>
-            <View style={styles.separator} />
-            <View style={styles.catCategoryContainer}>
-              <Avatar.Icon
-                size={24}
-                icon="check"
-                color={theme.colors.background}
-                style={styles.catCategoryTitleIcon}
-              />
-              <Text style={styles.catCategoryTitleLabel}>
-                Pisici sterilizate
-              </Text>
+            <View style={styles.editView}>
+              <Button
+                style={styles.button}
+                contentStyle={styles.buttonContent}
+                labelStyle={styles.buttonLabel}
+                icon="pencil-outline"
+                mode="contained"
+              >
+                Editează
+              </Button>
             </View>
           </View>
-          <View
-            style={{
-              height: Dimensions.get('window').height * 0.4,
-              marginTop: 32,
-            }}
-          >
-            <Image
-              source={catLady3}
-              style={styles.image}
-              resizeMode="contain"
+          <Caption style={styles.subTitle}>
+            Aleea Bârsei 3, în spatele blocului
+          </Caption>
+          <View style={styles.separator} />
+          <Caption style={styles.notes}>
+            Observatii: {hotspot.description}
+          </Caption>
+          <View style={styles.informationContainer}>
+            <StatusView {...hotspot}></StatusView>
+            <InforamtionView
+              title={'pisici \nnesterilizate'}
+              subTitle={'2'}
+            ></InforamtionView>
+            <InforamtionView
+              title={'pisici sterilizate'}
+              subTitle={'0'}
+            ></InforamtionView>
+          </View>
+          <View style={styles.informationContainer}>
+            <InforamtionView
+              title={'Contact'}
+              subTitle={'Ion Iliescu \n 0784354312'}
+            ></InforamtionView>
+            <InforamtionView
+              title={'Voluntar'}
+              subTitle={'Vadim \n 0746784323'}
+            ></InforamtionView>
+          </View>
+          <View style={styles.catCategoryContainer}>
+            <Avatar.Icon
+              size={24}
+              icon="close"
+              color={theme.colors.background}
+              style={styles.catCategoryTitleIcon}
             />
+            <Caption style={styles.catCategoryTitleLabel}>
+              Pisici nesterilizate
+            </Caption>
           </View>
-        </>
+          <View style={styles.separator} />
+          <View style={styles.catCategoryContainer}>
+            <Avatar.Icon
+              size={24}
+              icon="check"
+              color={theme.colors.background}
+              style={styles.catCategoryTitleIcon}
+            />
+            <Caption style={styles.catCategoryTitleLabel}>
+              Pisici sterilizate
+            </Caption>
+          </View>
+        </View>
+        <View style={styles.imageView}>
+          <Image source={catLady3} style={styles.image} resizeMode="contain" />
+        </View>
       </ScrollView>
     </View>
   );
