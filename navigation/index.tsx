@@ -59,7 +59,7 @@ const RootNavigator = () => {
         <Stack.Screen
           name="HotspotDetail"
           component={HotspotDetailScreen}
-          options={{ headerShown: false }}
+          options={{ title: '' }}
         />
       </Stack.Group>
     </Stack.Navigator>
