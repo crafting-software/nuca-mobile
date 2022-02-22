@@ -3,6 +3,7 @@
  * https://reactnavigation.org/docs/typescript/
  */
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { Hotspot } from './models/Hotspot';
 
 declare global {
   namespace ReactNavigation {
@@ -13,7 +14,7 @@ declare global {
 export type RootStackParamList = {
   Authentication: undefined;
   Main: undefined;
-  Modal: undefined;
+  HotspotDetail: { hotspot: Hotspot };
   AddHotspot: undefined;
   NotFound: undefined;
 };

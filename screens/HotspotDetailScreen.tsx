@@ -7,8 +7,10 @@ import {
   View,
 } from 'react-native';
 import { Avatar, Button, Caption, useTheme } from 'react-native-paper';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import catLady3 from '../assets/cat-lady3.png';
 import { Hotspot, HotspotStatus } from '../models/Hotspot';
+import { RootStackParamList } from '../types';
 
 const imageAspectRatio = 1080 / 872;
 const scaledWidth = Dimensions.get('window').width;
@@ -17,10 +19,8 @@ const scaledHeight = scaledWidth / imageAspectRatio;
 const getStyles = (theme: ReactNativePaper.Theme) =>
   StyleSheet.create({
     container: {
-      marginTop: 30,
-      borderTopLeftRadius: theme.roundness,
-      borderTopRightRadius: theme.roundness,
-      backgroundColor: 'rgba(255, 255, 255, 0.9)',
+      backgroundColor: theme.colors.background,
+      opacity: 0.9,
       width: '100%',
       height: '100%',
     },
@@ -93,8 +93,8 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
       height: '1000%',
     },
     statusView: {
-      padding: 14,
-      backgroundColor: theme.colors.backdrop,
+      paddingTop: 14,
+      paddingBottom: 14,
       justifyContent: 'center',
       alignItems: 'center',
       borderRadius: theme.roundness,
@@ -102,7 +102,6 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
       flex: 1,
       margin: 5,
       marginLeft: 0,
-      width: 50,
     },
     statusText: {
       color: theme.colors.text,
@@ -110,6 +109,7 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
       fontFamily: 'Nunito_700Bold',
       textTransform: 'uppercase',
       textAlign: 'center',
+      flexWrap: 'wrap',
     },
     informationView: {
       paddingTop: 14,
@@ -139,10 +139,12 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
     },
   });
 
-export const ModalScreen = ({ route }: any) => {
+export const HotspotDetailScreen = ({
+  route,
+}: NativeStackScreenProps<RootStackParamList, 'HotspotDetail'>) => {
   const theme = useTheme();
   const styles = getStyles(theme);
-  const hotspot = route.params.h as Hotspot;
+  const hotspot = route.params.hotspot;
 
   return (
     <View style={styles.container}>

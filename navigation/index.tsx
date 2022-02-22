@@ -4,8 +4,8 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { AuthContext } from '../context';
 import { AddHotspotScreen } from '../screens/AddHotspotScreen';
 import { AuthenticationScreen } from '../screens/AuthenticationScreen';
+import { HotspotDetailScreen } from '../screens/HotspotDetailScreen';
 import { MapScreen } from '../screens/MapScreen';
-import { ModalScreen } from '../screens/ModalScreen';
 import { NotFoundScreen } from '../screens/NotFoundScreen';
 import { RootStackParamList } from '../types';
 import LinkingConfiguration from './LinkingConfiguration';
@@ -57,8 +57,8 @@ const RootNavigator = () => {
 
       <Stack.Group screenOptions={{ presentation: 'modal' }}>
         <Stack.Screen
-          name="Modal"
-          component={ModalScreen}
+          name="HotspotDetail"
+          component={HotspotDetailScreen}
           options={{ headerShown: false }}
         />
       </Stack.Group>
