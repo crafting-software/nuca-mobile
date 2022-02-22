@@ -1,5 +1,5 @@
 import { capitalize } from 'lodash';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Dimensions,
   Image,
@@ -19,14 +19,16 @@ import {
   useTheme,
 } from 'react-native-paper';
 import SelectDropdown from 'react-native-select-dropdown';
+import { useNavigation } from '@react-navigation/native';
 import catLadyImage from '../assets/cat-lady2.png';
 import currentLocationIcon from '../assets/current-location.png';
 import mapPinIcon from '../assets/map-pin.png';
-import { Appbar } from '../components/Appbar';
 import { InputField } from '../components/InputField';
+import { SecondaryAppbar } from '../components/SecondaryAppbar';
 import { findCurrentLocation } from '../context/MapContext';
-import { HotspotStatus } from '../models/Hotspot';
-import { Location } from '../models/Location';
+import { HotspotStatus, hotspotStatusList } from '../models/Hotspot';
+import { getFormattedAddress, Location } from '../models/Location';
+import { RootStackScreenProps } from '../types';
 
 const getStyles = (theme: ReactNativePaper.Theme) =>
   StyleSheet.create({
@@ -185,7 +187,10 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
     },
   });
 
-export const AddHotspotScreen = () => {
+export const AddHotspotScreen = ({
+  route,
+}: RootStackScreenProps<'AddHotspot'>) => {
+  const navigation = useNavigation();
   const theme = useTheme();
   const styles = getStyles(theme);
 
@@ -197,17 +202,13 @@ export const AddHotspotScreen = () => {
   const [contactPersonPhone, setContactPersonPhone] = useState<string>('');
   const [volunteer, setVolunteer] = useState<string>('');
 
-  const [showStatusDropDown, setShowStatusDropDown] = useState(false);
-
-  const statusList: HotspotStatus[] = [
-    HotspotStatus.toDo,
-    HotspotStatus.inProgress,
-    HotspotStatus.done,
-  ];
+  useEffect(() => {
+    setLocation(route.params.location);
+  }, [route.params.location]);
 
   return (
     <View style={styles.container}>
-      <Appbar />
+      <SecondaryAppbar onBackPressed={() => navigation.goBack()} />
       <ScrollView style={styles.container}>
         <>
           <View style={styles.form}>
@@ -219,26 +220,10 @@ export const AddHotspotScreen = () => {
             </View>
 
             <InputField
-              placeholder="Caută"
-              rightIcon={
-                <TextInput.Icon
-                  name="magnify"
-                  color={theme.colors.text}
-                  style={{
-                    marginTop: 15,
-                  }}
-                />
-              }
+              placeholder="Adresă"
               inputFieldStyle={{ marginTop: 30 }}
-              onTextInputChangeText={text => {
-                const newLocation: Location = {
-                  latitude: 0,
-                  longitude: 0,
-                  city: text,
-                };
-                setLocation(newLocation);
-              }}
-              value={location?.city ?? ''}
+              value={location && getFormattedAddress(location)}
+              editable={false}
             />
 
             <View style={styles.locationButtonsContainer}>
@@ -286,7 +271,7 @@ export const AddHotspotScreen = () => {
             <Caption style={styles.textInputTitle}>STATUS</Caption>
             <SelectDropdown
               defaultButtonText="Alege status"
-              data={statusList}
+              data={hotspotStatusList}
               buttonStyle={styles.statusButton}
               buttonTextStyle={styles.statusButtonText}
               dropdownStyle={styles.statusDropdown}

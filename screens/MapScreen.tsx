@@ -1,6 +1,6 @@
 import * as LocationProvider from 'expo-location';
 import React, { useContext, useRef, useState } from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
 import MapView, { EdgeInsets, Marker, Region } from 'react-native-maps';
 import { Caption, FAB, TextInput, Title, useTheme } from 'react-native-paper';
 import { Theme } from 'react-native-paper/lib/typescript/types';
@@ -11,7 +11,7 @@ import { Appbar } from '../components/Appbar';
 import { MapContext } from '../context';
 import { findCurrentLocation } from '../context/MapContext';
 import { getHotspotMarker } from '../models/Hotspot';
-import { getFormattedAddress, Location } from '../models/Location';
+import { Location } from '../models/Location';
 
 const intialRegion: Region = {
   latitude: 46.77293258116839,
@@ -96,7 +96,7 @@ export const MapScreen = () => {
         style={styles.addLocationButton}
         activeOpacity={0.9}
         onPress={() => {
-          navigation.navigate('AddHotspot');
+          navigation.navigate('AddHotspot', { location: location });
         }}
       >
         <View style={styles.addLocationButtonLabelContainer}>
@@ -122,9 +122,6 @@ export const MapScreen = () => {
           });
         }}
       />
-      <Text style={styles.currentLocationLabel}>
-        {!!location && getFormattedAddress(location)}
-      </Text>
     </>
   );
 };
