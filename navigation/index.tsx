@@ -5,7 +5,7 @@ import { AuthContext } from '../context';
 import { AddHotspotScreen } from '../screens/AddHotspotScreen';
 import { AuthenticationScreen } from '../screens/AuthenticationScreen';
 import { MapScreen } from '../screens/MapScreen';
-import ModalScreen from '../screens/ModalScreen';
+import { ModalScreen } from '../screens/ModalScreen';
 import { NotFoundScreen } from '../screens/NotFoundScreen';
 import { RootStackParamList } from '../types';
 import LinkingConfiguration from './LinkingConfiguration';

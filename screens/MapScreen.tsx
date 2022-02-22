@@ -1,6 +1,6 @@
 import * as LocationProvider from 'expo-location';
 import React, { useContext, useRef, useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View, Image } from 'react-native';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import MapView, { EdgeInsets, Marker, Region } from 'react-native-maps';
 import { Caption, FAB, TextInput, Title, useTheme } from 'react-native-paper';
 import { Theme } from 'react-native-paper/lib/typescript/types';
@@ -86,7 +86,7 @@ export const MapScreen = () => {
               }}
               title={h.name}
               description={h.description}
-              onPress={() => navigation.navigate('Modal')}
+              onPress={() => navigation.navigate('Modal', { h })}
             >
               <Image
                 source={getHotspotMarker(h)}

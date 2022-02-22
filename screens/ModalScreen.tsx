@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import { Avatar, Button, Caption, useTheme } from 'react-native-paper';
 import catLady3 from '../assets/cat-lady3.png';
+import { Hotspot, HotspotStatus } from '../models/Hotspot';
 
 const imageAspectRatio = 1080 / 872;
 const scaledWidth = Dimensions.get('window').width;
@@ -25,10 +26,10 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
     },
     separator: {
       borderColor: theme.colors.disabled,
-      borderWidth: 1,
+      borderWidth: 0.7,
       borderLeftWidth: 0,
       borderRightWidth: 0,
-      height: 3,
+      height: 4,
       marginBottom: 16,
       marginTop: 16,
     },
@@ -64,6 +65,7 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
       color: theme.colors.placeholder,
       fontFamily: 'Nunito_400Regular',
       fontSize: 16,
+      marginBottom: 24,
     },
     image: {
       width: '100%',
@@ -102,8 +104,16 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
       marginLeft: 0,
       width: 50,
     },
+    statusText: {
+      color: theme.colors.text,
+      fontSize: 12,
+      fontFamily: 'Nunito_700Bold',
+      textTransform: 'uppercase',
+      textAlign: 'center',
+    },
     informationView: {
-      padding: 14,
+      paddingTop: 14,
+      paddingBottom: 14,
       backgroundColor: theme.colors.onSurface,
       alignItems: 'center',
       borderRadius: theme.roundness,
@@ -125,14 +135,14 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
       color: theme.colors.text,
       fontSize: 14,
       fontFamily: 'Nunito_700Bold',
-      textTransform: 'uppercase',
       textAlign: 'center',
     },
   });
 
-export default function ModalScreen() {
+export const ModalScreen = ({ route }: any) => {
   const theme = useTheme();
   const styles = getStyles(theme);
+  const hotspot = route.params.h as Hotspot;
 
   return (
     <View style={styles.container}>
@@ -161,43 +171,27 @@ export default function ModalScreen() {
               Aleea Bârsei 3, în spatele blocului
             </Text>
             <View style={styles.separator} />
-            <Text style={styles.notes}>
-              Observatii: Lorem ipsum dolor sit amet, consectetur adipiscing
-              elit. Morbi non sem egestas, cursus lorem bibendum, facilisis
-              lorem.
-            </Text>
+            <Text style={styles.notes}>Observatii: {hotspot.description}</Text>
             <View
               style={{
                 flexDirection: 'row',
                 justifyContent: 'space-between',
-                marginTop: 24,
               }}
             >
-              <View style={styles.statusView}>
-                <Caption
-                  style={{
-                    color: theme.colors.text,
-                    fontSize: 12,
-                    fontFamily: 'Nunito_700Bold',
-                  }}
-                >
-                  IN LUCRU
-                </Caption>
-              </View>
+              <StatusView {...hotspot}></StatusView>
               <InforamtionView
                 title={'pisici \nnesterilizate'}
                 subTitle={'2'}
               ></InforamtionView>
               <InforamtionView
                 title={'pisici sterilizate'}
-                subTitle={'0 \n 678'}
+                subTitle={'0'}
               ></InforamtionView>
             </View>
             <View
               style={{
                 flexDirection: 'row',
                 justifyContent: 'space-between',
-                marginTop: 24,
               }}
             >
               <InforamtionView
@@ -236,6 +230,7 @@ export default function ModalScreen() {
           <View
             style={{
               height: Dimensions.get('window').height * 0.4,
+              marginTop: 32,
             }}
           >
             <Image
@@ -248,14 +243,30 @@ export default function ModalScreen() {
       </ScrollView>
     </View>
   );
-}
+};
+
+const StatusView = (props: Hotspot) => {
+  const theme = useTheme();
+  const styles = getStyles(theme);
+  const getColor = ({ status }: Hotspot) => {
+    if (status === HotspotStatus.done) return '#01B961';
+    if (status === HotspotStatus.inProgress) return theme.colors.backdrop;
+    return theme.colors.error;
+  };
+
+  return (
+    <View style={[styles.statusView, { backgroundColor: getColor(props) }]}>
+      <Caption style={styles.statusText}>{props.status}</Caption>
+    </View>
+  );
+};
 
 interface InformationProps {
   readonly title: string;
   readonly subTitle: string;
 }
 
-export const InforamtionView = (props: InformationProps) => {
+const InforamtionView = (props: InformationProps) => {
   const theme = useTheme();
   const styles = getStyles(theme);
 
