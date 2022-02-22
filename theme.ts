@@ -52,6 +52,7 @@ export const getTheme = () => ({
     onSurface: '#D9F7FF',
     notification: '#61AFC5',
     backdrop: '#FFC700',
+    background: '#FFFFFF',
   },
   fonts: configureFonts(fontConfig),
 });

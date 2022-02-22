@@ -106,7 +106,7 @@ export const MapScreen = () => {
                 longitude: h.longitude,
               }}
               onPress={() =>
-                navigation.navigate('HotspotDetail', { hotspot: h })
+                navigation.navigate('HotspotDetail', { hotspotId: h.id })
               }
             >
               <Image

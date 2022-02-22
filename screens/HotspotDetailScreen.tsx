@@ -149,7 +149,14 @@ export const HotspotDetailScreen = ({
 }: NativeStackScreenProps<RootStackParamList, 'HotspotDetail'>) => {
   const theme = useTheme();
   const styles = getStyles(theme);
-  const hotspot = route.params.hotspot;
+  const hotspotId = route.params.hotspotId;
+  //Mock data for testing
+  const hotspot = {
+    id: 'adfv',
+    status: HotspotStatus.inProgress,
+    latitude: 42,
+    longitude: 43,
+  };
 
   return (
     <View style={styles.container}>
@@ -178,7 +185,8 @@ export const HotspotDetailScreen = ({
           </Caption>
           <View style={styles.separator} />
           <Caption style={styles.notes}>
-            Observatii: {hotspot.description}
+            Observatii: Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+            Morbi non sem egestas, cursus lorem bibendum, facilisis lorem.
           </Caption>
           <View style={styles.informationContainer}>
             <StatusView {...hotspot}></StatusView>
