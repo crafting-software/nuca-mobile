@@ -16,6 +16,7 @@ const linking: LinkingOptions<RootStackParamList> = {
       AddHotspot: 'addHotspot',
       Modal: 'modal',
       NotFound: '*',
+      ChoooseLocation: 'chooseLocation',
     },
   },
 };

@@ -17,6 +17,7 @@ export type RootStackParamList = {
   Modal: undefined;
   AddHotspot: { location?: Location };
   NotFound: undefined;
+  ChooseLocation: { location?: Location };
 };
 
 export type RootStackScreenProps<Screen extends keyof RootStackParamList> =

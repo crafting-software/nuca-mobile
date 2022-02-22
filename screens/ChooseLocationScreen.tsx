@@ -1,17 +1,22 @@
 import * as LocationProvider from 'expo-location';
-import React, { useContext, useRef, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
 import MapView, { EdgeInsets, Marker, Region } from 'react-native-maps';
-import { Caption, FAB, TextInput, Title, useTheme } from 'react-native-paper';
+import { Caption, FAB, TextInput, useTheme } from 'react-native-paper';
 import { Theme } from 'react-native-paper/lib/typescript/types';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import currentLocationIcon from '../assets/current-location.png';
-import { Appbar } from '../components/Appbar';
+import { SecondaryAppbar } from '../components/SecondaryAppbar';
 import { MapContext } from '../context';
-import { findCurrentLocation } from '../context/MapContext';
+import { findCurrentLocation, findPlace } from '../context/MapContext';
 import { getHotspotMarker } from '../models/Hotspot';
-import { Location } from '../models/Location';
+import {
+  defaultLocation,
+  getFormattedAddress,
+  Location,
+} from '../models/Location';
+import { RootStackScreenProps } from '../types';
 
 const intialRegion: Region = {
   latitude: 46.77293258116839,
@@ -20,9 +25,14 @@ const intialRegion: Region = {
   longitudeDelta: 0.0421,
 };
 
-export const MapScreen = () => {
+export const ChooseLocationScreen = ({
+  route,
+}: RootStackScreenProps<'ChooseLocation'>) => {
   const { hotspots } = useContext(MapContext);
-  const [location, setLocation] = useState<Location>();
+  const [selectedLocation, setSelectedLocation] = useState<Location>();
+
+  const canConfirmAddress = selectedLocation !== defaultLocation;
+
   const mapRef = useRef<MapView>(null);
   const navigation = useNavigation();
 
@@ -32,12 +42,7 @@ export const MapScreen = () => {
         address
       );
 
-      mapRef.current?.animateToRegion({
-        latitude,
-        longitude,
-        latitudeDelta: 0,
-        longitudeDelta: 0,
-      });
+      animateMapToRegion({ latitude: latitude, longitude: longitude });
     } catch (e) {
       alert('Address not found');
     }
@@ -47,9 +52,25 @@ export const MapScreen = () => {
   const theme = useTheme();
   const styles = getStyles(theme, insets);
 
+  const animateMapToRegion = (_location: Location) => {
+    mapRef.current?.animateToRegion({
+      latitude: _location.latitude,
+      longitude: _location.longitude,
+      latitudeDelta: 0,
+      longitudeDelta: 0,
+    });
+  };
+
+  useEffect(() => {
+    setSelectedLocation(route.params.location);
+    if (route.params.location) {
+      animateMapToRegion(route.params.location);
+    }
+  }, [route.params.location]);
+
   return (
     <>
-      <Appbar />
+      <SecondaryAppbar onBackPressed={() => navigation.goBack()} />
       <View style={styles.mapContainer}>
         <MapView
           ref={mapRef}
@@ -58,6 +79,17 @@ export const MapScreen = () => {
           initialRegion={intialRegion}
           showsUserLocation
           style={styles.map}
+          onPress={async e => {
+            const { latitude, longitude } = e.nativeEvent.coordinate;
+            const isSameMarker =
+              selectedLocation?.longitude === longitude &&
+              selectedLocation?.latitude === latitude;
+
+            if (!isSameMarker) {
+              const location = await findPlace(latitude, longitude);
+              setSelectedLocation(location);
+            }
+          }}
         >
           {hotspots.map(h => (
             <Marker
@@ -77,8 +109,22 @@ export const MapScreen = () => {
               />
             </Marker>
           ))}
+
+          {selectedLocation ? (
+            <Marker
+              key={`${selectedLocation.latitude} ${selectedLocation.longitude}`}
+              coordinate={{
+                latitude: selectedLocation.latitude,
+                longitude: selectedLocation.longitude,
+              }}
+              onPress={() => {
+                setSelectedLocation(defaultLocation);
+              }}
+            />
+          ) : null}
         </MapView>
         <TextInput
+          multiline={true}
           outlineColor={theme.colors.disabled}
           mode="outlined"
           style={styles.searchInput}
@@ -92,36 +138,38 @@ export const MapScreen = () => {
           onSubmitEditing={async ({ nativeEvent: { text } }) =>
             searchForAddress(text)
           }
+          value={selectedLocation && getFormattedAddress(selectedLocation)}
         />
       </View>
-      <TouchableOpacity
-        style={styles.addLocationButton}
-        activeOpacity={0.9}
-        onPress={() => {
-          navigation.navigate('AddHotspot', { location: location });
-        }}
-      >
-        <View style={styles.addLocationButtonLabelContainer}>
-          <Caption style={styles.addLocationButtonLabel}>
-            ADAUGĂ ZONĂ DE INTERES
+
+      {canConfirmAddress ? (
+        <TouchableOpacity
+          activeOpacity={0.9}
+          style={styles.confirmAddressButton}
+          onPress={() => {
+            navigation.navigate('AddHotspot', { location: selectedLocation });
+          }}
+        >
+          <Caption style={styles.confirmAddressButtonLabel}>
+            CONFIRMĂ ADRESA
           </Caption>
-          <Title style={styles.addLocationButtonLabelIcon}>+</Title>
-        </View>
-      </TouchableOpacity>
+          <View style={styles.confirmAddressButtonIconContainer}>
+            <TextInput.Icon
+              size={20}
+              name={'check'}
+              color={theme.colors.background}
+            />
+          </View>
+        </TouchableOpacity>
+      ) : null}
+
       <FAB
         style={styles.currentLocationButton}
         icon={currentLocationIcon}
         small
         onPress={async () => {
           const location = await findCurrentLocation();
-          setLocation(location);
-
-          mapRef.current?.animateToRegion({
-            latitude: location.latitude,
-            longitude: location.longitude,
-            latitudeDelta: 0,
-            longitudeDelta: 0,
-          });
+          animateMapToRegion(location);
         }}
       />
     </>
@@ -130,11 +178,6 @@ export const MapScreen = () => {
 
 const getStyles = (theme: Theme, insets: EdgeInsets) =>
   StyleSheet.create({
-    container: {
-      flex: 1,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
     mapContainer: {
       position: 'relative',
       width: '100%',
@@ -150,46 +193,34 @@ const getStyles = (theme: Theme, insets: EdgeInsets) =>
       right: 20,
       backgroundColor: theme.colors.text,
     },
-    addLocationButton: {
+    confirmAddressButton: {
+      flexDirection: 'row',
       position: 'absolute',
       bottom: Math.max(20, insets.bottom as number),
       left: 20,
       backgroundColor: theme.colors.text,
       borderRadius: theme.roundness,
-      height: 40,
+      paddingHorizontal: 12,
       alignItems: 'center',
       justifyContent: 'center',
-      paddingHorizontal: 12,
+      height: 40,
 
       elevation: 6,
       shadowColor: theme.colors.text,
       shadowOffset: { width: 2, height: 4 },
       shadowOpacity: 0.2,
     },
-    addLocationButtonLabelContainer: {
-      flexDirection: 'row',
-      alignItems: 'center',
-    },
-    addLocationButtonLabel: {
+    confirmAddressButtonLabel: {
       color: theme.colors.background,
       fontSize: 12,
       fontFamily: 'Nunito_700Bold',
       letterSpacing: 0.2,
     },
-    addLocationButtonLabelIcon: {
-      marginLeft: 8,
-      color: theme.colors.background,
-      fontSize: 24,
-      fontFamily: 'Nunito_700Bold',
-    },
-    currentLocationLabel: {
-      fontSize: 20,
-      backgroundColor: 'orange',
-      width: '100%',
-      position: 'absolute',
-      marginBottom: 100,
-      right: 0,
-      bottom: 0,
+    confirmAddressButtonIconContainer: {
+      width: 20,
+      alignItems: 'center',
+      height: 20,
+      marginBottom: 10,
     },
     searchInput: {
       position: 'absolute',

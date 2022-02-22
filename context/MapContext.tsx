@@ -20,11 +20,24 @@ export const findCurrentLocation = async (): Promise<Location> => {
   }
 
   const position = await LocationProvider.getCurrentPositionAsync();
+
+  return findPlace(position.coords.latitude, position.coords.longitude);
+};
+
+export const findPlace = async (
+  lat: number,
+  long: number
+): Promise<Location> => {
+  const place = await LocationProvider.reverseGeocodeAsync({
+    latitude: lat,
+    longitude: long,
+  });
+
   let location: Location = {
-    ...position.coords,
+    latitude: lat,
+    longitude: long,
   };
 
-  const place = await LocationProvider.reverseGeocodeAsync(position.coords);
   place.find(address => {
     location = { ...address, ...location };
   });

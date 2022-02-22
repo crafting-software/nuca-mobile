@@ -221,6 +221,7 @@ export const AddHotspotScreen = ({
 
             <InputField
               placeholder="Adresă"
+              multiline={true}
               inputFieldStyle={{ marginTop: 30 }}
               value={location && getFormattedAddress(location)}
               editable={false}
@@ -230,7 +231,11 @@ export const AddHotspotScreen = ({
               <View style={styles.leftLocationButtonContainer}>
                 <TouchableOpacity
                   style={styles.locationButton}
-                  onPress={() => alert('Alege locatia pe harta')}
+                  onPress={() =>
+                    navigation.navigate('ChooseLocation', {
+                      location: location,
+                    })
+                  }
                 >
                   <Image
                     style={styles.locationButtonIcon}

@@ -37,7 +37,7 @@ export const InputField = (props: InputFieldProps) => {
     input: {
       fontFamily: 'Nunito_400Regular',
       backgroundColor: theme.colors.background,
-      height: 60,
+      minHeight: 60,
       paddingVertical: 2,
       paddingHorizontal: 8,
       borderRadius: theme.roundness,
