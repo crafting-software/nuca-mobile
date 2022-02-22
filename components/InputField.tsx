@@ -22,6 +22,8 @@ export type InputFieldProps = {
   multiline?: boolean;
   editable?: boolean;
   keyboardType?: KeyboardTypeOptions | undefined;
+  onTextInputChangeText?: ((text: string) => void) | undefined;
+  value?: string | undefined;
 };
 
 export const InputField = (props: InputFieldProps) => {
@@ -63,6 +65,8 @@ export const InputField = (props: InputFieldProps) => {
         right={props.rightIcon}
         editable={props.editable}
         keyboardType={props.keyboardType}
+        onChangeText={props.onTextInputChangeText}
+        value={props.value}
       />
     </View>
   );

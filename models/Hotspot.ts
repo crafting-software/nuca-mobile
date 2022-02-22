@@ -8,6 +8,12 @@ export enum HotspotStatus {
   done = 'finalizat',
 }
 
+export const HotspotStatusValue = (value: string) => {
+  if (value == HotspotStatus.toDo) return HotspotStatus.toDo;
+  if (value == HotspotStatus.inProgress) return HotspotStatus.inProgress;
+  return HotspotStatus.done;
+};
+
 export type Hotspot = {
   name: string;
   description: string;

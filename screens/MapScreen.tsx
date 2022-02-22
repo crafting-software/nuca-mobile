@@ -1,6 +1,6 @@
 import * as LocationProvider from 'expo-location';
 import React, { useContext, useRef, useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View, Image } from 'react-native';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import MapView, { EdgeInsets, Marker, Region } from 'react-native-maps';
 import { Caption, FAB, TextInput, Title, useTheme } from 'react-native-paper';
 import { Theme } from 'react-native-paper/lib/typescript/types';
@@ -9,6 +9,7 @@ import { useNavigation } from '@react-navigation/native';
 import currentLocationIcon from '../assets/current-location.png';
 import { Appbar } from '../components/Appbar';
 import { MapContext } from '../context';
+import { findCurrentLocation } from '../context/MapContext';
 import { getHotspotMarker } from '../models/Hotspot';
 import { getFormattedAddress, Location } from '../models/Location';
 
@@ -17,25 +18,6 @@ const intialRegion: Region = {
   longitude: 23.587688864363546,
   latitudeDelta: 0.0922,
   longitudeDelta: 0.0421,
-};
-
-const findCurrentLocation = async (): Promise<Location> => {
-  const { status } = await LocationProvider.requestForegroundPermissionsAsync();
-  if (status !== 'granted') {
-    alert('Permission to access location was denied.');
-  }
-
-  const position = await LocationProvider.getCurrentPositionAsync();
-  let location: Location = {
-    ...position.coords,
-  };
-
-  const place = await LocationProvider.reverseGeocodeAsync(position.coords);
-  place.find(address => {
-    location = { ...address, ...location };
-  });
-
-  return location;
 };
 
 export const MapScreen = () => {
