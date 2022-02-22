@@ -1,8 +1,15 @@
 import * as LocationProvider from 'expo-location';
-import React, { useContext, useRef, useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View, Image } from 'react-native';
+import React, { useContext, useEffect, useRef, useState } from 'react';
+import { StyleSheet, TouchableOpacity, View, Image } from 'react-native';
 import MapView, { EdgeInsets, Marker, Region } from 'react-native-maps';
-import { Caption, FAB, TextInput, Title, useTheme } from 'react-native-paper';
+import {
+  ActivityIndicator,
+  Caption,
+  FAB,
+  TextInput,
+  Title,
+  useTheme,
+} from 'react-native-paper';
 import { Theme } from 'react-native-paper/lib/typescript/types';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
@@ -10,7 +17,8 @@ import currentLocationIcon from '../assets/current-location.png';
 import { Appbar } from '../components/Appbar';
 import { MapContext } from '../context';
 import { getHotspotMarker } from '../models/Hotspot';
-import { getFormattedAddress, Location } from '../models/Location';
+import { Location } from '../models/Location';
+import { loadHotspots } from '../utils/hotspots';
 
 const intialRegion: Region = {
   latitude: 46.77293258116839,
@@ -39,10 +47,23 @@ const findCurrentLocation = async (): Promise<Location> => {
 };
 
 export const MapScreen = () => {
-  const { hotspots } = useContext(MapContext);
-  const [location, setLocation] = useState<Location>();
+  const { hotspots, setHotspots } = useContext(MapContext);
+  const [_location, setLocation] = useState<Location>();
   const mapRef = useRef<MapView>(null);
   const navigation = useNavigation();
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    const load = async () => {
+      setIsLoading(true);
+      const { success, hotspots = [] } = await loadHotspots();
+      setIsLoading(false);
+
+      if (!success) alert('Failed to load hotspots');
+      setHotspots(hotspots);
+    };
+    load();
+  }, []);
 
   const searchForAddress = async (address: string): Promise<void> => {
     try {
@@ -84,8 +105,6 @@ export const MapScreen = () => {
                 latitude: h.latitude,
                 longitude: h.longitude,
               }}
-              title={h.name}
-              description={h.description}
               onPress={() => navigation.navigate('Modal')}
             >
               <Image
@@ -140,9 +159,11 @@ export const MapScreen = () => {
           });
         }}
       />
-      <Text style={styles.currentLocationLabel}>
-        {!!location && getFormattedAddress(location)}
-      </Text>
+      {isLoading && (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" />
+        </View>
+      )}
     </>
   );
 };
@@ -153,6 +174,15 @@ const getStyles = (theme: Theme, insets: EdgeInsets) =>
       flex: 1,
       alignItems: 'center',
       justifyContent: 'center',
+      position: 'relative',
+    },
+    loadingContainer: {
+      position: 'absolute',
+      backgroundColor: theme.colors.backdrop,
+      width: '100%',
+      height: '100%',
+      justifyContent: 'center',
+      alignItems: 'center',
     },
     mapContainer: {
       position: 'relative',
@@ -200,15 +230,6 @@ const getStyles = (theme: Theme, insets: EdgeInsets) =>
       color: theme.colors.background,
       fontSize: 24,
       fontFamily: 'Nunito_700Bold',
-    },
-    currentLocationLabel: {
-      fontSize: 20,
-      backgroundColor: 'orange',
-      width: '100%',
-      position: 'absolute',
-      marginBottom: 100,
-      right: 0,
-      bottom: 0,
     },
     searchInput: {
       position: 'absolute',
