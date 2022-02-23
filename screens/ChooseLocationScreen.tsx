@@ -1,8 +1,14 @@
 import * as LocationProvider from 'expo-location';
-import { useContext, useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
 import MapView, { EdgeInsets, Marker, Region } from 'react-native-maps';
-import { Caption, FAB, TextInput, useTheme } from 'react-native-paper';
+import {
+  ActivityIndicator,
+  Caption,
+  FAB,
+  TextInput,
+  useTheme,
+} from 'react-native-paper';
 import { Theme } from 'react-native-paper/lib/typescript/types';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
@@ -17,6 +23,7 @@ import {
   Location,
 } from '../models/Location';
 import { RootStackScreenProps } from '../types';
+import { loadHotspots } from '../utils/hotspots';
 
 const intialRegion: Region = {
   latitude: 46.77293258116839,
@@ -28,13 +35,14 @@ const intialRegion: Region = {
 export const ChooseLocationScreen = ({
   route,
 }: RootStackScreenProps<'ChooseLocation'>) => {
-  const { hotspots } = useContext(MapContext);
+  const { hotspots, setHotspots } = useContext(MapContext);
   const [selectedLocation, setSelectedLocation] = useState<Location>();
 
   const canConfirmAddress = selectedLocation !== defaultLocation;
 
   const mapRef = useRef<MapView>(null);
   const navigation = useNavigation();
+  const [isLoading, setIsLoading] = useState(false);
 
   const searchForAddress = async (address: string): Promise<void> => {
     try {
@@ -68,6 +76,17 @@ export const ChooseLocationScreen = ({
     }
   }, [route.params.location]);
 
+  useEffect(() => {
+    const load = async () => {
+      setIsLoading(true);
+      const { success, hotspots = [] } = await loadHotspots();
+      setIsLoading(false);
+      if (!success) alert('Failed to load hotspots');
+      setHotspots(hotspots);
+    };
+    load();
+  }, []);
+
   return (
     <>
       <SecondaryAppbar onBackPressed={() => navigation.goBack()} />
@@ -98,8 +117,6 @@ export const ChooseLocationScreen = ({
                 latitude: h.latitude,
                 longitude: h.longitude,
               }}
-              title={h.name}
-              description={h.description}
               onPress={() => navigation.navigate('Modal')}
             >
               <Image
@@ -172,6 +189,11 @@ export const ChooseLocationScreen = ({
           animateMapToRegion(location);
         }}
       />
+      {isLoading && (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" />
+        </View>
+      )}
     </>
   );
 };
@@ -186,6 +208,14 @@ const getStyles = (theme: Theme, insets: EdgeInsets) =>
     map: {
       width: '100%',
       flex: 1,
+    },
+    loadingContainer: {
+      position: 'absolute',
+      backgroundColor: theme.colors.backdrop,
+      width: '100%',
+      height: '100%',
+      justifyContent: 'center',
+      alignItems: 'center',
     },
     currentLocationButton: {
       position: 'absolute',

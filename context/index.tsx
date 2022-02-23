@@ -1,10 +1,9 @@
 import { useState, useMemo, ReactNode } from 'react';
-import { Hotspot } from '../models/Hotspot';
-import { mockData } from '../models/Hotspot';
+import { Hotspot, HotspotStatus } from '../models/Hotspot';
 import { AuthContext, Auth } from './AuthContext';
 import { MapContext } from './MapContext';
 
-export { AuthContext, Auth, MapContext, Hotspot };
+export { AuthContext, Auth, MapContext, Hotspot, HotspotStatus };
 
 export const AuthContextProvider = ({ children }: { children: ReactNode }) => {
   const [auth, setAuth] = useState<Auth>({ inProgress: false });
@@ -17,7 +16,7 @@ export const AuthContextProvider = ({ children }: { children: ReactNode }) => {
 };
 
 export const MapContextProvider = ({ children }: { children: ReactNode }) => {
-  const [hotspots, setHotspots] = useState<Hotspot[]>(mockData);
+  const [hotspots, setHotspots] = useState<Hotspot[]>([]);
 
   const hotspotsValue = useMemo(() => ({ hotspots, setHotspots }), [hotspots]);
 
