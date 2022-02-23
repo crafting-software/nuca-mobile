@@ -13,7 +13,7 @@ declare global {
 export type RootStackParamList = {
   Authentication: undefined;
   Main: undefined;
-  Modal: undefined;
+  HotspotDetail: { hotspotId: string };
   AddHotspot: undefined;
   NotFound: undefined;
 };

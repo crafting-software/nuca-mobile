@@ -1,5 +1,5 @@
-import { DefaultTheme, configureFonts } from 'react-native-paper';
-import { Fonts } from 'react-native-paper/lib/typescript/types';
+import { configureFonts, DefaultTheme } from 'react-native-paper';
+import { Fonts, Theme } from 'react-native-paper/lib/typescript/types';
 
 export const fontDefinition = {
   regular: {
@@ -36,6 +36,22 @@ export const fontConfig = {
   web: fontDefinition as Fonts,
 };
 
+type CustomColors = {
+  secondary: string;
+  warning: string;
+  success: string;
+  infoText: string;
+  infoBg: string;
+};
+
+type PaperColors = Theme['colors'];
+type NucaCustomColors = PaperColors & CustomColors;
+declare global {
+  namespace ReactNativePaper {
+    interface ThemeColors extends NucaCustomColors {}
+  }
+}
+
 export const getTheme = () => ({
   ...DefaultTheme,
   roundness: 30,
@@ -49,6 +65,11 @@ export const getTheme = () => ({
     disabled: '#CEDADE',
     placeholder: '#575F65',
     error: '#FF2C52',
+    infoBg: '#D9F7FF',
+    infoText: '#61AFC5',
+    background: '#FFFFFF',
+    warning: '#FF9212',
+    success: '#01C969',
   },
   fonts: configureFonts(fontConfig),
 });

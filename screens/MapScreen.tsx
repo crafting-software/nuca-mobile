@@ -1,6 +1,6 @@
 import * as LocationProvider from 'expo-location';
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { StyleSheet, TouchableOpacity, View, Image } from 'react-native';
+import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
 import MapView, { EdgeInsets, Marker, Region } from 'react-native-maps';
 import {
   ActivityIndicator,
@@ -105,7 +105,9 @@ export const MapScreen = () => {
                 latitude: h.latitude,
                 longitude: h.longitude,
               }}
-              onPress={() => navigation.navigate('Modal')}
+              onPress={() =>
+                navigation.navigate('HotspotDetail', { hotspotId: h.id })
+              }
             >
               <Image
                 source={getHotspotMarker(h)}

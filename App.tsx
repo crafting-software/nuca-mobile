@@ -3,13 +3,13 @@ import { StatusBar } from 'expo-status-bar';
 import { Provider as PaperProvider } from 'react-native-paper';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import {
-  useFonts,
   Nunito_200ExtraLight,
   Nunito_300Light,
   Nunito_400Regular,
+  Nunito_400Regular_Italic,
   Nunito_500Medium,
   Nunito_700Bold,
-  Nunito_400Regular_Italic,
+  useFonts,
 } from '@expo-google-fonts/nunito';
 import { AuthContextProvider, MapContextProvider } from './context';
 import Navigation from './navigation/index';
