@@ -115,7 +115,7 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
     informationView: {
       paddingTop: 14,
       paddingBottom: 14,
-      backgroundColor: theme.colors.onSurface,
+      backgroundColor: theme.colors.infoBg,
       alignItems: 'center',
       borderRadius: theme.roundness,
       height: 100,
@@ -125,7 +125,7 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
       flexDirection: 'column',
     },
     informationTitle: {
-      color: theme.colors.notification,
+      color: theme.colors.infoText,
       fontSize: 12,
       fontFamily: 'Nunito_700Bold',
       textAlign: 'center',
@@ -245,8 +245,8 @@ const StatusView = (props: Hotspot) => {
   const theme = useTheme();
   const styles = getStyles(theme);
   const getColor = ({ status }: Hotspot) => {
-    if (status === HotspotStatus.done) return '#01B961';
-    if (status === HotspotStatus.inProgress) return theme.colors.backdrop;
+    if (status === HotspotStatus.done) return theme.colors.success;
+    if (status === HotspotStatus.inProgress) return theme.colors.warning;
     return theme.colors.error;
   };
 
