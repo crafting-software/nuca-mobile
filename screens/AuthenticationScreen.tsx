@@ -17,7 +17,6 @@ import {
 } from 'react-native-paper';
 import catLady from '../assets/cat-lady.png';
 import { AuthContext } from '../context';
-import { RootStackScreenProps } from '../types';
 import { signIn as serverSignIn } from '../utils/sign-in';
 
 const getStyles = (theme: ReactNativePaper.Theme) =>

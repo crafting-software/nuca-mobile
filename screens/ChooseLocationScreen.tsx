@@ -38,7 +38,10 @@ export const ChooseLocationScreen = ({
   const { hotspots, setHotspots } = useContext(MapContext);
   const [selectedLocation, setSelectedLocation] = useState<Location>();
 
-  const canConfirmAddress = selectedLocation !== defaultLocation;
+  const canConfirmAddress =
+    selectedLocation &&
+    selectedLocation!.latitude != 0 &&
+    selectedLocation!.longitude != 0;
 
   const mapRef = useRef<MapView>(null);
   const navigation = useNavigation();
