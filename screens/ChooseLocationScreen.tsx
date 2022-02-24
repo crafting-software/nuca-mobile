@@ -1,51 +1,36 @@
 import * as LocationProvider from 'expo-location';
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
-import MapView, { EdgeInsets, Marker, Region } from 'react-native-maps';
 import {
-  ActivityIndicator,
-  Caption,
-  FAB,
-  TextInput,
-  useTheme,
-} from 'react-native-paper';
+  Image,
+  StyleSheet,
+  TextInput as BaseTextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import MapView, { EdgeInsets, Marker, Region } from 'react-native-maps';
+import { Caption, FAB, TextInput, useTheme } from 'react-native-paper';
 import { Theme } from 'react-native-paper/lib/typescript/types';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import currentLocationIcon from '../assets/current-location.png';
-import { SecondaryAppbar } from '../components/SecondaryAppbar';
+import { Appbar } from '../components/Appbar';
 import { MapContext } from '../context';
 import { findCurrentLocation, findPlace } from '../context/MapContext';
 import { getHotspotMarker } from '../models/Hotspot';
-import {
-  defaultLocation,
-  getFormattedAddress,
-  Location,
-} from '../models/Location';
+import { getFormattedAddress, Location } from '../models/Location';
 import { RootStackScreenProps } from '../types';
-import { loadHotspots } from '../utils/hotspots';
-
-const intialRegion: Region = {
-  latitude: 46.77293258116839,
-  longitude: 23.587688864363546,
-  latitudeDelta: 0.0922,
-  longitudeDelta: 0.0421,
-};
 
 export const ChooseLocationScreen = ({
   route,
 }: RootStackScreenProps<'ChooseLocation'>) => {
-  const { hotspots, setHotspots } = useContext(MapContext);
-  const [selectedLocation, setSelectedLocation] = useState<Location>();
-
-  const canConfirmAddress =
-    selectedLocation &&
-    selectedLocation!.latitude != 0 &&
-    selectedLocation!.longitude != 0;
+  const { hotspots } = useContext(MapContext);
+  const [selectedLocation, setSelectedLocation] = useState<Location | null>();
+  const [region, setRegion] = useState<Region>(route.params.region);
+  const [selectedAddress, setSelectedAddress] = useState('');
 
   const mapRef = useRef<MapView>(null);
+  const searchAddressRef = useRef<BaseTextInput>(null);
   const navigation = useNavigation();
-  const [isLoading, setIsLoading] = useState(false);
 
   const searchForAddress = async (address: string): Promise<void> => {
     try {
@@ -80,25 +65,21 @@ export const ChooseLocationScreen = ({
   }, [route.params.location]);
 
   useEffect(() => {
-    const load = async () => {
-      setIsLoading(true);
-      const { success, hotspots = [] } = await loadHotspots();
-      setIsLoading(false);
-      if (!success) alert('Failed to load hotspots');
-      setHotspots(hotspots);
-    };
-    load();
-  }, []);
+    setSelectedAddress(
+      selectedLocation ? getFormattedAddress(selectedLocation) : ''
+    );
+  }, [selectedLocation]);
 
   return (
     <>
-      <SecondaryAppbar onBackPressed={() => navigation.goBack()} />
+      <Appbar forDetailScreen={true} />
       <View style={styles.mapContainer}>
         <MapView
           ref={mapRef}
           // use intial region + animateToRegion instead of region as react state because
           // gestures don't work well https://github.com/react-native-maps/react-native-maps/issues/3639
-          initialRegion={intialRegion}
+          initialRegion={region}
+          onRegionChange={setRegion}
           showsUserLocation
           style={styles.map}
           onPress={async e => {
@@ -138,16 +119,20 @@ export const ChooseLocationScreen = ({
                 longitude: selectedLocation.longitude,
               }}
               onPress={() => {
-                setSelectedLocation(defaultLocation);
+                setSelectedLocation(null);
               }}
             />
           ) : null}
         </MapView>
         <TextInput
-          multiline={true}
+          ref={searchAddressRef}
+          multiline={false}
+          dense={true}
+          scrollEnabled={true}
+          blurOnSubmit={true}
           outlineColor={theme.colors.disabled}
           mode="outlined"
-          style={styles.searchInput}
+          style={[styles.searchInput, { height: 60 }]}
           autoCorrect={false}
           placeholder="Caută"
           autoComplete={false}
@@ -155,19 +140,26 @@ export const ChooseLocationScreen = ({
             <TextInput.Icon name="magnify" color={theme.colors.placeholder} />
           }
           returnKeyType="search"
-          onSubmitEditing={async ({ nativeEvent: { text } }) =>
-            searchForAddress(text)
-          }
-          value={selectedLocation && getFormattedAddress(selectedLocation)}
+          onSubmitEditing={async ({ nativeEvent: { text } }) => {
+            setSelectedAddress(text);
+            searchForAddress(text);
+          }}
+          onChangeText={text => {
+            setSelectedAddress(text);
+          }}
+          value={selectedAddress}
         />
       </View>
 
-      {canConfirmAddress ? (
+      {selectedLocation ? (
         <TouchableOpacity
           activeOpacity={0.9}
           style={styles.confirmAddressButton}
           onPress={() => {
-            navigation.navigate('AddHotspot', { location: selectedLocation });
+            navigation.navigate('AddHotspot', {
+              location: selectedLocation,
+              region: region,
+            });
           }}
         >
           <Caption style={styles.confirmAddressButtonLabel}>
@@ -192,11 +184,6 @@ export const ChooseLocationScreen = ({
           animateMapToRegion(location);
         }}
       />
-      {isLoading && (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" />
-        </View>
-      )}
     </>
   );
 };
@@ -211,14 +198,6 @@ const getStyles = (theme: Theme, insets: EdgeInsets) =>
     map: {
       width: '100%',
       flex: 1,
-    },
-    loadingContainer: {
-      position: 'absolute',
-      backgroundColor: theme.colors.backdrop,
-      width: '100%',
-      height: '100%',
-      justifyContent: 'center',
-      alignItems: 'center',
     },
     currentLocationButton: {
       position: 'absolute',
@@ -262,6 +241,7 @@ const getStyles = (theme: Theme, insets: EdgeInsets) =>
       right: 20,
       elevation: 6,
       paddingHorizontal: 8,
+      height: 60,
 
       shadowColor: theme.colors.text,
       shadowOffset: { width: 2, height: 4 },

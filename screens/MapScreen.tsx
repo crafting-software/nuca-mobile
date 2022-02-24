@@ -21,16 +21,15 @@ import { getHotspotMarker } from '../models/Hotspot';
 import { Location } from '../models/Location';
 import { loadHotspots } from '../utils/hotspots';
 
-const intialRegion: Region = {
-  latitude: 46.77293258116839,
-  longitude: 23.587688864363546,
-  latitudeDelta: 0.0922,
-  longitudeDelta: 0.0421,
-};
-
 export const MapScreen = () => {
   const { hotspots, setHotspots } = useContext(MapContext);
   const [location, setLocation] = useState<Location>();
+  const [region, setRegion] = useState<Region>({
+    latitude: 46.77293258116839,
+    longitude: 23.587688864363546,
+    latitudeDelta: 0.0922,
+    longitudeDelta: 0.0421,
+  });
   const mapRef = useRef<MapView>(null);
   const navigation = useNavigation();
   const [isLoading, setIsLoading] = useState(false);
@@ -76,7 +75,8 @@ export const MapScreen = () => {
           ref={mapRef}
           // use intial region + animateToRegion instead of region as react state because
           // gestures don't work well https://github.com/react-native-maps/react-native-maps/issues/3639
-          initialRegion={intialRegion}
+          initialRegion={region}
+          onRegionChange={setRegion}
           showsUserLocation
           style={styles.map}
         >
@@ -117,7 +117,10 @@ export const MapScreen = () => {
         style={styles.addLocationButton}
         activeOpacity={0.9}
         onPress={() => {
-          navigation.navigate('AddHotspot', { location: location });
+          navigation.navigate('AddHotspot', {
+            location: location,
+            region: region,
+          });
         }}
       >
         <View style={styles.addLocationButtonLabelContainer}>

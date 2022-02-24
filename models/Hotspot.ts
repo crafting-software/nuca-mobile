@@ -15,8 +15,8 @@ export const hotspotStatusList: HotspotStatus[] = [
 ];
 
 export const HotspotStatusValue = (value: string) => {
-  if (value == HotspotStatus.toDo) return HotspotStatus.toDo;
-  if (value == HotspotStatus.inProgress) return HotspotStatus.inProgress;
+  if (value === HotspotStatus.toDo) return HotspotStatus.toDo;
+  if (value === HotspotStatus.inProgress) return HotspotStatus.inProgress;
   return HotspotStatus.done;
 };
 

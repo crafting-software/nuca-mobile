@@ -23,8 +23,8 @@ import { useNavigation } from '@react-navigation/native';
 import catLadyImage from '../assets/cat-lady2.png';
 import currentLocationIcon from '../assets/current-location.png';
 import mapPinIcon from '../assets/map-pin.png';
+import { Appbar } from '../components/Appbar';
 import { InputField } from '../components/InputField';
-import { SecondaryAppbar } from '../components/SecondaryAppbar';
 import { findCurrentLocation } from '../context/MapContext';
 import { HotspotStatus, hotspotStatusList } from '../models/Hotspot';
 import { getFormattedAddress, Location } from '../models/Location';
@@ -195,12 +195,12 @@ export const AddHotspotScreen = ({
   const styles = getStyles(theme);
 
   const [location, setLocation] = useState<Location>();
-  const [name, setName] = useState<string>('');
+  const [addressDetails, setAddressDetails] = useState('');
   const [status, setStatus] = useState<HotspotStatus>();
-  const [remarks, setRemarks] = useState<string>('');
-  const [contactPerson, setContactPerson] = useState<string>('');
-  const [contactPersonPhone, setContactPersonPhone] = useState<string>('');
-  const [volunteer, setVolunteer] = useState<string>('');
+  const [remarks, setRemarks] = useState('');
+  const [contactPerson, setContactPerson] = useState('');
+  const [contactPersonPhone, setContactPersonPhone] = useState('');
+  const [volunteer, setVolunteer] = useState('');
 
   useEffect(() => {
     setLocation(route.params.location);
@@ -208,7 +208,7 @@ export const AddHotspotScreen = ({
 
   return (
     <View style={styles.container}>
-      <SecondaryAppbar onBackPressed={() => navigation.goBack()} />
+      <Appbar forDetailScreen={true} />
       <ScrollView style={styles.container}>
         <>
           <View style={styles.form}>
@@ -233,7 +233,8 @@ export const AddHotspotScreen = ({
                   style={styles.locationButton}
                   onPress={() =>
                     navigation.navigate('ChooseLocation', {
-                      location: location,
+                      location,
+                      region: route.params.region,
                     })
                   }
                 >
@@ -267,10 +268,10 @@ export const AddHotspotScreen = ({
             </View>
 
             <InputField
-              label="Nume"
+              label="Detalii adresă"
               placeholder="Nume"
               inputFieldStyle={{ marginTop: 70 }}
-              onTextInputChangeText={setName}
+              onTextInputChangeText={setAddressDetails}
             />
 
             <Caption style={styles.textInputTitle}>STATUS</Caption>
@@ -406,12 +407,12 @@ export const AddHotspotScreen = ({
               onPress={() =>
                 alert(
                   JSON.stringify({
-                    name: name,
-                    status: status,
-                    remarks: remarks,
-                    contactPerson: contactPerson,
-                    contactPersonPhone: contactPersonPhone,
-                    volunteer: volunteer,
+                    name: addressDetails,
+                    status,
+                    remarks,
+                    contactPerson,
+                    contactPersonPhone,
+                    volunteer,
                   })
                 )
               }
