@@ -13,6 +13,7 @@ import { Theme } from 'react-native-paper/lib/typescript/types';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import currentLocationIcon from '../assets/current-location.png';
+import markerNewImage from '../assets/marker-new.png';
 import { Appbar } from '../components/Appbar';
 import { MapContext } from '../context';
 import { findCurrentLocation, findPlace } from '../context/MapContext';
@@ -121,7 +122,13 @@ export const ChooseLocationScreen = ({
               onPress={() => {
                 setSelectedLocation(null);
               }}
-            />
+            >
+              <Image
+                source={markerNewImage}
+                style={styles.marker}
+                resizeMode="contain"
+              />
+            </Marker>
           ) : null}
         </MapView>
         <TextInput
