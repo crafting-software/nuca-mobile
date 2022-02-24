@@ -87,7 +87,9 @@ export const MapScreen = () => {
                 latitude: h.latitude,
                 longitude: h.longitude,
               }}
-              onPress={() => navigation.navigate('Modal')}
+              onPress={() =>
+                navigation.navigate('HotspotDetail', { hotspotId: h.id })
+              }
             >
               <Image
                 source={getHotspotMarker(h)}

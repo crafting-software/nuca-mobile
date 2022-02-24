@@ -14,7 +14,7 @@ const linking: LinkingOptions<RootStackParamList> = {
       Authentication: 'authentication',
       Main: 'main',
       AddHotspot: 'addHotspot',
-      Modal: 'modal',
+      HotspotDetail: 'hotspotDetail',
       NotFound: '*',
       ChooseLocation: 'chooseLocation',
     },
