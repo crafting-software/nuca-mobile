@@ -1,6 +1,9 @@
+import { camelCase, trim } from 'lodash';
 import doneMarker from '../assets/marker-done.png';
 import inProgressMarker from '../assets/marker-in-progress.png';
 import todoMarker from '../assets/marker-todo.png';
+import { castToCat, Cat } from './Cat';
+import { castToUser, User } from './User';
 
 export enum HotspotStatus {
   toDo = 'în așteptare',
@@ -31,7 +34,12 @@ export type HotspotDetails = Hotspot & {
   address: string;
   details: string;
   notes: string;
-  // cats and other data
+  sterilizedCats: Cat[];
+  unsterilizedCats: Cat[];
+  unsterilizedCatsCount: number; // this gets a manual input and might be different from the unsterilizedCats array length
+  contactName: string;
+  contactPhone: string;
+  volunteer?: User;
 };
 
 export const getHotspotMarker = ({ status }: Partial<Hotspot>) => {
@@ -39,3 +47,35 @@ export const getHotspotMarker = ({ status }: Partial<Hotspot>) => {
   if (status === HotspotStatus.inProgress) return inProgressMarker;
   return todoMarker;
 };
+
+export const castToHotspot = ({
+  id,
+  latitude,
+  longitude,
+  status,
+}: Record<string, any>) => ({
+  id,
+  latitude: parseFloat(latitude),
+  longitude: parseFloat(longitude),
+  status: HotspotStatus[camelCase(status) as keyof typeof HotspotStatus],
+});
+
+export const castToHotspotDetails = (
+  data: Record<string, any>
+): HotspotDetails => ({
+  ...castToHotspot(data),
+  address: trim(
+    `${data.street_name} ${data.street_number || ''}, ${data.city}, ${
+      data.zip
+    }`,
+    ','
+  ).trim(),
+  details: '',
+  notes: data.notes,
+  sterilizedCats: data.sterilized_cats.map(castToCat),
+  unsterilizedCats: data.unsterilized_cats.map(castToCat),
+  unsterilizedCatsCount: data.total_unsterilized_cats,
+  contactName: data.contact_name,
+  contactPhone: data.contact_phone,
+  volunteer: data.volunteer ? castToUser(data.volunteer) : undefined,
+});

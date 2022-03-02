@@ -208,7 +208,7 @@ export const AddHotspotScreen = ({
 
   return (
     <View style={styles.container}>
-      <Appbar forDetailScreen={true} />
+      <Appbar forDetailScreen />
       <ScrollView style={styles.container}>
         <>
           <View style={styles.form}>

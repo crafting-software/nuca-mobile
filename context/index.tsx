@@ -1,9 +1,16 @@
 import { useState, useMemo, ReactNode } from 'react';
-import { Hotspot, HotspotStatus } from '../models/Hotspot';
+import { Hotspot, HotspotDetails, HotspotStatus } from '../models/Hotspot';
 import { AuthContext, Auth } from './AuthContext';
 import { MapContext } from './MapContext';
 
-export { AuthContext, Auth, MapContext, Hotspot, HotspotStatus };
+export {
+  AuthContext,
+  Auth,
+  MapContext,
+  Hotspot,
+  HotspotStatus,
+  HotspotDetails,
+};
 
 export const AuthContextProvider = ({ children }: { children: ReactNode }) => {
   const [auth, setAuth] = useState<Auth>({ inProgress: false });

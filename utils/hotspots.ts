@@ -1,5 +1,10 @@
 import { camelCase } from 'lodash';
-import { Hotspot, HotspotStatus } from '../context';
+import {
+  castToHotspot,
+  castToHotspotDetails,
+  Hotspot,
+  HotspotDetails,
+} from '../models/Hotspot';
 import { makeRequest } from './server';
 
 export const loadHotspots = async (): Promise<{
@@ -16,23 +21,24 @@ export const loadHotspots = async (): Promise<{
     return { success: false, hotspots: [] };
   }
 
-  const hotspots = data.map(
-    ({
-      id,
-      latitude,
-      longitude,
-      status,
-    }: {
-      id: string;
-      latitude: string;
-      longitude: string;
-      status: string;
-    }) => ({
-      id,
-      latitude: parseFloat(latitude),
-      longitude: parseFloat(longitude),
-      status: HotspotStatus[camelCase(status) as keyof typeof HotspotStatus],
-    })
-  );
-  return { success: true, hotspots };
+  return { success: true, hotspots: data.map(castToHotspot) };
+};
+
+export const loadHotspotDetails = async (
+  hotspotId: string
+): Promise<{
+  success: boolean;
+  hotspotDetails?: HotspotDetails;
+}> => {
+  const { error, data } = await makeRequest({
+    path: `/hotspots/${hotspotId}`,
+    method: 'GET',
+  });
+
+  if (error) {
+    console.log('loading hotspots failed', error);
+    return { success: false };
+  }
+
+  return { success: true, hotspotDetails: castToHotspotDetails(data) };
 };

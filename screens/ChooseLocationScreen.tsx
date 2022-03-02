@@ -73,7 +73,7 @@ export const ChooseLocationScreen = ({
 
   return (
     <>
-      <Appbar forDetailScreen={true} />
+      <Appbar forDetailScreen />
       <View style={styles.mapContainer}>
         <MapView
           ref={mapRef}

@@ -1,9 +1,20 @@
-import { Dimensions, Image, ScrollView, StyleSheet, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import {
+  ActivityIndicator,
+  Dimensions,
+  Image,
+  ScrollView,
+  StyleSheet,
+  View,
+} from 'react-native';
 import { Avatar, Button, Caption, useTheme } from 'react-native-paper';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import catLady3 from '../assets/cat-lady3.png';
-import { Hotspot, HotspotStatus } from '../models/Hotspot';
+import { Appbar } from '../components/Appbar';
+import { CatCard } from '../components/CatCard';
+import { HotspotDetails, HotspotStatus } from '../models/Hotspot';
 import { RootStackParamList } from '../types';
+import { loadHotspotDetails } from '../utils/hotspots';
 
 const imageAspectRatio = 1080 / 872;
 const scaledWidth = Dimensions.get('window').width;
@@ -11,11 +22,14 @@ const scaledHeight = scaledWidth / imageAspectRatio;
 
 const getStyles = (theme: ReactNativePaper.Theme) =>
   StyleSheet.create({
+    loadingContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
     container: {
       backgroundColor: theme.colors.background,
-      opacity: 0.9,
-      width: '100%',
-      height: '100%',
+      flex: 1,
     },
     separator: {
       borderColor: theme.colors.disabled,
@@ -149,110 +163,140 @@ export const HotspotDetailScreen = ({
 }: NativeStackScreenProps<RootStackParamList, 'HotspotDetail'>) => {
   const theme = useTheme();
   const styles = getStyles(theme);
-  const hotspotId = route.params.hotspotId;
-  //Mock data for testing
-  const hotspot = {
-    id: 'adfv',
-    status: HotspotStatus.inProgress,
-    latitude: 42,
-    longitude: 43,
-  };
+
+  const [hotspotDetails, setHotspotDetails] = useState<HotspotDetails>();
+
+  useEffect(() => {
+    const load = async () => {
+      const { success, hotspotDetails: hd } = await loadHotspotDetails(
+        route.params.hotspotId
+      );
+      if (!success) alert('Failed to load hotspot details');
+      setHotspotDetails(hd);
+    };
+    load();
+  }, []);
+
+  if (!hotspotDetails)
+    return (
+      <>
+        <Appbar forDetailScreen />
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" />
+        </View>
+      </>
+    );
 
   return (
-    <View style={styles.container}>
-      <ScrollView style={styles.scrollView}>
-        <View style={styles.contentCotainer}>
-          <View style={styles.addressContainer}>
-            <View style={styles.addressView}>
-              <Caption style={styles.addressTitle}>
-                Aleea Bârsei 3 Cluj-Napoca, 400605
+    <>
+      <Appbar forDetailScreen />
+      <View style={styles.container}>
+        <ScrollView style={styles.scrollView}>
+          <View style={styles.contentCotainer}>
+            <View style={styles.addressContainer}>
+              <View style={styles.addressView}>
+                <Caption style={styles.addressTitle}>
+                  {hotspotDetails.address}
+                </Caption>
+              </View>
+              <View style={styles.editView}>
+                <Button
+                  style={styles.button}
+                  contentStyle={styles.buttonContent}
+                  labelStyle={styles.buttonLabel}
+                  icon="pencil-outline"
+                  mode="contained"
+                >
+                  Editează
+                </Button>
+              </View>
+            </View>
+            <Caption style={styles.subTitle}>{hotspotDetails.details}</Caption>
+            <View style={styles.separator} />
+            <Caption style={styles.notes}>{hotspotDetails.notes}</Caption>
+            <View style={styles.informationContainer}>
+              <StatusView status={hotspotDetails.status}></StatusView>
+              <InformationView
+                title={'pisici \nnesterilizate'}
+                subTitle={`${
+                  hotspotDetails.unsterilizedCatsCount ||
+                  hotspotDetails.unsterilizedCats.length
+                }`}
+              ></InformationView>
+              <InformationView
+                title={'pisici sterilizate'}
+                subTitle={`${hotspotDetails.sterilizedCats.length}`}
+              ></InformationView>
+            </View>
+            <View style={styles.informationContainer}>
+              <InformationView
+                title={'Contact'}
+                subTitle={`${hotspotDetails.contactName || '-'}\n${
+                  hotspotDetails.contactPhone || '-'
+                }`}
+              ></InformationView>
+              <InformationView
+                title={'Voluntar'}
+                subTitle={`${hotspotDetails.volunteer?.name || '-'}\n${
+                  hotspotDetails.volunteer?.phone || '-'
+                }`}
+              ></InformationView>
+            </View>
+            <View style={styles.catCategoryContainer}>
+              <Avatar.Icon
+                size={24}
+                icon="close"
+                color={theme.colors.background}
+                style={styles.catCategoryTitleIcon}
+              />
+              <Caption style={styles.catCategoryTitleLabel}>
+                Pisici nesterilizate
               </Caption>
             </View>
-            <View style={styles.editView}>
-              <Button
-                style={styles.button}
-                contentStyle={styles.buttonContent}
-                labelStyle={styles.buttonLabel}
-                icon="pencil-outline"
-                mode="contained"
-              >
-                Editează
-              </Button>
+            {hotspotDetails.unsterilizedCats.map((cat, index) => (
+              <CatCard key={cat.id} cat={cat} index={index + 1} />
+            ))}
+            <View style={styles.separator} />
+            <View style={styles.catCategoryContainer}>
+              <Avatar.Icon
+                size={24}
+                icon="check"
+                color={theme.colors.background}
+                style={styles.catCategoryTitleIcon}
+              />
+              <Caption style={styles.catCategoryTitleLabel}>
+                Pisici sterilizate
+              </Caption>
             </View>
+            {hotspotDetails.sterilizedCats.map((cat, index) => (
+              <CatCard key={cat.id} cat={cat} index={index + 1} />
+            ))}
           </View>
-          <Caption style={styles.subTitle}>
-            Aleea Bârsei 3, în spatele blocului
-          </Caption>
-          <View style={styles.separator} />
-          <Caption style={styles.notes}>
-            Observatii: Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-            Morbi non sem egestas, cursus lorem bibendum, facilisis lorem.
-          </Caption>
-          <View style={styles.informationContainer}>
-            <StatusView {...hotspot}></StatusView>
-            <InforamtionView
-              title={'pisici \nnesterilizate'}
-              subTitle={'2'}
-            ></InforamtionView>
-            <InforamtionView
-              title={'pisici sterilizate'}
-              subTitle={'0'}
-            ></InforamtionView>
-          </View>
-          <View style={styles.informationContainer}>
-            <InforamtionView
-              title={'Contact'}
-              subTitle={'Ion Iliescu \n 0784354312'}
-            ></InforamtionView>
-            <InforamtionView
-              title={'Voluntar'}
-              subTitle={'Vadim \n 0746784323'}
-            ></InforamtionView>
-          </View>
-          <View style={styles.catCategoryContainer}>
-            <Avatar.Icon
-              size={24}
-              icon="close"
-              color={theme.colors.background}
-              style={styles.catCategoryTitleIcon}
+          <View style={styles.imageView}>
+            <Image
+              source={catLady3}
+              style={styles.image}
+              resizeMode="contain"
             />
-            <Caption style={styles.catCategoryTitleLabel}>
-              Pisici nesterilizate
-            </Caption>
           </View>
-          <View style={styles.separator} />
-          <View style={styles.catCategoryContainer}>
-            <Avatar.Icon
-              size={24}
-              icon="check"
-              color={theme.colors.background}
-              style={styles.catCategoryTitleIcon}
-            />
-            <Caption style={styles.catCategoryTitleLabel}>
-              Pisici sterilizate
-            </Caption>
-          </View>
-        </View>
-        <View style={styles.imageView}>
-          <Image source={catLady3} style={styles.image} resizeMode="contain" />
-        </View>
-      </ScrollView>
-    </View>
+        </ScrollView>
+      </View>
+    </>
   );
 };
 
-const StatusView = (props: Hotspot) => {
+const StatusView = ({ status }: { status: HotspotStatus }) => {
   const theme = useTheme();
   const styles = getStyles(theme);
-  const getColor = ({ status }: Hotspot) => {
+  const getColor = (status: HotspotStatus) => {
     if (status === HotspotStatus.done) return theme.colors.success;
     if (status === HotspotStatus.inProgress) return theme.colors.warning;
     return theme.colors.error;
   };
 
   return (
-    <View style={[styles.statusView, { backgroundColor: getColor(props) }]}>
-      <Caption style={styles.statusText}>{props.status}</Caption>
+    <View style={[styles.statusView, { backgroundColor: getColor(status) }]}>
+      <Caption style={styles.statusText}>{status}</Caption>
     </View>
   );
 };
@@ -262,7 +306,7 @@ interface InformationProps {
   readonly subTitle: string;
 }
 
-const InforamtionView = (props: InformationProps) => {
+const InformationView = (props: InformationProps) => {
   const theme = useTheme();
   const styles = getStyles(theme);
 

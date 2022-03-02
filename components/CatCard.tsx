@@ -1,10 +1,7 @@
 import { isEmpty } from 'lodash';
 import React from 'react';
 import { FlatList, Image, StyleSheet, Text, View } from 'react-native';
-import { Button, Card, useTheme } from 'react-native-paper';
-import leftArrow from '../assets/leftArrow.png';
-import rigthArrow from '../assets/rigthArrow.png';
-import user from '../assets/user.png';
+import { Button, Card, IconButton, useTheme } from 'react-native-paper';
 import { Cat, getDateText } from '../models/Cat';
 
 const getStyles = (theme: ReactNativePaper.Theme) =>
@@ -13,6 +10,7 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
       width: '100%',
       backgroundColor: theme.colors.surface,
       borderRadius: 30,
+      marginBottom: 10,
     },
     container: {
       padding: 20,
@@ -62,6 +60,7 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
     icon: {
       width: 20,
       height: 20,
+      margin: 0,
       marginRight: 4,
     },
     circleView: {
@@ -113,12 +112,16 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
     },
   });
 interface CatCardProps {
-  readonly cat: Cat;
-  readonly index: number;
-  readonly isEditingMode: boolean;
+  cat: Cat;
+  index: number;
+  isEditingMode?: boolean;
 }
 
-export const CatCard = (props: CatCardProps) => {
+export const CatCard = ({
+  cat,
+  index,
+  isEditingMode = false,
+}: CatCardProps) => {
   const theme = useTheme();
   const styles = getStyles(theme);
 
@@ -127,56 +130,73 @@ export const CatCard = (props: CatCardProps) => {
       <View style={styles.container}>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <View style={{ flexDirection: 'row', alignItems: 'baseline' }}>
-            <Text style={styles.baseText}>{props.index}.</Text>
-            <Text style={styles.title}>Sex </Text>
+            <Text style={styles.baseText}>{index}.</Text>
+            <Text style={styles.title}>Sex</Text>
           </View>
           <View style={styles.circleView}>
-            <Text style={styles.genderText}>{props.cat.sex}</Text>
+            <Text style={styles.genderText}>{cat.sex}</Text>
           </View>
         </View>
-        {props.cat.notes && (
-          <Text style={styles.notes}>Observatii: {props.cat.notes}</Text>
+        {!!cat.notes && (
+          <Text style={styles.notes}>Observatii: {cat.notes}</Text>
         )}
-        {props.cat.isSterilized && (
+        {!!cat.isSterilized && (
           <View style={{ paddingTop: 8 }}>
             <View style={styles.informationLine}>
               <View style={styles.iconAndText}>
-                <Image source={leftArrow} style={styles.icon} />
+                <IconButton
+                  icon="calendar-arrow-left"
+                  size={20}
+                  color={theme.colors.placeholder}
+                  style={styles.icon}
+                />
                 <Text style={styles.baseText}>Dată internare:</Text>
               </View>
               <View style={{ width: '50%', justifyContent: 'flex-start' }}>
                 <Text style={styles.infoText}>
-                  {getDateText(props.cat.checkInDate)}
+                  {getDateText(cat.checkInDate)}
                 </Text>
               </View>
             </View>
             <View style={styles.informationLine}>
               <View style={styles.iconAndText}>
-                <Image source={rigthArrow} style={styles.icon} />
+                <IconButton
+                  icon="calendar-arrow-right"
+                  size={20}
+                  color={theme.colors.placeholder}
+                  style={styles.icon}
+                />
                 <Text style={styles.baseText}>Dată externare:</Text>
               </View>
               <View style={{ width: '50%', justifyContent: 'flex-start' }}>
                 <Text style={styles.infoText}>
-                  {getDateText(props.cat.checkOutDate)}
+                  {getDateText(cat.checkOutDate)}
                 </Text>
               </View>
             </View>
             <View style={styles.informationLine}>
               <View style={styles.iconAndText}>
-                <Image source={user} style={styles.icon} />
+                <IconButton
+                  icon="account"
+                  size={20}
+                  color={theme.colors.placeholder}
+                  style={styles.icon}
+                />
                 <Text style={styles.baseText}>Voluntar:</Text>
               </View>
               <View style={{ width: '50%', justifyContent: 'flex-start' }}>
-                <Text style={styles.infoText}>{props.cat.capturedBy.name}</Text>
+                <Text style={styles.infoText}>
+                  {cat.capturedBy?.name || ''}
+                </Text>
               </View>
             </View>
           </View>
         )}
-        {!isEmpty(props.cat.media) && (
+        {!isEmpty(cat.media) && (
           <FlatList
             style={{ marginTop: 20 }}
             horizontal
-            data={props.cat.media}
+            data={[] /*cat.media*/}
             keyExtractor={(item, index) => index.toString()}
             renderItem={({ item }) => (
               <View>
@@ -186,7 +206,7 @@ export const CatCard = (props: CatCardProps) => {
           />
         )}
       </View>
-      {props.isEditingMode && (
+      {isEditingMode && (
         <View style={{ flexDirection: 'row', paddingTop: 8 }}>
           <View style={styles.buttonView}>
             <Button
