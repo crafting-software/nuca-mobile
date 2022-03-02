@@ -16,39 +16,20 @@ import { useNavigation } from '@react-navigation/native';
 import currentLocationIcon from '../assets/current-location.png';
 import { Appbar } from '../components/Appbar';
 import { MapContext } from '../context';
+import { findCurrentLocation } from '../context/MapContext';
 import { getHotspotMarker } from '../models/Hotspot';
 import { Location } from '../models/Location';
 import { loadHotspots } from '../utils/hotspots';
 
-const intialRegion: Region = {
-  latitude: 46.77293258116839,
-  longitude: 23.587688864363546,
-  latitudeDelta: 0.0922,
-  longitudeDelta: 0.0421,
-};
-
-const findCurrentLocation = async (): Promise<Location> => {
-  const { status } = await LocationProvider.requestForegroundPermissionsAsync();
-  if (status !== 'granted') {
-    alert('Permission to access location was denied.');
-  }
-
-  const position = await LocationProvider.getCurrentPositionAsync();
-  let location: Location = {
-    ...position.coords,
-  };
-
-  const place = await LocationProvider.reverseGeocodeAsync(position.coords);
-  place.find(address => {
-    location = { ...address, ...location };
-  });
-
-  return location;
-};
-
 export const MapScreen = () => {
   const { hotspots, setHotspots } = useContext(MapContext);
-  const [_location, setLocation] = useState<Location>();
+  const [location, setLocation] = useState<Location>();
+  const [region, setRegion] = useState<Region>({
+    latitude: 46.77293258116839,
+    longitude: 23.587688864363546,
+    latitudeDelta: 0.0922,
+    longitudeDelta: 0.0421,
+  });
   const mapRef = useRef<MapView>(null);
   const navigation = useNavigation();
   const [isLoading, setIsLoading] = useState(false);
@@ -94,7 +75,8 @@ export const MapScreen = () => {
           ref={mapRef}
           // use intial region + animateToRegion instead of region as react state because
           // gestures don't work well https://github.com/react-native-maps/react-native-maps/issues/3639
-          initialRegion={intialRegion}
+          initialRegion={region}
+          onRegionChange={setRegion}
           showsUserLocation
           style={styles.map}
         >
@@ -124,7 +106,9 @@ export const MapScreen = () => {
           autoCorrect={false}
           placeholder="Caută"
           autoComplete={false}
-          right={<TextInput.Icon name="magnify" color={theme.colors.primary} />}
+          right={
+            <TextInput.Icon name="magnify" color={theme.colors.placeholder} />
+          }
           returnKeyType="search"
           onSubmitEditing={async ({ nativeEvent: { text } }) =>
             searchForAddress(text)
@@ -135,7 +119,10 @@ export const MapScreen = () => {
         style={styles.addLocationButton}
         activeOpacity={0.9}
         onPress={() => {
-          navigation.navigate('AddHotspot');
+          navigation.navigate('AddHotspot', {
+            location: location,
+            region: region,
+          });
         }}
       >
         <View style={styles.addLocationButtonLabelContainer}>

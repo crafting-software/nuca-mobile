@@ -4,6 +4,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { AuthContext } from '../context';
 import { AddHotspotScreen } from '../screens/AddHotspotScreen';
 import { AuthenticationScreen } from '../screens/AuthenticationScreen';
+import { ChooseLocationScreen } from '../screens/ChooseLocationScreen';
 import { HotspotDetailScreen } from '../screens/HotspotDetailScreen';
 import { MapScreen } from '../screens/MapScreen';
 import { NotFoundScreen } from '../screens/NotFoundScreen';
@@ -39,6 +40,11 @@ const RootNavigator = () => {
           <Stack.Screen
             name="AddHotspot"
             component={AddHotspotScreen}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="ChooseLocation"
+            component={ChooseLocationScreen}
             options={{ headerShown: false }}
           />
           <Stack.Screen

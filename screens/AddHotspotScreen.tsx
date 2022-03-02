@@ -1,5 +1,5 @@
 import { capitalize } from 'lodash';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Dimensions,
   Image,
@@ -19,13 +19,16 @@ import {
   useTheme,
 } from 'react-native-paper';
 import SelectDropdown from 'react-native-select-dropdown';
+import { useNavigation } from '@react-navigation/native';
 import catLadyImage from '../assets/cat-lady2.png';
 import currentLocationIcon from '../assets/current-location.png';
 import mapPinIcon from '../assets/map-pin.png';
 import { Appbar } from '../components/Appbar';
 import { InputField } from '../components/InputField';
-import { HotspotStatus } from '../models/Hotspot';
-import { Location } from '../models/Location';
+import { findCurrentLocation } from '../context/MapContext';
+import { HotspotStatus, hotspotStatusList } from '../models/Hotspot';
+import { getFormattedAddress, Location } from '../models/Location';
+import { RootStackScreenProps } from '../types';
 
 const getStyles = (theme: ReactNativePaper.Theme) =>
   StyleSheet.create({
@@ -184,23 +187,28 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
     },
   });
 
-export const AddHotspotScreen = () => {
+export const AddHotspotScreen = ({
+  route,
+}: RootStackScreenProps<'AddHotspot'>) => {
+  const navigation = useNavigation();
   const theme = useTheme();
   const styles = getStyles(theme);
 
   const [location, setLocation] = useState<Location>();
+  const [addressDetails, setAddressDetails] = useState('');
   const [status, setStatus] = useState<HotspotStatus>();
-  const [showStatusDropDown, setShowStatusDropDown] = useState(false);
+  const [remarks, setRemarks] = useState('');
+  const [contactPerson, setContactPerson] = useState('');
+  const [contactPersonPhone, setContactPersonPhone] = useState('');
+  const [volunteer, setVolunteer] = useState('');
 
-  const statusList: HotspotStatus[] = [
-    HotspotStatus.toDo,
-    HotspotStatus.inProgress,
-    HotspotStatus.done,
-  ];
+  useEffect(() => {
+    setLocation(route.params.location);
+  }, [route.params.location]);
 
   return (
     <View style={styles.container}>
-      <Appbar />
+      <Appbar forDetailScreen={true} />
       <ScrollView style={styles.container}>
         <>
           <View style={styles.form}>
@@ -212,24 +220,23 @@ export const AddHotspotScreen = () => {
             </View>
 
             <InputField
-              placeholder="Caută"
-              rightIcon={
-                <TextInput.Icon
-                  name="magnify"
-                  color={theme.colors.text}
-                  style={{
-                    marginTop: 15,
-                  }}
-                />
-              }
+              placeholder="Adresă"
+              multiline={true}
               inputFieldStyle={{ marginTop: 30 }}
+              value={location && getFormattedAddress(location)}
+              editable={false}
             />
 
             <View style={styles.locationButtonsContainer}>
               <View style={styles.leftLocationButtonContainer}>
                 <TouchableOpacity
                   style={styles.locationButton}
-                  onPress={() => alert('Alege locatia pe harta')}
+                  onPress={() =>
+                    navigation.navigate('ChooseLocation', {
+                      location,
+                      region: route.params.region,
+                    })
+                  }
                 >
                   <Image
                     style={styles.locationButtonIcon}
@@ -244,7 +251,10 @@ export const AddHotspotScreen = () => {
               <View style={styles.rightLocationButtonContainer}>
                 <TouchableOpacity
                   style={styles.locationButton}
-                  onPress={() => alert('Gaseste-mi locatia curenta')}
+                  onPress={async () => {
+                    const currentLocation = await findCurrentLocation();
+                    setLocation(currentLocation);
+                  }}
                 >
                   <Image
                     style={styles.locationButtonIcon}
@@ -258,15 +268,16 @@ export const AddHotspotScreen = () => {
             </View>
 
             <InputField
-              label="Nume"
+              label="Detalii adresă"
               placeholder="Nume"
               inputFieldStyle={{ marginTop: 70 }}
+              onTextInputChangeText={setAddressDetails}
             />
 
             <Caption style={styles.textInputTitle}>STATUS</Caption>
             <SelectDropdown
               defaultButtonText="Alege status"
-              data={statusList}
+              data={hotspotStatusList}
               buttonStyle={styles.statusButton}
               buttonTextStyle={styles.statusButtonText}
               dropdownStyle={styles.statusDropdown}
@@ -279,13 +290,13 @@ export const AddHotspotScreen = () => {
                   style={{ marginRight: 40 }}
                 />
               )}
-              onSelect={(selectedItem, _index) => {
-                setStatus(selectedItem);
+              onSelect={(selectedItem: HotspotStatus, _index) => {
+                setStatus(selectedItem as HotspotStatus);
               }}
-              buttonTextAfterSelection={(selectedItem, _index) =>
+              buttonTextAfterSelection={(selectedItem: HotspotStatus, _index) =>
                 capitalize(selectedItem as HotspotStatus)
               }
-              rowTextForSelection={(item, _index) =>
+              rowTextForSelection={(item: HotspotStatus, _index) =>
                 capitalize(item as HotspotStatus)
               }
             />
@@ -296,6 +307,7 @@ export const AddHotspotScreen = () => {
               placeholder="Scrie aici"
               inputFieldStyle={styles.inputField}
               textInputStyle={{ height: 100 }}
+              onTextInputChangeText={setRemarks}
             />
 
             <View style={styles.catsCountContainer}>
@@ -319,6 +331,7 @@ export const AddHotspotScreen = () => {
               label="Persoana de contact"
               placeholder="Nume persoana de contact"
               inputFieldStyle={styles.inputField}
+              onTextInputChangeText={setContactPerson}
             />
 
             <InputField
@@ -326,12 +339,14 @@ export const AddHotspotScreen = () => {
               placeholder="Telefon persoana de contact"
               keyboardType="phone-pad"
               inputFieldStyle={styles.inputField}
+              onTextInputChangeText={setContactPersonPhone}
             />
 
             <InputField
               label="Voluntar"
               placeholder="Voluntar"
               inputFieldStyle={styles.inputField}
+              onTextInputChangeText={setVolunteer}
             />
 
             <Divider style={[styles.divider, { marginTop: 54 }]} />
@@ -389,7 +404,18 @@ export const AddHotspotScreen = () => {
               labelStyle={styles.saveButtonLabel}
               icon="check"
               mode="contained"
-              onPress={() => alert('save')}
+              onPress={() =>
+                alert(
+                  JSON.stringify({
+                    name: addressDetails,
+                    status,
+                    remarks,
+                    contactPerson,
+                    contactPersonPhone,
+                    volunteer,
+                  })
+                )
+              }
             >
               Salvează
             </Button>

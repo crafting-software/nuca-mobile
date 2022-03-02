@@ -8,7 +8,13 @@ export type Location = {
 };
 
 export const getFormattedAddress = (location: Location): string => {
-  return `${location.street} ${location.streetNumber}, ${location.postalCode} ${location.city}`
-    .replace('  ', ' ')
-    .trim();
+  const textOrDefault = (value: string | null | undefined) => value ?? '';
+
+  const street = `${textOrDefault(location.street)} ${textOrDefault(
+    location.streetNumber
+  )}`.trim();
+
+  return `${street} ${street ? ',' : ''} ${textOrDefault(
+    location.postalCode
+  )} ${textOrDefault(location.city)}`.trim();
 };

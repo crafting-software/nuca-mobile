@@ -16,6 +16,7 @@ const linking: LinkingOptions<RootStackParamList> = {
       AddHotspot: 'addHotspot',
       HotspotDetail: 'hotspotDetail',
       NotFound: '*',
+      ChooseLocation: 'chooseLocation',
     },
   },
 };
