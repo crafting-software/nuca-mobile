@@ -1,4 +1,3 @@
-import { camelCase } from 'lodash';
 import {
   castToHotspot,
   castToHotspotDetails,
