@@ -7,6 +7,7 @@ import { AuthenticationScreen } from '../screens/AuthenticationScreen';
 import { ChooseLocationScreen } from '../screens/ChooseLocationScreen';
 import { HotspotDetailScreen } from '../screens/HotspotDetailScreen';
 import { MapScreen } from '../screens/MapScreen';
+import { ModalScreen } from '../screens/ModalScreen';
 import { NotFoundScreen } from '../screens/NotFoundScreen';
 import { RootStackParamList } from '../types';
 import LinkingConfiguration from './LinkingConfiguration';
@@ -48,6 +49,11 @@ const RootNavigator = () => {
             options={{ headerShown: false }}
           />
           <Stack.Screen
+            name="HotspotDetail"
+            component={HotspotDetailScreen}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
             name="NotFound"
             component={NotFoundScreen}
             options={{ title: 'Oops!', headerShown: false }}
@@ -63,8 +69,8 @@ const RootNavigator = () => {
 
       <Stack.Group screenOptions={{ presentation: 'modal' }}>
         <Stack.Screen
-          name="HotspotDetail"
-          component={HotspotDetailScreen}
+          name="Modal"
+          component={ModalScreen}
           options={{ title: '' }}
         />
       </Stack.Group>

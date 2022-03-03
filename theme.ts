@@ -14,6 +14,10 @@ export const fontDefinition = {
     fontFamily: 'Nunito_700Bold',
     fontWeight: 'normal',
   },
+  extraBold: {
+    fontFamily: 'Nunito_800ExtraBold',
+    fontWeight: 'normal',
+  },
   light: {
     fontFamily: 'Nunito_300Light',
     fontWeight: 'normal',
