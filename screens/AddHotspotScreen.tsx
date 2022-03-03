@@ -28,7 +28,9 @@ import { InputField } from '../components/InputField';
 import { findCurrentLocation } from '../context/MapContext';
 import { HotspotStatus, hotspotStatusList } from '../models/Hotspot';
 import { getFormattedAddress, Location } from '../models/Location';
+import { User } from '../models/User';
 import { RootStackScreenProps } from '../types';
+import { loadUsers } from '../utils/users';
 
 const getStyles = (theme: ReactNativePaper.Theme) =>
   StyleSheet.create({
@@ -202,9 +204,20 @@ export const AddHotspotScreen = ({
   const [contactPersonPhone, setContactPersonPhone] = useState('');
   const [volunteer, setVolunteer] = useState('');
 
+  const [users, setUsers] = useState<User[]>([]);
+
   useEffect(() => {
     setLocation(route.params.location);
   }, [route.params.location]);
+
+  useEffect(() => {
+    const load = async () => {
+      const { success, users } = await loadUsers();
+      if (!success) alert('Failed to load users');
+      setUsers(users);
+    };
+    load();
+  }, []);
 
   return (
     <View style={styles.container}>
