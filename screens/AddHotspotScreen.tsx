@@ -16,6 +16,7 @@ import {
   FAB,
   Headline,
   TextInput,
+  Title,
   useTheme,
 } from 'react-native-paper';
 import SelectDropdown from 'react-native-select-dropdown';
@@ -31,13 +32,13 @@ import { getFormattedAddress, Location } from '../models/Location';
 import { User } from '../models/User';
 import { RootStackScreenProps } from '../types';
 import { loadUsers } from '../utils/users';
+import { scaledHeight } from './HotspotDetailScreen';
 
 const getStyles = (theme: ReactNativePaper.Theme) =>
   StyleSheet.create({
     container: {
       backgroundColor: theme.colors.background,
-      height: '100%',
-      width: '100%',
+      flex: 1,
     },
     form: {
       padding: 20,
@@ -146,6 +147,12 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
       height: 64,
       marginTop: 100,
     },
+    deleteButton: {
+      height: 64,
+      backgroundColor: theme.colors.surface,
+      color: 'black',
+      marginTop: 10,
+    },
     saveButtonContent: {
       height: 64,
       alignItems: 'center',
@@ -154,6 +161,11 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
     },
     saveButtonLabel: {
       color: theme.colors.background,
+      fontSize: 18,
+      fontFamily: 'Nunito_700Bold',
+    },
+    deleteButtonLabel: {
+      color: theme.colors.text,
       fontSize: 18,
       fontFamily: 'Nunito_700Bold',
     },
@@ -187,6 +199,27 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
       fontSize: 15,
       fontFamily: 'Nunito_400Regular',
     },
+    imageView: {
+      height: Dimensions.get('window').height * 0.4,
+      marginTop: 32,
+    },
+    image: {
+      width: '100%',
+      maxHeight: scaledHeight,
+      position: 'absolute',
+      bottom: -20,
+    },
+    scrollView: {
+      width: '100%',
+      height: '1000%',
+    },
+    addressTitle: {
+      fontSize: 18,
+      fontFamily: 'Nunito_700Bold',
+      lineHeight: 26,
+      flexShrink: 1,
+      marginRight: 20,
+    },
   });
 
 export const AddHotspotScreen = ({
@@ -205,6 +238,7 @@ export const AddHotspotScreen = ({
   const [volunteer, setVolunteer] = useState('');
 
   const [users, setUsers] = useState<User[]>([]);
+  const isUpdate = route.params.isUpdate;
 
   useEffect(() => {
     setLocation(route.params.location);
@@ -220,73 +254,79 @@ export const AddHotspotScreen = ({
   }, []);
 
   return (
-    <View style={styles.container}>
+    <>
       <Appbar forDetailScreen />
-      <ScrollView style={styles.container}>
-        <>
+      <View style={styles.container}>
+        <ScrollView style={styles.scrollView}>
           <View style={styles.form}>
-            <View style={styles.screenTitleContainer}>
-              <Headline style={styles.screenTitleIcon}>+</Headline>
-              <Caption style={styles.screenTitleLabel}>
-                Adaugă zonă de interes
-              </Caption>
-            </View>
-
-            <InputField
-              placeholder="Adresă"
-              multiline={true}
-              inputFieldStyle={{ marginTop: 30 }}
-              value={location && getFormattedAddress(location)}
-              editable={false}
-            />
-
-            <View style={styles.locationButtonsContainer}>
-              <View style={styles.leftLocationButtonContainer}>
-                <TouchableOpacity
-                  style={styles.locationButton}
-                  onPress={() =>
-                    navigation.navigate('ChooseLocation', {
-                      location,
-                      region: route.params.region,
-                    })
-                  }
-                >
-                  <Image
-                    style={styles.locationButtonIcon}
-                    source={mapPinIcon}
-                  />
-                  <Caption style={styles.locationButtonLabel}>
-                    ALEGE PE HARTĂ
+            {!isUpdate ? (
+              <>
+                <View style={styles.screenTitleContainer}>
+                  <Headline style={styles.screenTitleIcon}>+</Headline>
+                  <Caption style={styles.screenTitleLabel}>
+                    Adaugă zonă de interes
                   </Caption>
-                </TouchableOpacity>
-              </View>
+                </View>
 
-              <View style={styles.rightLocationButtonContainer}>
-                <TouchableOpacity
-                  style={styles.locationButton}
-                  onPress={async () => {
-                    const currentLocation = await findCurrentLocation();
-                    setLocation(currentLocation);
-                  }}
-                >
-                  <Image
-                    style={styles.locationButtonIcon}
-                    source={currentLocationIcon}
-                  />
-                  <Caption style={styles.locationButtonLabel}>
-                    LOCAȚIA MEA
-                  </Caption>
-                </TouchableOpacity>
-              </View>
-            </View>
+                <InputField
+                  placeholder="Adresă"
+                  multiline={true}
+                  inputFieldStyle={{ marginTop: 30 }}
+                  value={location && getFormattedAddress(location)}
+                  editable={false}
+                />
 
+                <View style={styles.locationButtonsContainer}>
+                  <View style={styles.leftLocationButtonContainer}>
+                    <TouchableOpacity
+                      style={styles.locationButton}
+                      onPress={() =>
+                        navigation.navigate('ChooseLocation', {
+                          location,
+                          region: route.params.region,
+                        })
+                      }
+                    >
+                      <Image
+                        style={styles.locationButtonIcon}
+                        source={mapPinIcon}
+                      />
+                      <Caption style={styles.locationButtonLabel}>
+                        ALEGE PE HARTĂ
+                      </Caption>
+                    </TouchableOpacity>
+                  </View>
+
+                  <View style={styles.rightLocationButtonContainer}>
+                    <TouchableOpacity
+                      style={styles.locationButton}
+                      onPress={async () => {
+                        const currentLocation = await findCurrentLocation();
+                        setLocation(currentLocation);
+                      }}
+                    >
+                      <Image
+                        style={styles.locationButtonIcon}
+                        source={currentLocationIcon}
+                      />
+                      <Caption style={styles.locationButtonLabel}>
+                        LOCAȚIA MEA
+                      </Caption>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </>
+            ) : (
+              <Title style={styles.addressTitle}>
+                Aleea Bârsei 3 Cluj-Napoca, 400605
+              </Title>
+            )}
             <InputField
               label="Detalii adresă"
               placeholder="Nume"
-              inputFieldStyle={{ marginTop: 70 }}
+              inputFieldStyle={{ marginTop: 54 }}
               onTextInputChangeText={setAddressDetails}
             />
-
             <Caption style={styles.textInputTitle}>STATUS</Caption>
             <SelectDropdown
               defaultButtonText="Alege status"
@@ -313,7 +353,6 @@ export const AddHotspotScreen = ({
                 capitalize(item as HotspotStatus)
               }
             />
-
             <InputField
               multiline={true}
               label="Observații"
@@ -322,31 +361,17 @@ export const AddHotspotScreen = ({
               textInputStyle={{ height: 100 }}
               onTextInputChangeText={setRemarks}
             />
-
-            <View style={styles.catsCountContainer}>
-              <View style={styles.catsCountLeftItem}>
-                <InputField
-                  label="Pisici nesterilizate"
-                  placeholder="0"
-                  editable={false}
-                />
-              </View>
-              <View style={styles.catsCountRightItem}>
-                <InputField
-                  label="Pisici sterilizate"
-                  placeholder="0"
-                  editable={false}
-                />
-              </View>
-            </View>
-
+            <InputField
+              label="Pisici nesterilizate"
+              placeholder="0"
+              editable={false}
+            />
             <InputField
               label="Persoana de contact"
               placeholder="Nume persoana de contact"
               inputFieldStyle={styles.inputField}
               onTextInputChangeText={setContactPerson}
             />
-
             <InputField
               label="Telefon persoana de contact"
               placeholder="Telefon persoana de contact"
@@ -354,17 +379,32 @@ export const AddHotspotScreen = ({
               inputFieldStyle={styles.inputField}
               onTextInputChangeText={setContactPersonPhone}
             />
-
-            <InputField
-              label="Voluntar"
-              placeholder="Voluntar"
-              inputFieldStyle={styles.inputField}
-              onTextInputChangeText={setVolunteer}
+            <Caption style={styles.textInputTitle}>VOLUNTAR</Caption>
+            <SelectDropdown
+              defaultButtonText="Alege voluntar"
+              data={[]}
+              buttonStyle={styles.statusButton}
+              buttonTextStyle={styles.statusButtonText}
+              dropdownStyle={styles.statusDropdown}
+              rowTextStyle={styles.statusRowText}
+              dropdownIconPosition="right"
+              renderDropdownIcon={(_selectedItem, _index) => (
+                <TextInput.Icon
+                  name="chevron-down"
+                  color={theme.colors.text}
+                  style={{ marginRight: 40 }}
+                />
+              )}
+              onSelect={() => {}}
+              buttonTextAfterSelection={(selectedItem: HotspotStatus, _index) =>
+                capitalize(selectedItem as HotspotStatus)
+              }
+              rowTextForSelection={(item: HotspotStatus, _index) =>
+                capitalize(item as HotspotStatus)
+              }
             />
-
             <Divider style={[styles.divider, { marginTop: 54 }]} />
             <Divider style={[styles.divider, { marginTop: 1 }]} />
-
             <View style={styles.catCategoriesContainer}>
               <Avatar.Icon
                 size={24}
@@ -385,10 +425,8 @@ export const AddHotspotScreen = ({
                 onPress={() => alert('add unsterilized cat')}
               />
             </View>
-
             <Divider style={[styles.divider, { marginTop: 54 }]} />
             <Divider style={[styles.divider, { marginTop: 1 }]} />
-
             <View style={styles.catCategoriesContainer}>
               <Avatar.Icon
                 size={24}
@@ -409,7 +447,6 @@ export const AddHotspotScreen = ({
                 onPress={() => alert('add sterilized cat')}
               />
             </View>
-
             <Button
               uppercase={false}
               style={styles.saveButton}
@@ -432,22 +469,30 @@ export const AddHotspotScreen = ({
             >
               Salvează
             </Button>
+            {isUpdate && (
+              <Button
+                uppercase={false}
+                style={styles.deleteButton}
+                contentStyle={styles.saveButtonContent}
+                labelStyle={styles.deleteButtonLabel}
+                icon="close"
+                mode="contained"
+                onPress={() => alert('Delete hotspot')}
+              >
+                Șterge adresa
+              </Button>
+            )}
           </View>
 
-          <View
-            style={{
-              height: Dimensions.get('window').height * 0.4,
-              maxHeight: Dimensions.get('window').height * 0.4,
-            }}
-          >
+          <View style={styles.imageView}>
             <Image
-              style={styles.catLadyImage}
               source={catLadyImage}
+              style={styles.image}
               resizeMode="contain"
             />
           </View>
-        </>
-      </ScrollView>
-    </View>
+        </ScrollView>
+      </View>
+    </>
   );
 };

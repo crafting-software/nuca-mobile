@@ -25,7 +25,7 @@ import { loadHotspotDetails } from '../utils/hotspots';
 
 const imageAspectRatio = 1080 / 872;
 const scaledWidth = Dimensions.get('window').width;
-const scaledHeight = scaledWidth / imageAspectRatio;
+export const scaledHeight = scaledWidth / imageAspectRatio;
 
 const getStyles = (theme: ReactNativePaper.Theme) =>
   StyleSheet.create({

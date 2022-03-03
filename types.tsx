@@ -16,7 +16,7 @@ export type RootStackParamList = {
   Authentication: undefined;
   Main: undefined;
   Modal: undefined;
-  AddHotspot: { region: Region; location?: Location };
+  AddHotspot: { region: Region; location?: Location; isUpdate?: boolean };
   HotspotDetail: { hotspotId: string };
   NotFound: undefined;
   ChooseLocation: { region: Region; location?: Location };
