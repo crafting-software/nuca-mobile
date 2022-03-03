@@ -14,11 +14,11 @@ import { useNavigation } from '@react-navigation/native';
 import logo from '../assets/logo.png';
 import { AuthContext } from '../context';
 
-export type AppbarProps = {
+export const Appbar = ({
+  forDetailScreen = false,
+}: {
   forDetailScreen?: boolean;
-};
-
-export const Appbar = (props: AppbarProps) => {
+}) => {
   const { setAuth } = useContext(AuthContext);
   const signOut = () => {
     SecureStore.deleteItemAsync('auth');
@@ -68,14 +68,9 @@ export const Appbar = (props: AppbarProps) => {
 
   return (
     <PaperAppbar
-      style={[
-        styles.defaultBar,
-        !!props.forDetailScreen ? styles.detailScreenBar : {},
-      ]}
+      style={[styles.defaultBar, forDetailScreen ? styles.detailScreenBar : {}]}
     >
-      {!!props.forDetailScreen
-        ? detailScreenAppbarContent
-        : defaultAppbarContent}
+      {forDetailScreen ? detailScreenAppbarContent : defaultAppbarContent}
     </PaperAppbar>
   );
 };

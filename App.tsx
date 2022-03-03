@@ -9,6 +9,7 @@ import {
   Nunito_400Regular_Italic,
   Nunito_500Medium,
   Nunito_700Bold,
+  Nunito_800ExtraBold,
   useFonts,
 } from '@expo-google-fonts/nunito';
 import { AuthContextProvider, MapContextProvider } from './context';
@@ -22,6 +23,7 @@ export default () => {
     Nunito_400Regular,
     Nunito_500Medium,
     Nunito_700Bold,
+    Nunito_800ExtraBold,
     Nunito_400Regular_Italic,
   });
 

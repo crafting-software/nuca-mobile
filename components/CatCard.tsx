@@ -1,7 +1,13 @@
 import { isEmpty } from 'lodash';
 import React from 'react';
-import { FlatList, Image, StyleSheet, Text, View } from 'react-native';
-import { Button, Card, IconButton, useTheme } from 'react-native-paper';
+import { FlatList, Image, StyleSheet, View } from 'react-native';
+import {
+  Button,
+  Card,
+  IconButton,
+  useTheme,
+  Caption,
+} from 'react-native-paper';
 import { Cat, getDateText } from '../models/Cat';
 
 const getStyles = (theme: ReactNativePaper.Theme) =>
@@ -16,11 +22,24 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
       padding: 20,
       paddingBottom: 16,
     },
+    titleRow: {
+      flexDirection: 'row',
+      alignItems: 'baseline',
+    },
+    index: {
+      color: theme.colors.placeholder,
+      fontSize: 16,
+      lineHeight: 26,
+      fontFamily: 'Nunito_800ExtraBold',
+      marginLeft: 4,
+    },
     title: {
       color: theme.colors.placeholder,
       fontSize: 20,
+      lineHeight: 32,
       fontFamily: 'Nunito_400Regular',
       paddingLeft: 8,
+      textAlignVertical: 'center',
     },
     notes: {
       paddingTop: 12,
@@ -38,7 +57,9 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
       color: theme.colors.placeholder,
       fontSize: 16,
       fontFamily: 'Nunito_700Bold',
-      paddingLeft: 4,
+      letterSpacing: 0.01,
+      margin: 0,
+      marginLeft: 4,
     },
     infoText: {
       color: theme.colors.placeholder,
@@ -58,24 +79,22 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
       flexWrap: 'wrap',
     },
     icon: {
-      width: 20,
-      height: 20,
       margin: 0,
-      marginRight: 4,
-    },
-    circleView: {
-      width: 32,
-      height: 32,
-      borderRadius: 16,
-      borderColor: theme.colors.placeholder,
-      borderWidth: 1,
-      justifyContent: 'center',
     },
     genderText: {
       color: theme.colors.placeholder,
       fontSize: 16,
+      lineHeight: 32,
       fontFamily: 'Nunito_700Bold',
       textAlign: 'center',
+      width: 32,
+      height: 32,
+      marginLeft: 4,
+      borderRadius: 16,
+      borderColor: theme.colors.placeholder,
+      borderWidth: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
     },
     editButton: {
       height: 66,
@@ -128,17 +147,13 @@ export const CatCard = ({
   return (
     <Card style={styles.mainContainer}>
       <View style={styles.container}>
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <View style={{ flexDirection: 'row', alignItems: 'baseline' }}>
-            <Text style={styles.baseText}>{index}.</Text>
-            <Text style={styles.title}>Sex</Text>
-          </View>
-          <View style={styles.circleView}>
-            <Text style={styles.genderText}>{cat.sex}</Text>
-          </View>
+        <View style={styles.titleRow}>
+          <Caption style={styles.index}>{index}.</Caption>
+          <Caption style={styles.title}>Sex</Caption>
+          <Caption style={styles.genderText}>{cat.sex}</Caption>
         </View>
         {!!cat.notes && (
-          <Text style={styles.notes}>Observatii: {cat.notes}</Text>
+          <Caption style={styles.notes}>Observatii: {cat.notes}</Caption>
         )}
         {!!cat.isSterilized && (
           <View style={{ paddingTop: 8 }}>
@@ -150,13 +165,11 @@ export const CatCard = ({
                   color={theme.colors.placeholder}
                   style={styles.icon}
                 />
-                <Text style={styles.baseText}>Dată internare:</Text>
+                <Caption style={styles.baseText}>Dată internare:</Caption>
               </View>
-              <View style={{ width: '50%', justifyContent: 'flex-start' }}>
-                <Text style={styles.infoText}>
-                  {getDateText(cat.checkInDate)}
-                </Text>
-              </View>
+              <Caption style={styles.infoText}>
+                {getDateText(cat.checkInDate)}
+              </Caption>
             </View>
             <View style={styles.informationLine}>
               <View style={styles.iconAndText}>
@@ -166,13 +179,11 @@ export const CatCard = ({
                   color={theme.colors.placeholder}
                   style={styles.icon}
                 />
-                <Text style={styles.baseText}>Dată externare:</Text>
+                <Caption style={styles.baseText}>Dată externare:</Caption>
               </View>
-              <View style={{ width: '50%', justifyContent: 'flex-start' }}>
-                <Text style={styles.infoText}>
-                  {getDateText(cat.checkOutDate)}
-                </Text>
-              </View>
+              <Caption style={styles.infoText}>
+                {getDateText(cat.checkOutDate)}
+              </Caption>
             </View>
             <View style={styles.informationLine}>
               <View style={styles.iconAndText}>
@@ -182,13 +193,11 @@ export const CatCard = ({
                   color={theme.colors.placeholder}
                   style={styles.icon}
                 />
-                <Text style={styles.baseText}>Voluntar:</Text>
+                <Caption style={styles.baseText}>Voluntar:</Caption>
               </View>
-              <View style={{ width: '50%', justifyContent: 'flex-start' }}>
-                <Text style={styles.infoText}>
-                  {cat.capturedBy?.name || ''}
-                </Text>
-              </View>
+              <Caption style={styles.infoText}>
+                {cat.capturedBy?.name || ''}
+              </Caption>
             </View>
           </View>
         )}

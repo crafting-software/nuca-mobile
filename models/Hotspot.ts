@@ -1,4 +1,4 @@
-import { camelCase, trim } from 'lodash';
+import { camelCase } from 'lodash';
 import doneMarker from '../assets/marker-done.png';
 import inProgressMarker from '../assets/marker-in-progress.png';
 import todoMarker from '../assets/marker-todo.png';
@@ -32,6 +32,8 @@ export type Hotspot = {
 
 export type HotspotDetails = Hotspot & {
   address: string;
+  city: string;
+  zip: string;
   details: string;
   notes: string;
   sterilizedCats: Cat[];
@@ -64,13 +66,10 @@ export const castToHotspotDetails = (
   data: Record<string, any>
 ): HotspotDetails => ({
   ...castToHotspot(data),
-  address: trim(
-    `${data.street_name} ${data.street_number || ''}, ${data.city}, ${
-      data.zip
-    }`,
-    ','
-  ).trim(),
-  details: '',
+  address: data.address,
+  city: data.city,
+  zip: data.zip,
+  details: data.descriotion,
   notes: data.notes,
   sterilizedCats: data.sterilized_cats.map(castToCat),
   unsterilizedCats: data.unsterilized_cats.map(castToCat),
