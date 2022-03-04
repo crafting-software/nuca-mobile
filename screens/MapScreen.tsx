@@ -122,7 +122,6 @@ export const MapScreen = () => {
           navigation.navigate('AddHotspot', {
             location: location,
             region: region,
-            isUpdate: true,
           });
         }}
       >

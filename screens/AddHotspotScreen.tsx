@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import {
   Dimensions,
   Image,
+  LogBox,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
@@ -12,7 +13,6 @@ import {
   Avatar,
   Button,
   Caption,
-  Divider,
   FAB,
   Headline,
   TextInput,
@@ -22,17 +22,29 @@ import {
 import SelectDropdown from 'react-native-select-dropdown';
 import { useNavigation } from '@react-navigation/native';
 import catLadyImage from '../assets/cat-lady2.png';
+import catLady4 from '../assets/cat-lady4.png';
 import currentLocationIcon from '../assets/current-location.png';
 import mapPinIcon from '../assets/map-pin.png';
 import { Appbar } from '../components/Appbar';
 import { InputField } from '../components/InputField';
 import { findCurrentLocation } from '../context/MapContext';
-import { HotspotStatus, hotspotStatusList } from '../models/Hotspot';
+import {
+  HotspotDetails,
+  HotspotStatus,
+  hotspotStatusList,
+} from '../models/Hotspot';
 import { getFormattedAddress, Location } from '../models/Location';
 import { User } from '../models/User';
 import { RootStackScreenProps } from '../types';
 import { loadUsers } from '../utils/users';
-import { scaledHeight } from './HotspotDetailScreen';
+import { CatsView } from './HotspotDetailScreen';
+
+LogBox.ignoreLogs([
+  'Non-serializable values were found in the navigation state',
+]);
+const imageAspectRatio = 1080 / 1024;
+const scaledWidth = Dimensions.get('window').width;
+const scaledHeight = scaledWidth / imageAspectRatio;
 
 const getStyles = (theme: ReactNativePaper.Theme) =>
   StyleSheet.create({
@@ -116,14 +128,10 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
       width: '50%',
       paddingStart: 10,
     },
-    divider: {
-      backgroundColor: theme.colors.disabled,
-      height: 1,
-      opacity: 0.9,
-    },
     catCategoriesContainer: {
       flexDirection: 'row',
-      marginTop: 47,
+      paddingTop: 24,
+      paddingBottom: 24,
       alignItems: 'center',
     },
     catCategoryTitleIcon: {
@@ -145,7 +153,7 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
     },
     saveButton: {
       height: 64,
-      marginTop: 100,
+      marginTop: 54,
     },
     deleteButton: {
       height: 64,
@@ -200,14 +208,16 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
       fontFamily: 'Nunito_400Regular',
     },
     imageView: {
-      height: Dimensions.get('window').height * 0.4,
+      height: scaledHeight + 28,
       marginTop: 32,
+      width: '100%',
     },
     image: {
       width: '100%',
       maxHeight: scaledHeight,
       position: 'absolute',
-      bottom: -20,
+      bottom: 0,
+      resizeMode: 'contain',
     },
     scrollView: {
       width: '100%',
@@ -219,6 +229,15 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
       lineHeight: 26,
       flexShrink: 1,
       marginRight: 20,
+    },
+    separator: {
+      borderColor: theme.colors.disabled,
+      borderWidth: 0.7,
+      borderLeftWidth: 0,
+      borderRightWidth: 0,
+      height: 4,
+      marginBottom: 16,
+      marginTop: 16,
     },
   });
 
@@ -239,6 +258,9 @@ export const AddHotspotScreen = ({
 
   const [users, setUsers] = useState<User[]>([]);
   const isUpdate = route.params.isUpdate;
+  const [hotspotDetails, setHotspotDetails] = useState<
+    HotspotDetails | undefined
+  >(route.params.hotspotDetails);
 
   useEffect(() => {
     setLocation(route.params.location);
@@ -252,6 +274,8 @@ export const AddHotspotScreen = ({
     };
     load();
   }, []);
+
+  if (!hotspotDetails && isUpdate) return null;
 
   return (
     <>
@@ -403,8 +427,7 @@ export const AddHotspotScreen = ({
                 capitalize(item as HotspotStatus)
               }
             />
-            <Divider style={[styles.divider, { marginTop: 54 }]} />
-            <Divider style={[styles.divider, { marginTop: 1 }]} />
+            <View style={styles.separator} />
             <View style={styles.catCategoriesContainer}>
               <Avatar.Icon
                 size={24}
@@ -425,8 +448,13 @@ export const AddHotspotScreen = ({
                 onPress={() => alert('add unsterilized cat')}
               />
             </View>
-            <Divider style={[styles.divider, { marginTop: 54 }]} />
-            <Divider style={[styles.divider, { marginTop: 1 }]} />
+            {isUpdate && hotspotDetails && (
+              <CatsView
+                cats={hotspotDetails.unsterilizedCats}
+                isEditMode={true}
+              />
+            )}
+            <View style={styles.separator} />
             <View style={styles.catCategoriesContainer}>
               <Avatar.Icon
                 size={24}
@@ -447,6 +475,17 @@ export const AddHotspotScreen = ({
                 onPress={() => alert('add sterilized cat')}
               />
             </View>
+            {isUpdate && (
+              <>
+                {hotspotDetails && (
+                  <CatsView
+                    cats={hotspotDetails.sterilizedCats}
+                    isEditMode={true}
+                  />
+                )}
+                <View style={styles.separator} />
+              </>
+            )}
             <Button
               uppercase={false}
               style={styles.saveButton}
@@ -483,12 +522,10 @@ export const AddHotspotScreen = ({
               </Button>
             )}
           </View>
-
           <View style={styles.imageView}>
             <Image
-              source={catLadyImage}
+              source={isUpdate ? catLady4 : catLadyImage}
               style={styles.image}
-              resizeMode="contain"
             />
           </View>
         </ScrollView>
