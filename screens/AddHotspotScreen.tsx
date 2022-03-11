@@ -249,18 +249,32 @@ export const AddHotspotScreen = ({
   const styles = getStyles(theme);
 
   const [location, setLocation] = useState<Location>();
-  const [addressDetails, setAddressDetails] = useState('');
-  const [status, setStatus] = useState<HotspotStatus>();
-  const [remarks, setRemarks] = useState('');
-  const [contactPerson, setContactPerson] = useState('');
-  const [contactPersonPhone, setContactPersonPhone] = useState('');
-  const [volunteer, setVolunteer] = useState('');
 
   const [users, setUsers] = useState<User[]>([]);
   const isUpdate = route.params.isUpdate;
   const [hotspotDetails, setHotspotDetails] = useState<
     HotspotDetails | undefined
   >(route.params.hotspotDetails);
+  const [defaultHotspot, setDefaultHotspot] = useState<HotspotDetails>(
+    isUpdate
+      ? hotspotDetails!
+      : {
+          id: '',
+          status: HotspotStatus.toDo,
+          latitude: 0,
+          longitude: 0,
+          address: '',
+          city: '',
+          zip: '',
+          details: '',
+          notes: '',
+          sterilizedCats: [],
+          unsterilizedCats: [],
+          unsterilizedCatsCount: 0,
+          contactName: '',
+          contactPhone: '',
+        }
+  );
 
   useEffect(() => {
     setLocation(route.params.location);
@@ -342,14 +356,21 @@ export const AddHotspotScreen = ({
               </>
             ) : (
               <Title style={styles.addressTitle}>
-                Aleea Bârsei 3 Cluj-Napoca, 400605
+                {defaultHotspot?.address +
+                  ' ' +
+                  defaultHotspot?.city +
+                  ', ' +
+                  defaultHotspot?.zip}
               </Title>
             )}
             <InputField
               label="Detalii adresă"
               placeholder="Nume"
               inputFieldStyle={{ marginTop: 54 }}
-              onTextInputChangeText={setAddressDetails}
+              value={defaultHotspot?.details}
+              onTextInputChangeText={text =>
+                setDefaultHotspot(prev => ({ ...prev, details: text }))
+              }
             />
             <Caption style={styles.textInputTitle}>STATUS</Caption>
             <SelectDropdown
@@ -368,7 +389,7 @@ export const AddHotspotScreen = ({
                 />
               )}
               onSelect={(selectedItem: HotspotStatus, _index) => {
-                setStatus(selectedItem as HotspotStatus);
+                setDefaultHotspot(prev => ({ ...prev, status: selectedItem }));
               }}
               buttonTextAfterSelection={(selectedItem: HotspotStatus, _index) =>
                 capitalize(selectedItem as HotspotStatus)
@@ -376,6 +397,7 @@ export const AddHotspotScreen = ({
               rowTextForSelection={(item: HotspotStatus, _index) =>
                 capitalize(item as HotspotStatus)
               }
+              defaultValue={defaultHotspot.status}
             />
             <InputField
               multiline={true}
@@ -383,30 +405,46 @@ export const AddHotspotScreen = ({
               placeholder="Scrie aici"
               inputFieldStyle={styles.inputField}
               textInputStyle={{ height: 100 }}
-              onTextInputChangeText={setRemarks}
+              value={defaultHotspot.notes}
+              onTextInputChangeText={text =>
+                setDefaultHotspot(prev => ({ ...prev, notes: text }))
+              }
             />
             <InputField
               label="Pisici nesterilizate"
               placeholder="0"
-              editable={false}
+              keyboardType="number-pad"
+              value={String(defaultHotspot.unsterilizedCatsCount || 0)}
+              onTextInputChangeText={text =>
+                setDefaultHotspot(prev => ({
+                  ...prev,
+                  unsterilizedCatsCount: Number(text),
+                }))
+              }
             />
             <InputField
               label="Persoana de contact"
               placeholder="Nume persoana de contact"
               inputFieldStyle={styles.inputField}
-              onTextInputChangeText={setContactPerson}
+              value={defaultHotspot.contactName}
+              onTextInputChangeText={text =>
+                setDefaultHotspot(prev => ({ ...prev, contactName: text }))
+              }
             />
             <InputField
               label="Telefon persoana de contact"
               placeholder="Telefon persoana de contact"
               keyboardType="phone-pad"
               inputFieldStyle={styles.inputField}
-              onTextInputChangeText={setContactPersonPhone}
+              value={defaultHotspot.contactPhone}
+              onTextInputChangeText={text =>
+                setDefaultHotspot(prev => ({ ...prev, contactPhone: text }))
+              }
             />
             <Caption style={styles.textInputTitle}>VOLUNTAR</Caption>
             <SelectDropdown
               defaultButtonText="Alege voluntar"
-              data={[]}
+              data={users}
               buttonStyle={styles.statusButton}
               buttonTextStyle={styles.statusButtonText}
               dropdownStyle={styles.statusDropdown}
@@ -439,7 +477,6 @@ export const AddHotspotScreen = ({
               <Caption style={styles.catCategoryTitleLabel}>
                 Pisici nesterilizate
               </Caption>
-
               <FAB
                 color={theme.colors.background}
                 icon="plus"
@@ -448,9 +485,9 @@ export const AddHotspotScreen = ({
                 onPress={() => alert('add unsterilized cat')}
               />
             </View>
-            {isUpdate && hotspotDetails && (
+            {isUpdate && (
               <CatsView
-                cats={hotspotDetails.unsterilizedCats}
+                cats={defaultHotspot.unsterilizedCats}
                 isEditMode={true}
               />
             )}
@@ -462,11 +499,9 @@ export const AddHotspotScreen = ({
                 color={theme.colors.background}
                 style={styles.catCategoryTitleIcon}
               />
-
               <Caption style={styles.catCategoryTitleLabel}>
                 Pisici sterilizate
               </Caption>
-
               <FAB
                 color={theme.colors.background}
                 icon="plus"
@@ -477,12 +512,10 @@ export const AddHotspotScreen = ({
             </View>
             {isUpdate && (
               <>
-                {hotspotDetails && (
-                  <CatsView
-                    cats={hotspotDetails.sterilizedCats}
-                    isEditMode={true}
-                  />
-                )}
+                <CatsView
+                  cats={defaultHotspot.sterilizedCats}
+                  isEditMode={true}
+                />
                 <View style={styles.separator} />
               </>
             )}

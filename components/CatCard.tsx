@@ -3,11 +3,12 @@ import React from 'react';
 import { FlatList, Image, StyleSheet, View } from 'react-native';
 import {
   Button,
+  Caption,
   Card,
   IconButton,
   useTheme,
-  Caption,
 } from 'react-native-paper';
+import { useNavigation } from '@react-navigation/native';
 import { Cat, getDateText } from '../models/Cat';
 
 const getStyles = (theme: ReactNativePaper.Theme) =>
@@ -65,6 +66,7 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
       color: theme.colors.placeholder,
       fontSize: 16,
       fontFamily: 'Nunito_400Regular',
+      flexWrap: 'wrap',
     },
     iconAndText: {
       width: '50%',
@@ -143,6 +145,7 @@ export const CatCard = ({
 }: CatCardProps) => {
   const theme = useTheme();
   const styles = getStyles(theme);
+  const navigation = useNavigation();
 
   return (
     <Card style={styles.mainContainer}>
@@ -233,6 +236,7 @@ export const CatCard = ({
               contentStyle={styles.buttonContent}
               labelStyle={styles.buttonLabel}
               icon="close"
+              onPress={() => navigation.navigate('Modal')}
             >
               Șterge
             </Button>
