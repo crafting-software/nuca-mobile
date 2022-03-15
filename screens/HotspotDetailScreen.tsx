@@ -7,7 +7,7 @@ import {
   StyleSheet,
   View,
 } from 'react-native';
-import Region from 'react-native-maps';
+import { Region } from 'react-native-maps';
 import {
   Button,
   Caption,
@@ -198,8 +198,8 @@ export const HotspotDetailScreen = ({
       if (!success) alert('Failed to load hotspot details');
       setHotspotDetails(hd);
       setRegion({
-        latitude: hd?.latitude,
-        longitude: hd?.longitude,
+        latitude: hd?.latitude!,
+        longitude: hd?.longitude!,
         latitudeDelta: 0.0922,
         longitudeDelta: 0.0421,
       });
@@ -240,7 +240,7 @@ export const HotspotDetailScreen = ({
                 mode="contained"
                 onPress={() => {
                   navigation.navigate('AddHotspot', {
-                    region: region,
+                    region: region!,
                     isUpdate: true,
                     hotspotDetails: hotspotDetails,
                   });
