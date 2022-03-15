@@ -2,7 +2,6 @@ import { trim } from 'lodash';
 import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
-  Dimensions,
   Image,
   ScrollView,
   StyleSheet,
@@ -25,10 +24,6 @@ import { Cat } from '../models/Cat';
 import { HotspotDetails, HotspotStatus } from '../models/Hotspot';
 import { RootStackParamList } from '../types';
 import { loadHotspotDetails } from '../utils/hotspots';
-
-const imageAspectRatio = 1080 / 876;
-const scaledWidth = Dimensions.get('window').width;
-const scaledHeight = scaledWidth / imageAspectRatio;
 
 const getStyles = (theme: ReactNativePaper.Theme) =>
   StyleSheet.create({
@@ -86,15 +81,12 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
       marginBottom: 24,
     },
     imageView: {
-      height: scaledHeight + 28,
       marginTop: 32,
     },
     image: {
-      width: '100%',
-      maxHeight: scaledHeight,
-      position: 'absolute',
-      bottom: 0,
-      resizeMode: 'contain',
+      height: 375,
+      flex: 1,
+      width: undefined,
     },
     catCategoryContainer: {
       flexDirection: 'row',

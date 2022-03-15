@@ -1,7 +1,6 @@
 import { capitalize } from 'lodash';
 import React, { useEffect, useState } from 'react';
 import {
-  Dimensions,
   Image,
   LogBox,
   ScrollView,
@@ -9,6 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { Region } from 'react-native-maps';
 import {
   Avatar,
   Button,
@@ -42,9 +42,6 @@ import { CatsView } from './HotspotDetailScreen';
 LogBox.ignoreLogs([
   'Non-serializable values were found in the navigation state',
 ]);
-const imageAspectRatio = 1080 / 1024;
-const scaledWidth = Dimensions.get('window').width;
-const scaledHeight = scaledWidth / imageAspectRatio;
 
 const getStyles = (theme: ReactNativePaper.Theme) =>
   StyleSheet.create({
@@ -208,20 +205,12 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
       fontFamily: 'Nunito_400Regular',
     },
     imageView: {
-      height: scaledHeight + 28,
       marginTop: 32,
-      width: '100%',
     },
     image: {
-      width: '100%',
-      maxHeight: scaledHeight,
-      position: 'absolute',
-      bottom: 0,
-      resizeMode: 'contain',
-    },
-    scrollView: {
-      width: '100%',
-      height: '1000%',
+      height: 375,
+      flex: 1,
+      width: undefined,
     },
     addressTitle: {
       fontSize: 18,
@@ -244,11 +233,8 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
 export const AddHotspotScreen = ({
   route,
 }: RootStackScreenProps<'AddHotspot'>) => {
-  const navigation = useNavigation();
   const theme = useTheme();
   const styles = getStyles(theme);
-
-  const [location, setLocation] = useState<Location>();
 
   const [users, setUsers] = useState<User[]>([]);
   const isUpdate = route.params.isUpdate;
@@ -277,10 +263,6 @@ export const AddHotspotScreen = ({
   );
 
   useEffect(() => {
-    setLocation(route.params.location);
-  }, [route.params.location]);
-
-  useEffect(() => {
     const load = async () => {
       const { success, users } = await loadUsers();
       if (!success) alert('Failed to load users');
@@ -289,71 +271,17 @@ export const AddHotspotScreen = ({
     load();
   }, []);
 
-  if (!hotspotDetails && isUpdate) return null;
-
   return (
     <>
       <Appbar forDetailScreen />
       <View style={styles.container}>
-        <ScrollView style={styles.scrollView}>
+        <ScrollView>
           <View style={styles.form}>
             {!isUpdate ? (
-              <>
-                <View style={styles.screenTitleContainer}>
-                  <Headline style={styles.screenTitleIcon}>+</Headline>
-                  <Caption style={styles.screenTitleLabel}>
-                    Adaugă zonă de interes
-                  </Caption>
-                </View>
-
-                <InputField
-                  placeholder="Adresă"
-                  multiline={true}
-                  inputFieldStyle={{ marginTop: 30 }}
-                  value={location && getFormattedAddress(location)}
-                  editable={false}
-                />
-
-                <View style={styles.locationButtonsContainer}>
-                  <View style={styles.leftLocationButtonContainer}>
-                    <TouchableOpacity
-                      style={styles.locationButton}
-                      onPress={() =>
-                        navigation.navigate('ChooseLocation', {
-                          location,
-                          region: route.params.region,
-                        })
-                      }
-                    >
-                      <Image
-                        style={styles.locationButtonIcon}
-                        source={mapPinIcon}
-                      />
-                      <Caption style={styles.locationButtonLabel}>
-                        ALEGE PE HARTĂ
-                      </Caption>
-                    </TouchableOpacity>
-                  </View>
-
-                  <View style={styles.rightLocationButtonContainer}>
-                    <TouchableOpacity
-                      style={styles.locationButton}
-                      onPress={async () => {
-                        const currentLocation = await findCurrentLocation();
-                        setLocation(currentLocation);
-                      }}
-                    >
-                      <Image
-                        style={styles.locationButtonIcon}
-                        source={currentLocationIcon}
-                      />
-                      <Caption style={styles.locationButtonLabel}>
-                        LOCAȚIA MEA
-                      </Caption>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              </>
+              <AddLocation
+                routeLocation={route.params.location}
+                routeRegion={route.params.region}
+              />
             ) : (
               <Title style={styles.addressTitle}>
                 {defaultHotspot?.address +
@@ -529,12 +457,7 @@ export const AddHotspotScreen = ({
               onPress={() =>
                 alert(
                   JSON.stringify({
-                    name: addressDetails,
-                    status,
-                    remarks,
-                    contactPerson,
-                    contactPersonPhone,
-                    volunteer,
+                    name: defaultHotspot.address,
                   })
                 )
               }
@@ -562,6 +485,76 @@ export const AddHotspotScreen = ({
             />
           </View>
         </ScrollView>
+      </View>
+    </>
+  );
+};
+
+const AddLocation = ({
+  routeLocation,
+  routeRegion,
+}: {
+  routeLocation?: Location;
+  routeRegion: Region;
+}) => {
+  const theme = useTheme();
+  const styles = getStyles(theme);
+
+  const navigation = useNavigation();
+  const [location, setLocation] = useState<Location>();
+
+  useEffect(() => {
+    setLocation(routeLocation);
+  }, [routeLocation]);
+
+  return (
+    <>
+      <View style={styles.screenTitleContainer}>
+        <Headline style={styles.screenTitleIcon}>+</Headline>
+        <Caption style={styles.screenTitleLabel}>
+          Adaugă zonă de interes
+        </Caption>
+      </View>
+
+      <InputField
+        placeholder="Adresă"
+        multiline={true}
+        inputFieldStyle={{ marginTop: 30 }}
+        value={location && getFormattedAddress(location)}
+        editable={false}
+      />
+
+      <View style={styles.locationButtonsContainer}>
+        <View style={styles.leftLocationButtonContainer}>
+          <TouchableOpacity
+            style={styles.locationButton}
+            onPress={() =>
+              navigation.navigate('ChooseLocation', {
+                location,
+                region: routeRegion,
+              })
+            }
+          >
+            <Image style={styles.locationButtonIcon} source={mapPinIcon} />
+            <Caption style={styles.locationButtonLabel}>ALEGE PE HARTĂ</Caption>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.rightLocationButtonContainer}>
+          <TouchableOpacity
+            style={styles.locationButton}
+            onPress={async () => {
+              const currentLocation = await findCurrentLocation();
+              setLocation(currentLocation);
+            }}
+          >
+            <Image
+              style={styles.locationButtonIcon}
+              source={currentLocationIcon}
+            />
+            <Caption style={styles.locationButtonLabel}>LOCAȚIA MEA</Caption>
+          </TouchableOpacity>
+        </View>
       </View>
     </>
   );
