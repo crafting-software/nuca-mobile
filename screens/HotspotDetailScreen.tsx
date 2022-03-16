@@ -2,12 +2,12 @@ import { trim } from 'lodash';
 import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
-  Dimensions,
   Image,
   ScrollView,
   StyleSheet,
   View,
 } from 'react-native';
+import { Region } from 'react-native-maps';
 import {
   Button,
   Caption,
@@ -15,17 +15,15 @@ import {
   Title,
   useTheme,
 } from 'react-native-paper';
+import { useNavigation } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import catLady3 from '../assets/cat-lady3.png';
 import { Appbar } from '../components/Appbar';
 import { CatCard } from '../components/CatCard';
+import { Cat } from '../models/Cat';
 import { HotspotDetails, HotspotStatus } from '../models/Hotspot';
 import { RootStackParamList } from '../types';
 import { loadHotspotDetails } from '../utils/hotspots';
-
-const imageAspectRatio = 1080 / 872;
-const scaledWidth = Dimensions.get('window').width;
-const scaledHeight = scaledWidth / imageAspectRatio;
 
 const getStyles = (theme: ReactNativePaper.Theme) =>
   StyleSheet.create({
@@ -83,14 +81,12 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
       marginBottom: 24,
     },
     imageView: {
-      height: Dimensions.get('window').height * 0.4,
       marginTop: 32,
     },
     image: {
-      width: '100%',
-      maxHeight: scaledHeight,
-      position: 'absolute',
-      bottom: 0,
+      height: 375,
+      flex: 1,
+      width: undefined,
     },
     catCategoryContainer: {
       flexDirection: 'row',
@@ -165,6 +161,23 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
       paddingTop: 18,
     },
     contentCotainer: { padding: 20 },
+    moreButton: {
+      height: 40,
+      marginTop: 24,
+      marginBottom: 24,
+      maxWidth: 150,
+    },
+    moreButtonContent: {
+      height: 40,
+      alignItems: 'center',
+      justifyContent: 'center',
+      flexDirection: 'row-reverse',
+    },
+    moreButtonLabel: {
+      color: theme.colors.background,
+      fontSize: 12,
+      fontFamily: 'Nunito_700Bold',
+    },
   });
 
 export const HotspotDetailScreen = ({
@@ -172,8 +185,10 @@ export const HotspotDetailScreen = ({
 }: NativeStackScreenProps<RootStackParamList, 'HotspotDetail'>) => {
   const theme = useTheme();
   const styles = getStyles(theme);
+  const navigation = useNavigation();
 
   const [hotspotDetails, setHotspotDetails] = useState<HotspotDetails>();
+  const [region, setRegion] = useState<Region>();
 
   useEffect(() => {
     const load = async () => {
@@ -182,6 +197,12 @@ export const HotspotDetailScreen = ({
       );
       if (!success) alert('Failed to load hotspot details');
       setHotspotDetails(hd);
+      setRegion({
+        latitude: hd?.latitude!,
+        longitude: hd?.longitude!,
+        latitudeDelta: 0.0922,
+        longitudeDelta: 0.0421,
+      });
     };
     load();
   }, []);
@@ -217,7 +238,13 @@ export const HotspotDetailScreen = ({
                 labelStyle={styles.buttonLabel}
                 icon="pencil-outline"
                 mode="contained"
-                onPress={() => {}}
+                onPress={() => {
+                  navigation.navigate('AddHotspot', {
+                    region: region!,
+                    isUpdate: true,
+                    hotspotDetails: hotspotDetails,
+                  });
+                }}
                 compact
               >
                 Editează
@@ -267,9 +294,7 @@ export const HotspotDetailScreen = ({
                 Pisici nesterilizate
               </Title>
             </View>
-            {hotspotDetails.unsterilizedCats.map((cat, index) => (
-              <CatCard key={cat.id} cat={cat} index={index + 1} />
-            ))}
+            <CatsView cats={hotspotDetails.unsterilizedCats} />
             <View style={styles.separator} />
             <View style={styles.catCategoryContainer}>
               <IconButton
@@ -282,9 +307,7 @@ export const HotspotDetailScreen = ({
                 Pisici sterilizate
               </Title>
             </View>
-            {hotspotDetails.sterilizedCats.map((cat, index) => (
-              <CatCard key={cat.id} cat={cat} index={index + 1} />
-            ))}
+            <CatsView cats={hotspotDetails.sterilizedCats} />
           </View>
           <View style={styles.imageView}>
             <Image
@@ -344,6 +367,46 @@ const InformationView = ({
         <Caption style={styles.informationSubtitle}>{subtitle}</Caption>
       )}
       {!!count && <Title style={styles.informationCount}>{count}</Title>}
+    </View>
+  );
+};
+
+export const CatsView = ({
+  cats,
+  isEditMode,
+}: {
+  cats: Cat[];
+  isEditMode?: boolean;
+}) => {
+  const theme = useTheme();
+  const styles = getStyles(theme);
+  const maxVisibleCat = 2;
+  const [visibleCat, setVisible] = useState<number>(maxVisibleCat);
+
+  return (
+    <View>
+      {cats.slice(0, visibleCat).map((cat, index) => (
+        <CatCard
+          key={cat.id}
+          cat={cat}
+          index={index + 1}
+          isEditingMode={isEditMode}
+        />
+      ))}
+      {cats.length > maxVisibleCat && visibleCat === maxVisibleCat && (
+        <View style={{ alignItems: 'center' }}>
+          <Button
+            style={styles.moreButton}
+            contentStyle={styles.moreButtonContent}
+            labelStyle={styles.moreButtonLabel}
+            icon="arrow-down"
+            mode="contained"
+            onPress={() => setVisible(cats.length)}
+          >
+            vezi mai multe
+          </Button>
+        </View>
+      )}
     </View>
   );
 };

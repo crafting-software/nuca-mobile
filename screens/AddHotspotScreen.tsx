@@ -1,43 +1,48 @@
 import { capitalize } from 'lodash';
 import React, { useEffect, useState } from 'react';
 import {
-  Dimensions,
   Image,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
   View,
 } from 'react-native';
+import { Region } from 'react-native-maps';
 import {
   Avatar,
   Button,
   Caption,
-  Divider,
   FAB,
   Headline,
   TextInput,
+  Title,
   useTheme,
 } from 'react-native-paper';
 import SelectDropdown from 'react-native-select-dropdown';
 import { useNavigation } from '@react-navigation/native';
 import catLadyImage from '../assets/cat-lady2.png';
+import catLady4 from '../assets/cat-lady4.png';
 import currentLocationIcon from '../assets/current-location.png';
 import mapPinIcon from '../assets/map-pin.png';
 import { Appbar } from '../components/Appbar';
 import { InputField } from '../components/InputField';
 import { findCurrentLocation } from '../context/MapContext';
-import { HotspotStatus, hotspotStatusList } from '../models/Hotspot';
+import {
+  HotspotDetails,
+  HotspotStatus,
+  hotspotStatusList,
+} from '../models/Hotspot';
 import { getFormattedAddress, Location } from '../models/Location';
 import { User } from '../models/User';
 import { RootStackScreenProps } from '../types';
 import { loadUsers } from '../utils/users';
+import { CatsView } from './HotspotDetailScreen';
 
 const getStyles = (theme: ReactNativePaper.Theme) =>
   StyleSheet.create({
     container: {
       backgroundColor: theme.colors.background,
-      height: '100%',
-      width: '100%',
+      flex: 1,
     },
     form: {
       padding: 20,
@@ -115,14 +120,10 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
       width: '50%',
       paddingStart: 10,
     },
-    divider: {
-      backgroundColor: theme.colors.disabled,
-      height: 1,
-      opacity: 0.9,
-    },
     catCategoriesContainer: {
       flexDirection: 'row',
-      marginTop: 47,
+      paddingTop: 24,
+      paddingBottom: 24,
       alignItems: 'center',
     },
     catCategoryTitleIcon: {
@@ -144,7 +145,13 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
     },
     saveButton: {
       height: 64,
-      marginTop: 100,
+      marginTop: 54,
+    },
+    deleteButton: {
+      height: 64,
+      backgroundColor: theme.colors.surface,
+      color: 'black',
+      marginTop: 10,
     },
     saveButtonContent: {
       height: 64,
@@ -154,6 +161,11 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
     },
     saveButtonLabel: {
       color: theme.colors.background,
+      fontSize: 18,
+      fontFamily: 'Nunito_700Bold',
+    },
+    deleteButtonLabel: {
+      color: theme.colors.text,
       fontSize: 18,
       fontFamily: 'Nunito_700Bold',
     },
@@ -187,28 +199,63 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
       fontSize: 15,
       fontFamily: 'Nunito_400Regular',
     },
+    imageView: {
+      marginTop: 32,
+    },
+    image: {
+      height: 375,
+      flex: 1,
+      width: undefined,
+    },
+    addressTitle: {
+      fontSize: 18,
+      fontFamily: 'Nunito_700Bold',
+      lineHeight: 26,
+      flexShrink: 1,
+      marginRight: 20,
+    },
+    separator: {
+      borderColor: theme.colors.disabled,
+      borderWidth: 0.7,
+      borderLeftWidth: 0,
+      borderRightWidth: 0,
+      height: 4,
+      marginBottom: 16,
+      marginTop: 16,
+    },
   });
 
 export const AddHotspotScreen = ({
   route,
 }: RootStackScreenProps<'AddHotspot'>) => {
-  const navigation = useNavigation();
   const theme = useTheme();
   const styles = getStyles(theme);
 
-  const [location, setLocation] = useState<Location>();
-  const [addressDetails, setAddressDetails] = useState('');
-  const [status, setStatus] = useState<HotspotStatus>();
-  const [remarks, setRemarks] = useState('');
-  const [contactPerson, setContactPerson] = useState('');
-  const [contactPersonPhone, setContactPersonPhone] = useState('');
-  const [volunteer, setVolunteer] = useState('');
-
   const [users, setUsers] = useState<User[]>([]);
-
-  useEffect(() => {
-    setLocation(route.params.location);
-  }, [route.params.location]);
+  const isUpdate = route.params.isUpdate;
+  const [hotspotDetails, setHotspotDetails] = useState<
+    HotspotDetails | undefined
+  >(route.params.hotspotDetails);
+  const [defaultHotspot, setDefaultHotspot] = useState<HotspotDetails>(
+    isUpdate
+      ? hotspotDetails!
+      : {
+          id: '',
+          status: HotspotStatus.toDo,
+          latitude: 0,
+          longitude: 0,
+          address: '',
+          city: '',
+          zip: '',
+          details: '',
+          notes: '',
+          sterilizedCats: [],
+          unsterilizedCats: [],
+          unsterilizedCatsCount: 0,
+          contactName: '',
+          contactPhone: '',
+        }
+  );
 
   useEffect(() => {
     const load = async () => {
@@ -220,73 +267,34 @@ export const AddHotspotScreen = ({
   }, []);
 
   return (
-    <View style={styles.container}>
+    <>
       <Appbar forDetailScreen />
-      <ScrollView style={styles.container}>
-        <>
+      <View style={styles.container}>
+        <ScrollView>
           <View style={styles.form}>
-            <View style={styles.screenTitleContainer}>
-              <Headline style={styles.screenTitleIcon}>+</Headline>
-              <Caption style={styles.screenTitleLabel}>
-                Adaugă zonă de interes
-              </Caption>
-            </View>
-
-            <InputField
-              placeholder="Adresă"
-              multiline={true}
-              inputFieldStyle={{ marginTop: 30 }}
-              value={location && getFormattedAddress(location)}
-              editable={false}
-            />
-
-            <View style={styles.locationButtonsContainer}>
-              <View style={styles.leftLocationButtonContainer}>
-                <TouchableOpacity
-                  style={styles.locationButton}
-                  onPress={() =>
-                    navigation.navigate('ChooseLocation', {
-                      location,
-                      region: route.params.region,
-                    })
-                  }
-                >
-                  <Image
-                    style={styles.locationButtonIcon}
-                    source={mapPinIcon}
-                  />
-                  <Caption style={styles.locationButtonLabel}>
-                    ALEGE PE HARTĂ
-                  </Caption>
-                </TouchableOpacity>
-              </View>
-
-              <View style={styles.rightLocationButtonContainer}>
-                <TouchableOpacity
-                  style={styles.locationButton}
-                  onPress={async () => {
-                    const currentLocation = await findCurrentLocation();
-                    setLocation(currentLocation);
-                  }}
-                >
-                  <Image
-                    style={styles.locationButtonIcon}
-                    source={currentLocationIcon}
-                  />
-                  <Caption style={styles.locationButtonLabel}>
-                    LOCAȚIA MEA
-                  </Caption>
-                </TouchableOpacity>
-              </View>
-            </View>
-
+            {!isUpdate ? (
+              <AddLocation
+                routeLocation={route.params.location}
+                routeRegion={route.params.region}
+              />
+            ) : (
+              <Title style={styles.addressTitle}>
+                {defaultHotspot?.address +
+                  ' ' +
+                  defaultHotspot?.city +
+                  ', ' +
+                  defaultHotspot?.zip}
+              </Title>
+            )}
             <InputField
               label="Detalii adresă"
               placeholder="Nume"
-              inputFieldStyle={{ marginTop: 70 }}
-              onTextInputChangeText={setAddressDetails}
+              inputFieldStyle={{ marginTop: 54 }}
+              value={defaultHotspot?.details}
+              onTextInputChangeText={text =>
+                setDefaultHotspot(prev => ({ ...prev, details: text }))
+              }
             />
-
             <Caption style={styles.textInputTitle}>STATUS</Caption>
             <SelectDropdown
               defaultButtonText="Alege status"
@@ -304,7 +312,7 @@ export const AddHotspotScreen = ({
                 />
               )}
               onSelect={(selectedItem: HotspotStatus, _index) => {
-                setStatus(selectedItem as HotspotStatus);
+                setDefaultHotspot(prev => ({ ...prev, status: selectedItem }));
               }}
               buttonTextAfterSelection={(selectedItem: HotspotStatus, _index) =>
                 capitalize(selectedItem as HotspotStatus)
@@ -312,59 +320,75 @@ export const AddHotspotScreen = ({
               rowTextForSelection={(item: HotspotStatus, _index) =>
                 capitalize(item as HotspotStatus)
               }
+              defaultValue={defaultHotspot.status}
             />
-
             <InputField
               multiline={true}
               label="Observații"
               placeholder="Scrie aici"
               inputFieldStyle={styles.inputField}
               textInputStyle={{ height: 100 }}
-              onTextInputChangeText={setRemarks}
+              value={defaultHotspot.notes}
+              onTextInputChangeText={text =>
+                setDefaultHotspot(prev => ({ ...prev, notes: text }))
+              }
             />
-
-            <View style={styles.catsCountContainer}>
-              <View style={styles.catsCountLeftItem}>
-                <InputField
-                  label="Pisici nesterilizate"
-                  placeholder="0"
-                  editable={false}
-                />
-              </View>
-              <View style={styles.catsCountRightItem}>
-                <InputField
-                  label="Pisici sterilizate"
-                  placeholder="0"
-                  editable={false}
-                />
-              </View>
-            </View>
-
+            <InputField
+              label="Pisici nesterilizate"
+              placeholder="0"
+              keyboardType="number-pad"
+              value={String(defaultHotspot.unsterilizedCatsCount || 0)}
+              onTextInputChangeText={text =>
+                setDefaultHotspot(prev => ({
+                  ...prev,
+                  unsterilizedCatsCount: Number(text),
+                }))
+              }
+            />
             <InputField
               label="Persoana de contact"
               placeholder="Nume persoana de contact"
               inputFieldStyle={styles.inputField}
-              onTextInputChangeText={setContactPerson}
+              value={defaultHotspot.contactName}
+              onTextInputChangeText={text =>
+                setDefaultHotspot(prev => ({ ...prev, contactName: text }))
+              }
             />
-
             <InputField
               label="Telefon persoana de contact"
               placeholder="Telefon persoana de contact"
               keyboardType="phone-pad"
               inputFieldStyle={styles.inputField}
-              onTextInputChangeText={setContactPersonPhone}
+              value={defaultHotspot.contactPhone}
+              onTextInputChangeText={text =>
+                setDefaultHotspot(prev => ({ ...prev, contactPhone: text }))
+              }
             />
-
-            <InputField
-              label="Voluntar"
-              placeholder="Voluntar"
-              inputFieldStyle={styles.inputField}
-              onTextInputChangeText={setVolunteer}
+            <Caption style={styles.textInputTitle}>VOLUNTAR</Caption>
+            <SelectDropdown
+              defaultButtonText="Alege voluntar"
+              data={users}
+              buttonStyle={styles.statusButton}
+              buttonTextStyle={styles.statusButtonText}
+              dropdownStyle={styles.statusDropdown}
+              rowTextStyle={styles.statusRowText}
+              dropdownIconPosition="right"
+              renderDropdownIcon={(_selectedItem, _index) => (
+                <TextInput.Icon
+                  name="chevron-down"
+                  color={theme.colors.text}
+                  style={{ marginRight: 40 }}
+                />
+              )}
+              onSelect={() => {}}
+              buttonTextAfterSelection={(selectedItem: HotspotStatus, _index) =>
+                capitalize(selectedItem as HotspotStatus)
+              }
+              rowTextForSelection={(item: HotspotStatus, _index) =>
+                capitalize(item as HotspotStatus)
+              }
             />
-
-            <Divider style={[styles.divider, { marginTop: 54 }]} />
-            <Divider style={[styles.divider, { marginTop: 1 }]} />
-
+            <View style={styles.separator} />
             <View style={styles.catCategoriesContainer}>
               <Avatar.Icon
                 size={24}
@@ -376,7 +400,6 @@ export const AddHotspotScreen = ({
               <Caption style={styles.catCategoryTitleLabel}>
                 Pisici nesterilizate
               </Caption>
-
               <FAB
                 color={theme.colors.background}
                 icon="plus"
@@ -385,10 +408,13 @@ export const AddHotspotScreen = ({
                 onPress={() => alert('add unsterilized cat')}
               />
             </View>
-
-            <Divider style={[styles.divider, { marginTop: 54 }]} />
-            <Divider style={[styles.divider, { marginTop: 1 }]} />
-
+            {isUpdate && (
+              <CatsView
+                cats={defaultHotspot.unsterilizedCats}
+                isEditMode={true}
+              />
+            )}
+            <View style={styles.separator} />
             <View style={styles.catCategoriesContainer}>
               <Avatar.Icon
                 size={24}
@@ -396,11 +422,9 @@ export const AddHotspotScreen = ({
                 color={theme.colors.background}
                 style={styles.catCategoryTitleIcon}
               />
-
               <Caption style={styles.catCategoryTitleLabel}>
                 Pisici sterilizate
               </Caption>
-
               <FAB
                 color={theme.colors.background}
                 icon="plus"
@@ -409,7 +433,15 @@ export const AddHotspotScreen = ({
                 onPress={() => alert('add sterilized cat')}
               />
             </View>
-
+            {isUpdate && (
+              <>
+                <CatsView
+                  cats={defaultHotspot.sterilizedCats}
+                  isEditMode={true}
+                />
+                <View style={styles.separator} />
+              </>
+            )}
             <Button
               uppercase={false}
               style={styles.saveButton}
@@ -420,34 +452,105 @@ export const AddHotspotScreen = ({
               onPress={() =>
                 alert(
                   JSON.stringify({
-                    name: addressDetails,
-                    status,
-                    remarks,
-                    contactPerson,
-                    contactPersonPhone,
-                    volunteer,
+                    name: defaultHotspot.address,
                   })
                 )
               }
             >
               Salvează
             </Button>
+            {isUpdate && (
+              <Button
+                uppercase={false}
+                style={styles.deleteButton}
+                contentStyle={styles.saveButtonContent}
+                labelStyle={styles.deleteButtonLabel}
+                icon="close"
+                mode="contained"
+                onPress={() => alert('Delete hotspot')}
+              >
+                Șterge adresa
+              </Button>
+            )}
           </View>
+          <View style={styles.imageView}>
+            <Image
+              source={isUpdate ? catLady4 : catLadyImage}
+              style={styles.image}
+            />
+          </View>
+        </ScrollView>
+      </View>
+    </>
+  );
+};
 
-          <View
-            style={{
-              height: Dimensions.get('window').height * 0.4,
-              maxHeight: Dimensions.get('window').height * 0.4,
+const AddLocation = ({
+  routeLocation,
+  routeRegion,
+}: {
+  routeLocation?: Location;
+  routeRegion: Region;
+}) => {
+  const theme = useTheme();
+  const styles = getStyles(theme);
+
+  const navigation = useNavigation();
+  const [location, setLocation] = useState<Location>();
+
+  useEffect(() => {
+    setLocation(routeLocation);
+  }, [routeLocation]);
+
+  return (
+    <>
+      <View style={styles.screenTitleContainer}>
+        <Headline style={styles.screenTitleIcon}>+</Headline>
+        <Caption style={styles.screenTitleLabel}>
+          Adaugă zonă de interes
+        </Caption>
+      </View>
+
+      <InputField
+        placeholder="Adresă"
+        multiline={true}
+        inputFieldStyle={{ marginTop: 30 }}
+        value={location && getFormattedAddress(location)}
+        editable={false}
+      />
+
+      <View style={styles.locationButtonsContainer}>
+        <View style={styles.leftLocationButtonContainer}>
+          <TouchableOpacity
+            style={styles.locationButton}
+            onPress={() =>
+              navigation.navigate('ChooseLocation', {
+                location,
+                region: routeRegion,
+              })
+            }
+          >
+            <Image style={styles.locationButtonIcon} source={mapPinIcon} />
+            <Caption style={styles.locationButtonLabel}>ALEGE PE HARTĂ</Caption>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.rightLocationButtonContainer}>
+          <TouchableOpacity
+            style={styles.locationButton}
+            onPress={async () => {
+              const currentLocation = await findCurrentLocation();
+              setLocation(currentLocation);
             }}
           >
             <Image
-              style={styles.catLadyImage}
-              source={catLadyImage}
-              resizeMode="contain"
+              style={styles.locationButtonIcon}
+              source={currentLocationIcon}
             />
-          </View>
-        </>
-      </ScrollView>
-    </View>
+            <Caption style={styles.locationButtonLabel}>LOCAȚIA MEA</Caption>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </>
   );
 };
