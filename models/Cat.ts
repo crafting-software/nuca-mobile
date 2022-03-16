@@ -4,8 +4,8 @@ export type Cat = {
   id: string;
   sex: 'M' | 'F';
   notes: string;
-  checkInDate: Date;
-  checkOutDate: Date;
+  checkInDate: number;
+  checkOutDate: number;
   isSterilized: boolean;
   capturedBy?: User;
   media: Record<string, string>;
@@ -18,13 +18,14 @@ export const castToCat = (backendCat: Record<string, any>): Cat => ({
     : undefined,
   sex: backendCat.sex,
   notes: backendCat.notes || '',
-  checkInDate: new Date(backendCat.check_in_date),
-  checkOutDate: new Date(backendCat.check_out_date),
+  checkInDate: backendCat.check_in_date,
+  checkOutDate: backendCat.check_out_date,
   isSterilized: backendCat.is_sterilized,
   media: backendCat.media,
 });
 
-export const getDateText = (date: Date): string => {
+export const getDateText = (timestamp: number): string => {
+  const date = new Date(timestamp);
   const monthNames = [
     'ianuarie',
     'februarie',

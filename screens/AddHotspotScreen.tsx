@@ -2,7 +2,6 @@ import { capitalize } from 'lodash';
 import React, { useEffect, useState } from 'react';
 import {
   Image,
-  LogBox,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
@@ -38,10 +37,6 @@ import { User } from '../models/User';
 import { RootStackScreenProps } from '../types';
 import { loadUsers } from '../utils/users';
 import { CatsView } from './HotspotDetailScreen';
-
-LogBox.ignoreLogs([
-  'Non-serializable values were found in the navigation state',
-]);
 
 const getStyles = (theme: ReactNativePaper.Theme) =>
   StyleSheet.create({
