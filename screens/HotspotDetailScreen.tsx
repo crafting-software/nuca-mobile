@@ -1,5 +1,5 @@
 import { trim } from 'lodash';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Image,
@@ -222,7 +222,7 @@ export const HotspotDetailScreen = ({
     ','
   )
     .trim()
-    .replaceAll(' ,', ',');
+    .replace(' ,', ',');
 
   return (
     <>

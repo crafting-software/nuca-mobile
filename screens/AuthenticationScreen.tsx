@@ -1,6 +1,6 @@
 import AppLoading from 'expo-app-loading';
 import * as SecureStore from 'expo-secure-store';
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import {
   Image,
   KeyboardAvoidingView,
