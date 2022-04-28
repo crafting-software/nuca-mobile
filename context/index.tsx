@@ -1,7 +1,7 @@
 import { useState, useMemo, ReactNode } from 'react';
 import { Hotspot, HotspotDetails, HotspotStatus } from '../models/Hotspot';
 import { AuthContext, Auth } from './AuthContext';
-import { MapContext } from './MapContext';
+import { MapContext, findCurrentLocation } from './MapContext';
 
 export {
   AuthContext,
@@ -10,6 +10,7 @@ export {
   Hotspot,
   HotspotStatus,
   HotspotDetails,
+  findCurrentLocation,
 };
 
 export const AuthContextProvider = ({ children }: { children: ReactNode }) => {

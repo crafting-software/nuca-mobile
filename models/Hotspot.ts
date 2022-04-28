@@ -69,7 +69,7 @@ export const castToHotspotDetails = (
   address: data.address,
   city: data.city,
   zip: data.zip,
-  details: data.descriotion,
+  details: data.description,
   notes: data.notes,
   sterilizedCats: data.sterilized_cats.map(castToCat),
   unsterilizedCats: data.unsterilized_cats.map(castToCat),
@@ -77,4 +77,17 @@ export const castToHotspotDetails = (
   contactName: data.contact_name,
   contactPhone: data.contact_phone,
   volunteer: data.volunteer ? castToUser(data.volunteer) : undefined,
+});
+
+export const toApiModel = (hotspot: HotspotDetails): Record<string, any> => ({
+  ...hotspot,
+  latitude: hotspot.latitude.toString(),
+  longitude: hotspot.longitude.toString(),
+  status: hotspot.status.charAt(0).toUpperCase() + hotspot.status.slice(1),
+  description: hotspot.details,
+  cats: [...hotspot.sterilizedCats, ...hotspot.unsterilizedCats],
+  total_unsterilized_cats: hotspot.unsterilizedCatsCount,
+  contact_name: hotspot.contactName,
+  contact_phone: hotspot.contactPhone,
+  volunteer_id: hotspot.volunteer?.id,
 });
