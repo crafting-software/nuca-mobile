@@ -1,7 +1,9 @@
 import { capitalize } from 'lodash';
+import React, { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Button, Caption, Card, TextInput, useTheme } from 'react-native-paper';
 import SelectDropdown from 'react-native-select-dropdown';
+import { User } from '../models/User';
 import { InputField } from './InputField';
 
 const getStyles = (theme: ReactNativePaper.Theme) =>
@@ -88,6 +90,31 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
       fontFamily: 'Nunito_700Bold',
       textTransform: 'uppercase',
     },
+    dropdownButton: {
+      width: '100%',
+      borderRadius: theme.roundness,
+      height: 60,
+      backgroundColor: theme.colors.background,
+      borderWidth: 1,
+      borderColor: theme.colors.disabled,
+      marginTop: 5,
+    },
+    dropdownText: {
+      fontSize: 15,
+      textAlign: 'left',
+      paddingHorizontal: 8,
+      fontFamily: 'Nunito_400Regular',
+      color: theme.colors.text,
+    },
+    statusDropdown: {
+      borderRadius: theme.roundness,
+    },
+    statusRowText: {
+      textAlign: 'left',
+      paddingHorizontal: 18,
+      fontSize: 15,
+      fontFamily: 'Nunito_400Regular',
+    },
   });
 
 export const AddCatCard = ({
@@ -97,29 +124,22 @@ export const AddCatCard = ({
 }) => {
   const theme = useTheme();
   const styles = getStyles(theme);
+  const [users, setUsers] = useState<User[]>([]);
 
   return (
     <Card style={styles.mainContainer}>
       <View style={styles.container}>
         <View style={styles.titleRow}>
           {isEditingMode ? (
-            <Button
-              uppercase={false}
-              contentStyle={styles.buttonContent}
-              labelStyle={styles.titleLabel}
-              icon="pencil"
-            >
-              Editează
-            </Button>
+            <>
+              <Caption style={styles.textInputTitle}>Editează</Caption>
+              <Button labelStyle={{ color: theme.colors.text }} icon="pencil" />
+            </>
           ) : (
-            <Button
-              uppercase={false}
-              contentStyle={styles.buttonContent}
-              labelStyle={styles.titleLabel}
-              icon="plus"
-            >
-              Adaugă
-            </Button>
+            <>
+              <Caption style={styles.textInputTitle}>Adaugă</Caption>
+              <Button labelStyle={{ color: theme.colors.text }} icon="plus" />
+            </>
           )}
         </View>
         <Caption style={styles.textInputTitle}>Sex</Caption>
@@ -154,7 +174,29 @@ export const AddCatCard = ({
           value={''}
           onTextInputChangeText={text => {}}
         />
-        <Caption style={styles.textInputTitle}>Adaugă poze/video</Caption>
+        <Caption style={styles.textInputTitle}>VOLUNTAR</Caption>
+        <SelectDropdown
+          defaultButtonText="Alege voluntar"
+          data={users}
+          buttonStyle={styles.dropdownButton}
+          buttonTextStyle={styles.dropdownText}
+          dropdownStyle={styles.statusDropdown}
+          rowTextStyle={styles.statusRowText}
+          dropdownIconPosition="right"
+          renderDropdownIcon={() => (
+            <TextInput.Icon
+              name="chevron-down"
+              color={theme.colors.text}
+              style={{ marginRight: 40 }}
+            />
+          )}
+          onSelect={() => {}}
+          rowTextForSelection={(user: User) => user.name}
+          buttonTextAfterSelection={(user: User) => user.name}
+        />
+        {isEditingMode && (
+          <Caption style={styles.textInputTitle}>Adaugă poze/video</Caption>
+        )}
       </View>
       <Button
         style={styles.saveButton}
