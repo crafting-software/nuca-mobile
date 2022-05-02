@@ -1,5 +1,5 @@
 import { capitalize } from 'lodash';
-import React, { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import {
   Image,
   ScrollView,
@@ -14,6 +14,7 @@ import {
   Caption,
   FAB,
   Headline,
+  Snackbar,
   TextInput,
   Title,
   useTheme,
@@ -25,8 +26,9 @@ import catLady4 from '../assets/cat-lady4.png';
 import currentLocationIcon from '../assets/current-location.png';
 import mapPinIcon from '../assets/map-pin.png';
 import { Appbar } from '../components/Appbar';
+import { FullScreenActivityIndicator } from '../components/FullScreenActivityIndicator';
 import { InputField } from '../components/InputField';
-import { findCurrentLocation } from '../context/MapContext';
+import { findCurrentLocation, MapContext } from '../context';
 import {
   HotspotDetails,
   HotspotStatus,
@@ -35,6 +37,7 @@ import {
 import { getFormattedAddress, Location } from '../models/Location';
 import { User } from '../models/User';
 import { RootStackScreenProps } from '../types';
+import { addHotspot, updateHotspot } from '../utils/hotspots';
 import { loadUsers } from '../utils/users';
 import { CatsView } from './HotspotDetailScreen';
 
@@ -173,7 +176,7 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
       maxWidth: '100%',
       maxHeight: '100%',
     },
-    statusButton: {
+    dropdownButton: {
       width: '100%',
       borderRadius: theme.roundness,
       height: 60,
@@ -182,7 +185,7 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
       borderColor: theme.colors.disabled,
       marginTop: 5,
     },
-    statusButtonText: {
+    dropdownText: {
       fontSize: 15,
       textAlign: 'left',
       paddingHorizontal: 8,
@@ -191,7 +194,6 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
     },
     statusDropdown: {
       borderRadius: theme.roundness,
-      width: 150,
     },
     statusRowText: {
       textAlign: 'left',
@@ -225,36 +227,38 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
     },
   });
 
-export const AddHotspotScreen = ({
+export const HotspotFormScreen = ({
   route,
 }: RootStackScreenProps<'AddHotspot'>) => {
+  const { hotspots, setHotspots } = useContext(MapContext);
+  const [isInProgress, setIsInProgress] = useState(false);
+  const [isSnackbarVisible, setIsSnackbarVisible] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const navigation = useNavigation();
+
   const theme = useTheme();
   const styles = getStyles(theme);
 
   const [users, setUsers] = useState<User[]>([]);
   const isUpdate = route.params.isUpdate;
-  const [hotspotDetails, setHotspotDetails] = useState<
-    HotspotDetails | undefined
-  >(route.params.hotspotDetails);
-  const [defaultHotspot, setDefaultHotspot] = useState<HotspotDetails>(
-    isUpdate
-      ? hotspotDetails!
-      : {
-          id: '',
-          status: HotspotStatus.toDo,
-          latitude: 0,
-          longitude: 0,
-          address: '',
-          city: '',
-          zip: '',
-          details: '',
-          notes: '',
-          sterilizedCats: [],
-          unsterilizedCats: [],
-          unsterilizedCatsCount: 0,
-          contactName: '',
-          contactPhone: '',
-        }
+
+  const [hotspotDetails, setHotspotDetails] = useState<HotspotDetails>(
+    route.params.hotspotDetails || {
+      id: '',
+      status: HotspotStatus.toDo,
+      latitude: 0,
+      longitude: 0,
+      address: '',
+      city: '',
+      zip: '',
+      details: '',
+      notes: '',
+      sterilizedCats: [],
+      unsterilizedCats: [],
+      unsterilizedCatsCount: 0,
+      contactName: '',
+      contactPhone: '',
+    }
   );
 
   useEffect(() => {
@@ -265,6 +269,30 @@ export const AddHotspotScreen = ({
     };
     load();
   }, []);
+
+  const save = async () => {
+    const submitFunc = isUpdate ? updateHotspot : addHotspot;
+
+    setIsInProgress(true);
+
+    const { success, hotspotDetails: newHotspot } = await submitFunc(
+      hotspotDetails
+    );
+
+    if (success) {
+      const newHostpots = [
+        ...hotspots.filter(h => h.id !== newHotspot!.id),
+        newHotspot!,
+      ];
+      setHotspots(newHostpots);
+
+      navigation.goBack();
+    } else {
+      setIsInProgress(false);
+      setSnackbarMessage(isUpdate ? 'Editare nereusita' : 'Adaugare nereusita');
+      setIsSnackbarVisible(true);
+    }
+  };
 
   return (
     <>
@@ -279,28 +307,24 @@ export const AddHotspotScreen = ({
               />
             ) : (
               <Title style={styles.addressTitle}>
-                {defaultHotspot?.address +
-                  ' ' +
-                  defaultHotspot?.city +
-                  ', ' +
-                  defaultHotspot?.zip}
+                {`${hotspotDetails.address} ${hotspotDetails.city}, ${hotspotDetails.zip}`}
               </Title>
             )}
             <InputField
               label="Detalii adresă"
               placeholder="Nume"
               inputFieldStyle={{ marginTop: 54 }}
-              value={defaultHotspot?.details}
+              value={hotspotDetails.details}
               onTextInputChangeText={text =>
-                setDefaultHotspot(prev => ({ ...prev, details: text }))
+                setHotspotDetails({ ...hotspotDetails, details: text })
               }
             />
             <Caption style={styles.textInputTitle}>STATUS</Caption>
             <SelectDropdown
               defaultButtonText="Alege status"
               data={hotspotStatusList}
-              buttonStyle={styles.statusButton}
-              buttonTextStyle={styles.statusButtonText}
+              buttonStyle={styles.dropdownButton}
+              buttonTextStyle={styles.dropdownText}
               dropdownStyle={styles.statusDropdown}
               rowTextStyle={styles.statusRowText}
               dropdownIconPosition="right"
@@ -311,16 +335,16 @@ export const AddHotspotScreen = ({
                   style={{ marginRight: 40 }}
                 />
               )}
-              onSelect={(selectedItem: HotspotStatus, _index) => {
-                setDefaultHotspot(prev => ({ ...prev, status: selectedItem }));
-              }}
-              buttonTextAfterSelection={(selectedItem: HotspotStatus, _index) =>
+              onSelect={(selectedItem: HotspotStatus) =>
+                setHotspotDetails({ ...hotspotDetails, status: selectedItem })
+              }
+              buttonTextAfterSelection={(selectedItem: HotspotStatus) =>
                 capitalize(selectedItem as HotspotStatus)
               }
-              rowTextForSelection={(item: HotspotStatus, _index) =>
+              rowTextForSelection={(item: HotspotStatus) =>
                 capitalize(item as HotspotStatus)
               }
-              defaultValue={defaultHotspot.status}
+              defaultValue={hotspotDetails.status}
             />
             <InputField
               multiline={true}
@@ -328,30 +352,30 @@ export const AddHotspotScreen = ({
               placeholder="Scrie aici"
               inputFieldStyle={styles.inputField}
               textInputStyle={{ height: 100 }}
-              value={defaultHotspot.notes}
+              value={hotspotDetails.notes}
               onTextInputChangeText={text =>
-                setDefaultHotspot(prev => ({ ...prev, notes: text }))
+                setHotspotDetails({ ...hotspotDetails, notes: text })
               }
             />
             <InputField
               label="Pisici nesterilizate"
               placeholder="0"
               keyboardType="number-pad"
-              value={String(defaultHotspot.unsterilizedCatsCount || 0)}
+              value={String(hotspotDetails.unsterilizedCatsCount || 0)}
               onTextInputChangeText={text =>
-                setDefaultHotspot(prev => ({
-                  ...prev,
+                setHotspotDetails({
+                  ...hotspotDetails,
                   unsterilizedCatsCount: Number(text),
-                }))
+                })
               }
             />
             <InputField
               label="Persoana de contact"
               placeholder="Nume persoana de contact"
               inputFieldStyle={styles.inputField}
-              value={defaultHotspot.contactName}
+              value={hotspotDetails.contactName}
               onTextInputChangeText={text =>
-                setDefaultHotspot(prev => ({ ...prev, contactName: text }))
+                setHotspotDetails({ ...hotspotDetails, contactName: text })
               }
             />
             <InputField
@@ -359,21 +383,21 @@ export const AddHotspotScreen = ({
               placeholder="Telefon persoana de contact"
               keyboardType="phone-pad"
               inputFieldStyle={styles.inputField}
-              value={defaultHotspot.contactPhone}
+              value={hotspotDetails.contactPhone}
               onTextInputChangeText={text =>
-                setDefaultHotspot(prev => ({ ...prev, contactPhone: text }))
+                setHotspotDetails({ ...hotspotDetails, contactPhone: text })
               }
             />
             <Caption style={styles.textInputTitle}>VOLUNTAR</Caption>
             <SelectDropdown
               defaultButtonText="Alege voluntar"
               data={users}
-              buttonStyle={styles.statusButton}
-              buttonTextStyle={styles.statusButtonText}
+              buttonStyle={styles.dropdownButton}
+              buttonTextStyle={styles.dropdownText}
               dropdownStyle={styles.statusDropdown}
               rowTextStyle={styles.statusRowText}
               dropdownIconPosition="right"
-              renderDropdownIcon={(_selectedItem, _index) => (
+              renderDropdownIcon={() => (
                 <TextInput.Icon
                   name="chevron-down"
                   color={theme.colors.text}
@@ -381,12 +405,8 @@ export const AddHotspotScreen = ({
                 />
               )}
               onSelect={() => {}}
-              buttonTextAfterSelection={(selectedItem: HotspotStatus, _index) =>
-                capitalize(selectedItem as HotspotStatus)
-              }
-              rowTextForSelection={(item: HotspotStatus, _index) =>
-                capitalize(item as HotspotStatus)
-              }
+              rowTextForSelection={(user: User) => user.name}
+              buttonTextAfterSelection={(user: User) => user.name}
             />
             <View style={styles.separator} />
             <View style={styles.catCategoriesContainer}>
@@ -410,7 +430,7 @@ export const AddHotspotScreen = ({
             </View>
             {isUpdate && (
               <CatsView
-                cats={defaultHotspot.unsterilizedCats}
+                cats={hotspotDetails.unsterilizedCats}
                 isEditMode={true}
               />
             )}
@@ -436,7 +456,7 @@ export const AddHotspotScreen = ({
             {isUpdate && (
               <>
                 <CatsView
-                  cats={defaultHotspot.sterilizedCats}
+                  cats={hotspotDetails.sterilizedCats}
                   isEditMode={true}
                 />
                 <View style={styles.separator} />
@@ -449,13 +469,7 @@ export const AddHotspotScreen = ({
               labelStyle={styles.saveButtonLabel}
               icon="check"
               mode="contained"
-              onPress={() =>
-                alert(
-                  JSON.stringify({
-                    name: defaultHotspot.address,
-                  })
-                )
-              }
+              onPress={save}
             >
               Salvează
             </Button>
@@ -481,6 +495,13 @@ export const AddHotspotScreen = ({
           </View>
         </ScrollView>
       </View>
+      {isInProgress && <FullScreenActivityIndicator />}
+      <Snackbar
+        visible={isSnackbarVisible}
+        onDismiss={() => setIsSnackbarVisible(false)}
+      >
+        {snackbarMessage}
+      </Snackbar>
     </>
   );
 };

@@ -1,5 +1,5 @@
 import * as SecureStore from 'expo-secure-store';
-import React, { useContext, useState } from 'react';
+import { useContext, useState } from 'react';
 import { Image, StyleSheet } from 'react-native';
 import { EdgeInsets } from 'react-native-maps';
 import {

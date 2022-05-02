@@ -1,5 +1,5 @@
 import * as LocationProvider from 'expo-location';
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
 import MapView, { EdgeInsets, Marker, Region } from 'react-native-maps';
 import {
@@ -15,6 +15,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import currentLocationIcon from '../assets/current-location.png';
 import { Appbar } from '../components/Appbar';
+import { FullScreenActivityIndicator } from '../components/FullScreenActivityIndicator';
 import { MapContext } from '../context';
 import { findCurrentLocation } from '../context/MapContext';
 import { getHotspotMarker } from '../models/Hotspot';
@@ -148,11 +149,7 @@ export const MapScreen = () => {
           });
         }}
       />
-      {isLoading && (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" />
-        </View>
-      )}
+      {isLoading && <FullScreenActivityIndicator />}
     </>
   );
 };
@@ -164,14 +161,6 @@ const getStyles = (theme: Theme, insets: EdgeInsets) =>
       alignItems: 'center',
       justifyContent: 'center',
       position: 'relative',
-    },
-    loadingContainer: {
-      position: 'absolute',
-      backgroundColor: theme.colors.backdrop,
-      width: '100%',
-      height: '100%',
-      justifyContent: 'center',
-      alignItems: 'center',
     },
     mapContainer: {
       position: 'relative',

@@ -1,5 +1,5 @@
 import * as LocationProvider from 'expo-location';
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import {
   Image,
   StyleSheet,
