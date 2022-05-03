@@ -2,9 +2,16 @@ import { capitalize } from 'lodash';
 import React, { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Button, Caption, Card, TextInput, useTheme } from 'react-native-paper';
+import {
+  DatePickerInput,
+  en,
+  registerTranslation,
+} from 'react-native-paper-dates';
 import SelectDropdown from 'react-native-select-dropdown';
 import { User } from '../models/User';
 import { InputField } from './InputField';
+
+registerTranslation('en', en);
 
 const getStyles = (theme: ReactNativePaper.Theme) =>
   StyleSheet.create({
@@ -115,6 +122,19 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
       fontSize: 15,
       fontFamily: 'Nunito_400Regular',
     },
+    pickerContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginTop: 12,
+      backgroundColor: 'red',
+      flexWrap: 'wrap',
+    },
+    datePickerContainer: {
+      width: '50%',
+      flexDirection: 'column',
+      justifyContent: 'flex-start',
+      alignItems: 'flex-start',
+    },
   });
 
 export const AddCatCard = ({
@@ -125,6 +145,8 @@ export const AddCatCard = ({
   const theme = useTheme();
   const styles = getStyles(theme);
   const [users, setUsers] = useState<User[]>([]);
+  const [date, setDate] = React.useState<Date | undefined>(undefined);
+  const [inputDate, setInputDate] = React.useState<Date | undefined>(undefined);
 
   return (
     <Card style={styles.mainContainer}>
@@ -174,6 +196,26 @@ export const AddCatCard = ({
           value={''}
           onTextInputChangeText={text => {}}
         />
+        <View style={styles.pickerContainer}>
+          <View style={styles.datePickerContainer}>
+            <Caption style={styles.textInputTitle}>Dată internare</Caption>
+            <DatePickerInput
+              locale="en"
+              value={inputDate}
+              onChange={d => setInputDate(d)}
+              mode="outlined"
+            />
+          </View>
+          <View style={styles.datePickerContainer}>
+            <Caption style={styles.textInputTitle}>Dată externare</Caption>
+            <DatePickerInput
+              locale="en"
+              value={inputDate}
+              onChange={d => setInputDate(d)}
+              mode="outlined"
+            />
+          </View>
+        </View>
         <Caption style={styles.textInputTitle}>VOLUNTAR</Caption>
         <SelectDropdown
           defaultButtonText="Alege voluntar"
