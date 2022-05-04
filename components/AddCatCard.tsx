@@ -309,10 +309,10 @@ export const AddCatCard = ({
             />
           </>
         )}
-        {isEditingMode && (
+        {!isEditingMode && (
           <Caption style={styles.textInputTitle}>Adaugă poze/video</Caption>
         )}
-        <View>
+        <View style={{ paddingTop: 8 }}>
           <Image style={styles.media} source={imagePlaceholder} />
         </View>
       </View>
