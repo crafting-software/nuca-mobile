@@ -257,7 +257,7 @@ export const CatCard = ({
           )}
         </Card>
       ) : (
-        <AddCatCard isEditingMode={true} />
+        <AddCatCard isEditingMode={isEditingMode} cat={cat} />
       )}
     </>
   );
