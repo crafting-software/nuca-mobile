@@ -11,7 +11,6 @@ import {
   useTheme,
 } from 'react-native-paper';
 import { Cat, getDateText } from '../models/Cat';
-import { AddCatCard } from './AddCatCard';
 
 const getStyles = (theme: ReactNativePaper.Theme) =>
   StyleSheet.create({
@@ -147,119 +146,128 @@ export const CatCard = ({
 }: CatCardProps) => {
   const theme = useTheme();
   const styles = getStyles(theme);
+
+  return (
+    <>
+      {!isEditingMode ? (
+        <CatDetailView cat={cat} index={index} />
+      ) : (
+        <AddCatCard isEditingMode={isEditingMode} cat={cat} />
+      )}
+    </>
+  );
+};
+
+const CatDetailView = ({ cat, index }: { cat: Cat; index: number }) => {
+  const theme = useTheme();
+  const styles = getStyles(theme);
   const [visible, setVisible] = useState(false);
 
   const showModal = () => setVisible(true);
   const hideModal = () => setVisible(false);
 
   return (
-    <>
-      {!isEditingMode ? (
-        <Card style={styles.mainContainer}>
-          <Portal>
-            <Modal visible={visible} onDismiss={hideModal}>
-              <DeleteModal hideModal={hideModal} />
-            </Modal>
-          </Portal>
-          <View style={styles.container}>
-            <View style={styles.titleRow}>
-              <Caption style={styles.index}>{index}.</Caption>
-              <Caption style={styles.title}>Sex</Caption>
-              <Caption style={styles.genderText}>{cat.sex}</Caption>
-            </View>
-            {!!cat.notes && (
-              <Caption style={styles.notes}>Observatii: {cat.notes}</Caption>
-            )}
-            {!!cat.isSterilized && (
-              <View style={{ paddingTop: 8 }}>
-                <View style={styles.informationLine}>
-                  <View style={styles.iconAndText}>
-                    <IconButton
-                      icon="calendar-arrow-left"
-                      size={20}
-                      color={theme.colors.placeholder}
-                      style={styles.icon}
-                    />
-                    <Caption style={styles.baseText}>Dată internare:</Caption>
-                  </View>
-                  <Caption style={styles.infoText}>
-                    {getDateText(cat.checkInDate)}
-                  </Caption>
-                </View>
-                <View style={styles.informationLine}>
-                  <View style={styles.iconAndText}>
-                    <IconButton
-                      icon="calendar-arrow-right"
-                      size={20}
-                      color={theme.colors.placeholder}
-                      style={styles.icon}
-                    />
-                    <Caption style={styles.baseText}>Dată externare:</Caption>
-                  </View>
-                  <Caption style={styles.infoText}>
-                    {getDateText(cat.checkOutDate)}
-                  </Caption>
-                </View>
-                <View style={styles.informationLine}>
-                  <View style={styles.iconAndText}>
-                    <IconButton
-                      icon="account"
-                      size={20}
-                      color={theme.colors.placeholder}
-                      style={styles.icon}
-                    />
-                    <Caption style={styles.baseText}>Voluntar:</Caption>
-                  </View>
-                  <Caption style={styles.infoText}>
-                    {cat.capturedBy?.name || ''}
-                  </Caption>
-                </View>
+    <Card style={styles.mainContainer}>
+      <Portal>
+        <Modal visible={visible} onDismiss={hideModal}>
+          <DeleteModal hideModal={hideModal} />
+        </Modal>
+      </Portal>
+      <View style={styles.container}>
+        <View style={styles.titleRow}>
+          <Caption style={styles.index}>{index}.</Caption>
+          <Caption style={styles.title}>Sex</Caption>
+          <Caption style={styles.genderText}>{cat.sex}</Caption>
+        </View>
+        {!!cat.notes && (
+          <Caption style={styles.notes}>Observatii: {cat.notes}</Caption>
+        )}
+        {!!cat.isSterilized && (
+          <View style={{ paddingTop: 8 }}>
+            <View style={styles.informationLine}>
+              <View style={styles.iconAndText}>
+                <IconButton
+                  icon="calendar-arrow-left"
+                  size={20}
+                  color={theme.colors.placeholder}
+                  style={styles.icon}
+                />
+                <Caption style={styles.baseText}>Dată internare:</Caption>
               </View>
-            )}
-            {!isEmpty(cat.media) && (
-              <FlatList
-                style={{ marginTop: 20 }}
-                horizontal
-                data={[] /*cat.media*/}
-                keyExtractor={(item, index) => index.toString()}
-                renderItem={({ item }) => (
-                  <View>
-                    <Image style={styles.media} source={{ uri: item }} />
-                  </View>
-                )}
-              />
-            )}
+              <Caption style={styles.infoText}>
+                {getDateText(cat.checkInDate)}
+              </Caption>
+            </View>
+            <View style={styles.informationLine}>
+              <View style={styles.iconAndText}>
+                <IconButton
+                  icon="calendar-arrow-right"
+                  size={20}
+                  color={theme.colors.placeholder}
+                  style={styles.icon}
+                />
+                <Caption style={styles.baseText}>Dată externare:</Caption>
+              </View>
+              <Caption style={styles.infoText}>
+                {getDateText(cat.checkOutDate)}
+              </Caption>
+            </View>
+            <View style={styles.informationLine}>
+              <View style={styles.iconAndText}>
+                <IconButton
+                  icon="account"
+                  size={20}
+                  color={theme.colors.placeholder}
+                  style={styles.icon}
+                />
+                <Caption style={styles.baseText}>Voluntar:</Caption>
+              </View>
+              <Caption style={styles.infoText}>
+                {cat.capturedBy?.name || ''}
+              </Caption>
+            </View>
           </View>
-          {isEditingMode && (
-            <View style={{ flexDirection: 'row', paddingTop: 8 }}>
-              <View style={styles.buttonView}>
-                <Button
-                  style={styles.editButton}
-                  contentStyle={styles.buttonContent}
-                  labelStyle={styles.buttonLabel}
-                  icon="pencil"
-                >
-                  Editează
-                </Button>
+        )}
+        {!isEmpty(cat.media) && (
+          <FlatList
+            style={{ marginTop: 20 }}
+            horizontal
+            data={[] /*cat.media*/}
+            keyExtractor={(item, index) => index.toString()}
+            renderItem={({ item }) => (
+              <View>
+                <Image style={styles.media} source={{ uri: item }} />
               </View>
-              <View style={styles.buttonView}>
-                <Button
-                  style={styles.deleteButton}
-                  contentStyle={styles.buttonContent}
-                  labelStyle={styles.buttonLabel}
-                  icon="close"
-                  onPress={showModal}
-                >
-                  Șterge
-                </Button>
-              </View>
-            </View>
-          )}
-        </Card>
-      ) : (
-        <AddCatCard isEditingMode={isEditingMode} cat={cat} />
+            )}
+          />
+        )}
+      </View>
+      {isEditingMode && (
+        <View style={{ flexDirection: 'row', paddingTop: 8 }}>
+          <View style={styles.buttonView}>
+            <Button
+              style={styles.editButton}
+              contentStyle={styles.buttonContent}
+              labelStyle={styles.buttonLabel}
+              icon="pencil"
+            >
+              Editează
+            </Button>
+          </View>
+          <View style={styles.buttonView}>
+            <Button
+              style={styles.deleteButton}
+              contentStyle={styles.buttonContent}
+              labelStyle={styles.buttonLabel}
+              icon="close"
+              onPress={showModal}
+            >
+              Șterge
+            </Button>
+          </View>
+        </View>
       )}
-    </>
+    </Card>
   );
 };
 
