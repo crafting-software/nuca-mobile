@@ -1,5 +1,5 @@
 import { capitalize } from 'lodash';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 import { Button, Caption, Card, TextInput, useTheme } from 'react-native-paper';
 import {
@@ -11,6 +11,7 @@ import SelectDropdown from 'react-native-select-dropdown';
 import imagePlaceholder from '../assets/image-placeholder.png';
 import { Cat } from '../models/Cat';
 import { User } from '../models/User';
+import { loadUsers } from '../utils/users';
 import { InputField } from './InputField';
 
 registerTranslation('en', en);
@@ -158,7 +159,6 @@ export const AddCatCard = ({
   const theme = useTheme();
   const styles = getStyles(theme);
   const [users, setUsers] = useState<User[]>([]);
-  const [inputDate, setInputDate] = React.useState<Date | undefined>(undefined);
   const defaultCat: Cat = {
     id: 'place',
     sex: 'F',
@@ -170,6 +170,15 @@ export const AddCatCard = ({
     media: {},
   };
   const [localCat, setCat] = useState<Cat>(cat || defaultCat);
+
+  useEffect(() => {
+    const load = async () => {
+      const { success, users } = await loadUsers();
+      if (!success) alert('Failed to load users');
+      setUsers(users);
+    };
+    load();
+  }, []);
 
   return (
     <Card style={styles.mainContainer}>
@@ -286,9 +295,8 @@ export const AddCatCard = ({
             </View>
             <Caption style={styles.volunteerTitle}>VOLUNTAR</Caption>
             <SelectDropdown
-              defaultButtonText="Alege voluntar"
+              defaultButtonText={localCat.capturedBy?.name || 'Alege voluntar'}
               data={users}
-              defaultValue={localCat.capturedBy}
               buttonStyle={styles.dropdownButton}
               buttonTextStyle={styles.dropdownText}
               dropdownStyle={styles.statusDropdown}
@@ -306,6 +314,7 @@ export const AddCatCard = ({
               }
               rowTextForSelection={(user: User) => user.name}
               buttonTextAfterSelection={(user: User) => user.name}
+              defaultValue={localCat.capturedBy?.name}
             />
           </>
         )}
@@ -321,6 +330,7 @@ export const AddCatCard = ({
         contentStyle={styles.buttonContent}
         labelStyle={styles.buttonLabel}
         icon="check"
+        onPress={() => alert('Should Save modified localCat')}
       >
         Salvează
       </Button>

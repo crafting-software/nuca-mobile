@@ -427,7 +427,7 @@ export const HotspotFormScreen = ({
                 small
                 onPress={() => alert('add unsterilized cat')}
               />
-            </View>
+            </View> 
             {isUpdate && (
               <CatsView
                 cats={hotspotDetails.unsterilizedCats}
