@@ -18,6 +18,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import catLady3 from '../assets/cat-lady3.png';
+import { AddCatCard } from '../components/AddCatCard';
 import { Appbar } from '../components/Appbar';
 import { CatCard } from '../components/CatCard';
 import { Cat } from '../models/Cat';
@@ -371,6 +372,8 @@ const InformationView = ({
   );
 };
 
+export type CatsViewTypes = 'create' | 'detail';
+
 export const CatsView = ({
   cats,
   isEditMode,
@@ -385,14 +388,20 @@ export const CatsView = ({
 
   return (
     <View>
-      {cats.slice(0, visibleCat).map((cat, index) => (
-        <CatCard
-          key={cat.id}
-          cat={cat}
-          index={index + 1}
-          isEditingMode={isEditMode}
-        />
-      ))}
+      {cats
+        .slice(0, visibleCat)
+        .map((cat, index) =>
+          cat.isNew ? (
+            <AddCatCard key={cat.id} cat={cat} />
+          ) : (
+            <CatCard
+              key={cat.id}
+              cat={cat}
+              index={index + 1}
+              isEditingMode={isEditMode}
+            />
+          )
+        )}
       {cats.length > maxVisibleCat && visibleCat === maxVisibleCat && (
         <View style={{ alignItems: 'center' }}>
           <Button

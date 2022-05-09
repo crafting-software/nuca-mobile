@@ -29,6 +29,7 @@ import { Appbar } from '../components/Appbar';
 import { FullScreenActivityIndicator } from '../components/FullScreenActivityIndicator';
 import { InputField } from '../components/InputField';
 import { findCurrentLocation, MapContext } from '../context';
+import { defaultSterilizedCat, defaultUnSterilizedCat } from '../models/Cat';
 import {
   HotspotDetails,
   HotspotStatus,
@@ -425,15 +426,20 @@ export const HotspotFormScreen = ({
                 icon="plus"
                 style={styles.catCategoryAddButton}
                 small
-                onPress={() => alert('add unsterilized cat')}
+                onPress={() => {
+                  const localList = hotspotDetails.unsterilizedCats;
+                  localList.push(defaultUnSterilizedCat);
+                  setHotspotDetails({
+                    ...hotspotDetails,
+                    unsterilizedCats: localList,
+                  });
+                }}
               />
-            </View> 
-            {isUpdate && (
-              <CatsView
-                cats={hotspotDetails.unsterilizedCats}
-                isEditMode={true}
-              />
-            )}
+            </View>
+            <CatsView
+              cats={hotspotDetails.unsterilizedCats}
+              isEditMode={true}
+            />
             <View style={styles.separator} />
             <View style={styles.catCategoriesContainer}>
               <Avatar.Icon
@@ -450,18 +456,18 @@ export const HotspotFormScreen = ({
                 icon="plus"
                 style={styles.catCategoryAddButton}
                 small
-                onPress={() => alert('add sterilized cat')}
+                onPress={() => {
+                  const localList = hotspotDetails.sterilizedCats;
+                  localList.push(defaultSterilizedCat);
+                  setHotspotDetails({
+                    ...hotspotDetails,
+                    sterilizedCats: localList,
+                  });
+                }}
               />
             </View>
-            {isUpdate && (
-              <>
-                <CatsView
-                  cats={hotspotDetails.sterilizedCats}
-                  isEditMode={true}
-                />
-                <View style={styles.separator} />
-              </>
-            )}
+            <CatsView cats={hotspotDetails.sterilizedCats} isEditMode={true} />
+            <View style={styles.separator} />
             <Button
               uppercase={false}
               style={styles.saveButton}
