@@ -148,13 +148,14 @@ export const CatCard = ({
   const theme = useTheme();
   const styles = getStyles(theme);
   const [visible, setVisible] = useState(false);
+  const [shouldEdit, setShouldEdit] = useState(false);
 
   const showModal = () => setVisible(true);
   const hideModal = () => setVisible(false);
 
   return (
     <>
-      {!isEditingMode ? (
+      {!shouldEdit ? (
         <Card style={styles.mainContainer}>
           <Portal>
             <Modal visible={visible} onDismiss={hideModal}>
@@ -238,6 +239,7 @@ export const CatCard = ({
                   contentStyle={styles.buttonContent}
                   labelStyle={styles.buttonLabel}
                   icon="pencil"
+                  onPress={() => setShouldEdit(true)}
                 >
                   Editează
                 </Button>

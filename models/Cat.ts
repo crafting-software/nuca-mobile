@@ -9,6 +9,7 @@ export type Cat = {
   isSterilized: boolean;
   capturedBy?: User;
   media: Record<string, string>;
+  isNew?: boolean;
 };
 
 export const castToCat = (backendCat: Record<string, any>): Cat => ({
@@ -43,4 +44,28 @@ export const getDateText = (timestamp: number): string => {
   return `${date.getDay()} ${
     monthNames[date.getMonth()]
   } ${date.getFullYear()}`;
+};
+
+export const defaultSterilizedCat: Cat = {
+  id: (Math.floor(Math.random() * 100) + 1).toString(),
+  sex: 'F',
+  notes: '',
+  checkInDate: new Date().getTime() / 1000,
+  checkOutDate: new Date().getTime() / 1000,
+  isSterilized: true,
+  capturedBy: undefined,
+  media: {},
+  isNew: true,
+};
+
+export const defaultUnSterilizedCat: Cat = {
+  id: (Math.floor(Math.random() * 100) + 1).toString(),
+  sex: 'F',
+  notes: '',
+  checkInDate: new Date().getTime() / 1000,
+  checkOutDate: new Date().getTime() / 1000,
+  isSterilized: false,
+  capturedBy: undefined,
+  media: {},
+  isNew: true,
 };
