@@ -428,7 +428,9 @@ export const HotspotFormScreen = ({
                 small
                 onPress={() => {
                   const localList = hotspotDetails.unsterilizedCats;
+                  localList.reverse();
                   localList.push(defaultUnSterilizedCat);
+                  localList.reverse();
                   setHotspotDetails({
                     ...hotspotDetails,
                     unsterilizedCats: localList,
@@ -458,7 +460,9 @@ export const HotspotFormScreen = ({
                 small
                 onPress={() => {
                   const localList = hotspotDetails.sterilizedCats;
+                  localList.reverse();
                   localList.push(defaultSterilizedCat);
+                  localList.reverse();
                   setHotspotDetails({
                     ...hotspotDetails,
                     sterilizedCats: localList,

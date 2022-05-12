@@ -392,7 +392,7 @@ export const CatsView = ({
         .slice(0, visibleCat)
         .map((cat, index) =>
           cat.isNew ? (
-            <AddCatCard key={cat.id} cat={cat} />
+            <AddCatCard key={index} cat={cat} />
           ) : (
             <CatCard
               key={cat.id}
