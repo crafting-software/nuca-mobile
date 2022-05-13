@@ -295,6 +295,21 @@ export const HotspotFormScreen = ({
     }
   };
 
+  const deleteCat = (catId: string) => {
+    const unsterilizedCats = hotspotDetails.unsterilizedCats.filter(
+      c => c.id !== catId
+    );
+    const sterilizedCats = hotspotDetails.sterilizedCats.filter(
+      c => c.id !== catId
+    );
+
+    setHotspotDetails({
+      ...hotspotDetails,
+      unsterilizedCats: unsterilizedCats,
+      sterilizedCats: sterilizedCats,
+    });
+  };
+
   return (
     <>
       <Appbar forDetailScreen />
@@ -441,6 +456,7 @@ export const HotspotFormScreen = ({
             <CatsView
               cats={hotspotDetails.unsterilizedCats}
               isEditMode={true}
+              deleteFunction={deleteCat}
             />
             <View style={styles.separator} />
             <View style={styles.catCategoriesContainer}>
@@ -470,7 +486,11 @@ export const HotspotFormScreen = ({
                 }}
               />
             </View>
-            <CatsView cats={hotspotDetails.sterilizedCats} isEditMode={true} />
+            <CatsView
+              cats={hotspotDetails.sterilizedCats}
+              isEditMode={true}
+              deleteFunction={deleteCat}
+            />
             <View style={styles.separator} />
             <Button
               uppercase={false}

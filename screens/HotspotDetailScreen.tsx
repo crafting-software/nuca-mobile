@@ -377,9 +377,11 @@ export type CatsViewTypes = 'create' | 'detail';
 export const CatsView = ({
   cats,
   isEditMode,
+  deleteFunction,
 }: {
   cats: Cat[];
   isEditMode?: boolean;
+  deleteFunction?: (catId: string) => void;
 }) => {
   const theme = useTheme();
   const styles = getStyles(theme);
@@ -399,6 +401,7 @@ export const CatsView = ({
               cat={cat}
               index={index + 1}
               isEditingMode={isEditMode}
+              deleteFunction={deleteFunction}
             />
           )
         )}
