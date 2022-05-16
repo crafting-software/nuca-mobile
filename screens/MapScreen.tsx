@@ -2,14 +2,7 @@ import * as LocationProvider from 'expo-location';
 import { useContext, useEffect, useRef, useState } from 'react';
 import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
 import MapView, { EdgeInsets, Marker, Region } from 'react-native-maps';
-import {
-  ActivityIndicator,
-  Caption,
-  FAB,
-  TextInput,
-  Title,
-  useTheme,
-} from 'react-native-paper';
+import { Caption, FAB, TextInput, Title, useTheme } from 'react-native-paper';
 import { Theme } from 'react-native-paper/lib/typescript/types';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';

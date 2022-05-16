@@ -12,7 +12,11 @@ import {
   Nunito_800ExtraBold,
   useFonts,
 } from '@expo-google-fonts/nunito';
-import { AuthContextProvider, MapContextProvider } from './context';
+import {
+  AuthContextProvider,
+  HotspotContextProvider,
+  MapContextProvider,
+} from './context';
 import Navigation from './navigation/index';
 import { getTheme } from './theme';
 
@@ -36,8 +40,10 @@ export default () => {
       <MapContextProvider>
         <PaperProvider theme={theme}>
           <SafeAreaProvider>
-            <Navigation />
-            <StatusBar />
+            <HotspotContextProvider>
+              <Navigation />
+              <StatusBar />
+            </HotspotContextProvider>
           </SafeAreaProvider>
         </PaperProvider>
       </MapContextProvider>

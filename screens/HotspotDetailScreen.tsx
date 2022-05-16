@@ -1,5 +1,5 @@
 import { trim } from 'lodash';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Image,
@@ -21,8 +21,9 @@ import catLady3 from '../assets/cat-lady3.png';
 import { AddCatCard } from '../components/AddCatCard';
 import { Appbar } from '../components/Appbar';
 import { CatCard } from '../components/CatCard';
+import { HotspotContext } from '../context/HotspotDetailContext';
 import { Cat } from '../models/Cat';
-import { HotspotDetails, HotspotStatus } from '../models/Hotspot';
+import { HotspotStatus } from '../models/Hotspot';
 import { RootStackParamList } from '../types';
 import { loadHotspotDetails } from '../utils/hotspots';
 
@@ -188,7 +189,7 @@ export const HotspotDetailScreen = ({
   const styles = getStyles(theme);
   const navigation = useNavigation();
 
-  const [hotspotDetails, setHotspotDetails] = useState<HotspotDetails>();
+  const { hotspotDetails, setHotspotDetails } = useContext(HotspotContext);
   const [region, setRegion] = useState<Region>();
 
   useEffect(() => {
@@ -197,7 +198,7 @@ export const HotspotDetailScreen = ({
         route.params.hotspotId
       );
       if (!success) alert('Failed to load hotspot details');
-      setHotspotDetails(hd);
+      if (hd) setHotspotDetails(hd);
       setRegion({
         latitude: hd?.latitude!,
         longitude: hd?.longitude!,
@@ -243,7 +244,6 @@ export const HotspotDetailScreen = ({
                   navigation.navigate('AddHotspot', {
                     region: region!,
                     isUpdate: true,
-                    hotspotDetails: hotspotDetails,
                   });
                 }}
                 compact
@@ -375,7 +375,7 @@ const InformationView = ({
 export type CatsViewTypes = 'create' | 'detail';
 
 export const CatsView = ({
-  cats,
+  cats = [],
   isEditMode,
   deleteFunction,
 }: {
@@ -387,7 +387,9 @@ export const CatsView = ({
   const styles = getStyles(theme);
   const maxVisibleCat = 2;
   const [visibleCat, setVisible] = useState<number>(maxVisibleCat);
-
+  {
+    cats.forEach(cat => console.log(cat.isSterilized + '  ' + cat.notes));
+  }
   return (
     <View>
       {cats

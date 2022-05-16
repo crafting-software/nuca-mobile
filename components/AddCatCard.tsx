@@ -1,5 +1,5 @@
 import { capitalize } from 'lodash';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 import { Button, Caption, Card, TextInput, useTheme } from 'react-native-paper';
 import {
@@ -9,6 +9,7 @@ import {
 } from 'react-native-paper-dates';
 import SelectDropdown from 'react-native-select-dropdown';
 import imagePlaceholder from '../assets/image-placeholder.png';
+import { HotspotContext } from '../context/HotspotDetailContext';
 import { Cat, defaultSterilizedCat } from '../models/Cat';
 import { User } from '../models/User';
 import { loadUsers } from '../utils/users';
@@ -160,6 +161,7 @@ export const AddCatCard = ({
   const styles = getStyles(theme);
   const [users, setUsers] = useState<User[]>([]);
   const [localCat, setCat] = useState<Cat>(cat || defaultSterilizedCat);
+  const { hotspotDetails, setHotspotDetails } = useContext(HotspotContext);
 
   useEffect(() => {
     const load = async () => {
@@ -169,6 +171,25 @@ export const AddCatCard = ({
     };
     load();
   }, []);
+
+  const saveCat = () => {
+    console.log('should save cat');
+    if (isEditingMode) {
+      const catList = localCat.isSterilized
+        ? hotspotDetails.sterilizedCats
+        : hotspotDetails.unsterilizedCats;
+      const catIndex = catList.findIndex(c => c.id === localCat.id);
+      catList[catIndex] = localCat;
+      localCat.isSterilized
+        ? setHotspotDetails(prev => ({
+            ...prev,
+            sterilizedCats: catList,
+          }))
+        : setHotspotDetails(prev => ({ ...prev, unsterilizedCats: catList }));
+    } else {
+      console.log('Create cat does not work yet!');
+    }
+  };
 
   return (
     <Card style={styles.mainContainer}>
@@ -201,7 +222,7 @@ export const AddCatCard = ({
         <Caption style={styles.textInputTitle}>Sex</Caption>
         <SelectDropdown
           data={['M', 'F']}
-          defaultValue={localCat?.sex}
+          defaultValue={localCat.sex}
           buttonStyle={styles.genderButton}
           buttonTextStyle={styles.genderButtonText}
           dropdownStyle={styles.genderDropdown}
@@ -231,7 +252,7 @@ export const AddCatCard = ({
           placeholder="Scrie aici"
           inputFieldStyle={styles.inputField}
           textInputStyle={{ height: 100 }}
-          value={localCat?.notes}
+          value={localCat.notes}
           onTextInputChangeText={text => {
             setCat(prev => ({
               ...prev,
@@ -320,7 +341,7 @@ export const AddCatCard = ({
         contentStyle={styles.buttonContent}
         labelStyle={styles.buttonLabel}
         icon="check"
-        onPress={() => alert('Should Save modified localCat')}
+        onPress={() => saveCat()}
       >
         Salvează
       </Button>
