@@ -100,32 +100,6 @@ export const toApiModel = (hotspot: HotspotDetails): Record<string, any> => ({
       )
     ].slice(1),
   total_unsterilized_cats: hotspot.unsterilizedCatsCount,
-  cats: [...hotspot.sterilizedCats, ...hotspot.unsterilizedCats],
-  volunteer_id: hotspot.volunteer?.id,
-});
-
-export const toUpdateApiModel = (
-  hotspot: HotspotDetails
-): Record<string, any> => ({
-  id: hotspot.id,
-  contact_name: hotspot.contactName,
-  contact_phone: hotspot.contactPhone,
-  description: hotspot.description,
-  notes: hotspot.notes,
-  status:
-    Object.keys(HotspotStatus)
-      [
-        Object.values(HotspotStatus).indexOf(
-          hotspot.status as unknown as HotspotStatus
-        )
-      ].charAt(0)
-      .toUpperCase() +
-    Object.keys(HotspotStatus)[
-      Object.values(HotspotStatus).indexOf(
-        hotspot.status as unknown as HotspotStatus
-      )
-    ].slice(1),
-  total_unsterilized_cats: hotspot.unsterilizedCatsCount,
   volunteer_id: hotspot.volunteer?.id,
 });
 
