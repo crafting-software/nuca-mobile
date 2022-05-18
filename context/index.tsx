@@ -1,7 +1,13 @@
-import { useState, useMemo, ReactNode } from 'react';
-import { Hotspot, HotspotDetails, HotspotStatus } from '../models/Hotspot';
-import { AuthContext, Auth } from './AuthContext';
-import { MapContext, findCurrentLocation } from './MapContext';
+import { ReactNode, useMemo, useState } from 'react';
+import {
+  defaultHotspotDetails,
+  Hotspot,
+  HotspotDetails,
+  HotspotStatus,
+} from '../models/Hotspot';
+import { Auth, AuthContext } from './AuthContext';
+import { HotspotContext } from './HotspotDetailContext';
+import { findCurrentLocation, MapContext } from './MapContext';
 
 export {
   AuthContext,
@@ -30,5 +36,26 @@ export const MapContextProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <MapContext.Provider value={hotspotsValue}>{children}</MapContext.Provider>
+  );
+};
+
+export const HotspotContextProvider = ({
+  children,
+}: {
+  children: ReactNode;
+}) => {
+  const [hotspotDetails, setHotspotDetails] = useState<HotspotDetails>(
+    defaultHotspotDetails
+  );
+
+  const hotspotDetailsValue = useMemo(
+    () => ({ hotspotDetails, setHotspotDetails }),
+    [hotspotDetails]
+  );
+
+  return (
+    <HotspotContext.Provider value={hotspotDetailsValue}>
+      {children}
+    </HotspotContext.Provider>
   );
 };

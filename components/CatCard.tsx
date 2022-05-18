@@ -138,12 +138,14 @@ interface CatCardProps {
   cat: Cat;
   index: number;
   isEditingMode?: boolean;
+  deleteFunction?: (catId: string) => void;
 }
 
 export const CatCard = ({
   cat,
   index,
   isEditingMode = false,
+  deleteFunction,
 }: CatCardProps) => {
   const theme = useTheme();
   const styles = getStyles(theme);
@@ -159,7 +161,11 @@ export const CatCard = ({
         <Card style={styles.mainContainer}>
           <Portal>
             <Modal visible={visible} onDismiss={hideModal}>
-              <DeleteModal hideModal={hideModal} />
+              <DeleteModal
+                catId={cat.id}
+                hideModal={hideModal}
+                deleteCat={deleteFunction}
+              />
             </Modal>
           </Portal>
           <View style={styles.container}>
@@ -310,7 +316,15 @@ const getModalStyles = (theme: ReactNativePaper.Theme) =>
     },
   });
 
-export const DeleteModal = ({ hideModal }: { hideModal: () => void }) => {
+export const DeleteModal = ({
+  catId,
+  hideModal,
+  deleteCat,
+}: {
+  catId: string;
+  hideModal: () => void;
+  deleteCat?: (catId: string) => void;
+}) => {
   const theme = useTheme();
   const styles = getModalStyles(theme);
 
@@ -340,7 +354,9 @@ export const DeleteModal = ({ hideModal }: { hideModal: () => void }) => {
             contentStyle={styles.buttonContent}
             labelStyle={styles.buttonLabel}
             icon="close"
-            onPress={() => alert('Delete cat')}
+            onPress={() => {
+              deleteCat && deleteCat(catId);
+            }}
           >
             Șterge
           </Button>

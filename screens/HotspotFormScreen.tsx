@@ -29,12 +29,13 @@ import { Appbar } from '../components/Appbar';
 import { FullScreenActivityIndicator } from '../components/FullScreenActivityIndicator';
 import { InputField } from '../components/InputField';
 import { findCurrentLocation, MapContext } from '../context';
-import { defaultSterilizedCat, defaultUnSterilizedCat } from '../models/Cat';
+import { HotspotContext } from '../context/HotspotDetailContext';
 import {
-  HotspotDetails,
-  HotspotStatus,
-  hotspotStatusList,
-} from '../models/Hotspot';
+  Cat,
+  defaultSterilizedCat,
+  defaultUnSterilizedCat,
+} from '../models/Cat';
+import { HotspotStatus, hotspotStatusList } from '../models/Hotspot';
 import { getFormattedAddress, Location } from '../models/Location';
 import { User } from '../models/User';
 import { RootStackScreenProps } from '../types';
@@ -243,24 +244,9 @@ export const HotspotFormScreen = ({
   const [users, setUsers] = useState<User[]>([]);
   const isUpdate = route.params.isUpdate;
 
-  const [hotspotDetails, setHotspotDetails] = useState<HotspotDetails>(
-    route.params.hotspotDetails || {
-      id: '',
-      status: HotspotStatus.toDo,
-      latitude: 0,
-      longitude: 0,
-      address: '',
-      city: '',
-      zip: '',
-      details: '',
-      notes: '',
-      sterilizedCats: [],
-      unsterilizedCats: [],
-      unsterilizedCatsCount: 0,
-      contactName: '',
-      contactPhone: '',
-    }
-  );
+  const { hotspotDetails, setHotspotDetails } = useContext(HotspotContext);
+
+  const [newSterilizedCats, setNewSterilizedCats] = useState<Cat[]>([]);
 
   useEffect(() => {
     const load = async () => {
@@ -295,6 +281,21 @@ export const HotspotFormScreen = ({
     }
   };
 
+  const deleteCat = (catId: string) => {
+    const unsterilizedCats = hotspotDetails.unsterilizedCats.filter(
+      c => c.id !== catId
+    );
+    const sterilizedCats = hotspotDetails.sterilizedCats.filter(
+      c => c.id !== catId
+    );
+
+    setHotspotDetails({
+      ...hotspotDetails,
+      unsterilizedCats: unsterilizedCats,
+      sterilizedCats: sterilizedCats,
+    });
+  };
+
   return (
     <>
       <Appbar forDetailScreen />
@@ -315,9 +316,9 @@ export const HotspotFormScreen = ({
               label="Detalii adresă"
               placeholder="Nume"
               inputFieldStyle={{ marginTop: 54 }}
-              value={hotspotDetails.details}
+              value={hotspotDetails.description}
               onTextInputChangeText={text =>
-                setHotspotDetails({ ...hotspotDetails, details: text })
+                setHotspotDetails({ ...hotspotDetails, description: text })
               }
             />
             <Caption style={styles.textInputTitle}>STATUS</Caption>
@@ -391,7 +392,9 @@ export const HotspotFormScreen = ({
             />
             <Caption style={styles.textInputTitle}>VOLUNTAR</Caption>
             <SelectDropdown
-              defaultButtonText="Alege voluntar"
+              defaultButtonText={
+                hotspotDetails.volunteer?.name || 'Alege voluntar'
+              }
               data={users}
               buttonStyle={styles.dropdownButton}
               buttonTextStyle={styles.dropdownText}
@@ -405,7 +408,9 @@ export const HotspotFormScreen = ({
                   style={{ marginRight: 40 }}
                 />
               )}
-              onSelect={() => {}}
+              onSelect={(user: User) =>
+                setHotspotDetails({ ...hotspotDetails, volunteer: user })
+              }
               rowTextForSelection={(user: User) => user.name}
               buttonTextAfterSelection={(user: User) => user.name}
             />
@@ -427,13 +432,11 @@ export const HotspotFormScreen = ({
                 style={styles.catCategoryAddButton}
                 small
                 onPress={() => {
-                  const localList = hotspotDetails.unsterilizedCats;
-                  localList.reverse();
-                  localList.push(defaultUnSterilizedCat);
-                  localList.reverse();
                   setHotspotDetails({
                     ...hotspotDetails,
-                    unsterilizedCats: localList,
+                    unsterilizedCats: [defaultUnSterilizedCat].concat(
+                      hotspotDetails.unsterilizedCats
+                    ),
                   });
                 }}
               />
@@ -441,6 +444,7 @@ export const HotspotFormScreen = ({
             <CatsView
               cats={hotspotDetails.unsterilizedCats}
               isEditMode={true}
+              deleteFunction={deleteCat}
             />
             <View style={styles.separator} />
             <View style={styles.catCategoriesContainer}>
@@ -459,18 +463,17 @@ export const HotspotFormScreen = ({
                 style={styles.catCategoryAddButton}
                 small
                 onPress={() => {
-                  const localList = hotspotDetails.sterilizedCats;
-                  localList.reverse();
-                  localList.push(defaultSterilizedCat);
-                  localList.reverse();
-                  setHotspotDetails({
-                    ...hotspotDetails,
-                    sterilizedCats: localList,
-                  });
+                  setNewSterilizedCats(
+                    [defaultSterilizedCat].concat(newSterilizedCats)
+                  );
                 }}
               />
             </View>
-            <CatsView cats={hotspotDetails.sterilizedCats} isEditMode={true} />
+            <CatsView
+              cats={newSterilizedCats.concat(hotspotDetails.sterilizedCats)}
+              isEditMode={true}
+              deleteFunction={deleteCat}
+            />
             <View style={styles.separator} />
             <Button
               uppercase={false}
