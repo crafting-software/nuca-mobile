@@ -173,7 +173,6 @@ export const AddCatCard = ({
   }, []);
 
   const saveCat = () => {
-    console.log('should save cat');
     if (isEditingMode) {
       const catList = localCat.isSterilized
         ? hotspotDetails.sterilizedCats

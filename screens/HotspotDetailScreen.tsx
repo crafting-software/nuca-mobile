@@ -251,7 +251,9 @@ export const HotspotDetailScreen = ({
                 Editează
               </Button>
             </View>
-            <Caption style={styles.subTitle}>{hotspotDetails.details}</Caption>
+            <Caption style={styles.subTitle}>
+              {hotspotDetails.description}
+            </Caption>
             <View style={styles.separator} />
             {!!hotspotDetails.notes && (
               <Caption style={styles.notes}>{hotspotDetails.notes}</Caption>
@@ -387,9 +389,7 @@ export const CatsView = ({
   const styles = getStyles(theme);
   const maxVisibleCat = 2;
   const [visibleCat, setVisible] = useState<number>(maxVisibleCat);
-  {
-    cats.forEach(cat => console.log(cat.isSterilized + '  ' + cat.notes));
-  }
+
   return (
     <View>
       {cats

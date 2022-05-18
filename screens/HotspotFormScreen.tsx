@@ -316,9 +316,9 @@ export const HotspotFormScreen = ({
               label="Detalii adresă"
               placeholder="Nume"
               inputFieldStyle={{ marginTop: 54 }}
-              value={hotspotDetails.details}
+              value={hotspotDetails.description}
               onTextInputChangeText={text =>
-                setHotspotDetails({ ...hotspotDetails, details: text })
+                setHotspotDetails({ ...hotspotDetails, description: text })
               }
             />
             <Caption style={styles.textInputTitle}>STATUS</Caption>
@@ -392,7 +392,9 @@ export const HotspotFormScreen = ({
             />
             <Caption style={styles.textInputTitle}>VOLUNTAR</Caption>
             <SelectDropdown
-              defaultButtonText="Alege voluntar"
+              defaultButtonText={
+                hotspotDetails.volunteer?.name || 'Alege voluntar'
+              }
               data={users}
               buttonStyle={styles.dropdownButton}
               buttonTextStyle={styles.dropdownText}
@@ -406,7 +408,9 @@ export const HotspotFormScreen = ({
                   style={{ marginRight: 40 }}
                 />
               )}
-              onSelect={() => {}}
+              onSelect={(user: User) =>
+                setHotspotDetails({ ...hotspotDetails, volunteer: user })
+              }
               rowTextForSelection={(user: User) => user.name}
               buttonTextAfterSelection={(user: User) => user.name}
             />
@@ -428,10 +432,6 @@ export const HotspotFormScreen = ({
                 style={styles.catCategoryAddButton}
                 small
                 onPress={() => {
-                  // const localList = hotspotDetails.unsterilizedCats;
-                  // // localList.reverse();
-                  // localList.unshift(defaultUnSterilizedCat);
-                  // localList.reverse();
                   setHotspotDetails({
                     ...hotspotDetails,
                     unsterilizedCats: [defaultUnSterilizedCat].concat(
