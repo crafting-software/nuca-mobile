@@ -243,6 +243,7 @@ export const HotspotFormScreen = ({
 
   const [users, setUsers] = useState<User[]>([]);
   const isUpdate = route.params.isUpdate;
+  const location = route.params.location;
 
   const { hotspotDetails, setHotspotDetails } = useContext(HotspotContext);
 
@@ -257,12 +258,23 @@ export const HotspotFormScreen = ({
     load();
   }, []);
 
+  useEffect(() => {
+    if (location)
+      setHotspotDetails({
+        ...hotspotDetails,
+        city: location.city || '',
+        zip: location.postalCode || '',
+        address: location.street || '',
+        latitude: location.latitude,
+        longitude: location.longitude,
+      });
+  }, [location]);
+
   const save = async () => {
     const submitFunc = isUpdate ? updateHotspot : addHotspot;
 
     setIsInProgress(true);
 
-    console.log('hot ', hotspotDetails);
     const { success, hotspotDetails: newHotspot } = await submitFunc(
       hotspotDetails
     );
@@ -577,7 +589,6 @@ const AddLocation = ({
             style={styles.locationButton}
             onPress={async () => {
               const currentLocation = await findCurrentLocation();
-           
               setLocation(currentLocation);
             }}
           >
