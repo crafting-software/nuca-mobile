@@ -4,7 +4,6 @@ import {
   Hotspot,
   HotspotDetails,
   toApiModel,
-  toUpdateApiModel,
 } from '../models/Hotspot';
 import { makeRequest } from './server';
 
@@ -53,7 +52,7 @@ export const updateHotspot = async (
   const { error, data } = await makeRequest({
     path: `/hotspots/${hotspotDetails.id}`,
     method: 'PATCH',
-    body: toUpdateApiModel(hotspotDetails),
+    body: toApiModel(hotspotDetails),
   });
 
   if (error) {
