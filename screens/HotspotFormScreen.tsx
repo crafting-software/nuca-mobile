@@ -262,6 +262,7 @@ export const HotspotFormScreen = ({
 
     setIsInProgress(true);
 
+    console.log('hot ', hotspotDetails);
     const { success, hotspotDetails: newHotspot } = await submitFunc(
       hotspotDetails
     );
@@ -309,7 +310,7 @@ export const HotspotFormScreen = ({
               />
             ) : (
               <Title style={styles.addressTitle}>
-                {`${hotspotDetails.address} ${hotspotDetails.city}, ${hotspotDetails.zip}`}
+                {`${hotspotDetails.address} ${hotspotDetails.city}, ${hotspotDetails.zip}, ${hotspotDetails.latitude}`}
               </Title>
             )}
             <InputField
@@ -532,6 +533,8 @@ const AddLocation = ({
   const navigation = useNavigation();
   const [location, setLocation] = useState<Location>();
 
+  const { hotspotDetails, setHotspotDetails } = useContext(HotspotContext);
+
   useEffect(() => {
     setLocation(routeLocation);
   }, [routeLocation]);
@@ -574,6 +577,7 @@ const AddLocation = ({
             style={styles.locationButton}
             onPress={async () => {
               const currentLocation = await findCurrentLocation();
+           
               setLocation(currentLocation);
             }}
           >
