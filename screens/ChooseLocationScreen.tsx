@@ -95,9 +95,9 @@ export const ChooseLocationScreen = ({
             }
           }}
         >
-          {hotspots.map((h, index) => (
+          {hotspots.map(h => (
             <Marker
-              key={index}
+              key={`${h.latitude} ${h.longitude}`}
               coordinate={{
                 latitude: h.latitude,
                 longitude: h.longitude,
