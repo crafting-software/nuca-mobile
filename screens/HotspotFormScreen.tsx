@@ -1,4 +1,4 @@
-import { capitalize } from 'lodash';
+import { capitalize, delay } from 'lodash';
 import { useContext, useEffect, useState } from 'react';
 import {
   Image,
@@ -169,6 +169,11 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
       fontSize: 18,
       fontFamily: 'Nunito_700Bold',
     },
+    snackLabel: {
+      color: theme.colors.background,
+      fontSize: 16,
+      fontFamily: 'Nunito_700Bold',
+    },
     deleteButtonLabel: {
       color: theme.colors.text,
       fontSize: 18,
@@ -236,6 +241,7 @@ export const HotspotFormScreen = ({
   const [isInProgress, setIsInProgress] = useState(false);
   const [isSnackbarVisible, setIsSnackbarVisible] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [isError, setIsError] = useState(false);
   const navigation = useNavigation();
 
   const theme = useTheme();
@@ -285,11 +291,22 @@ export const HotspotFormScreen = ({
         newHotspot!,
       ];
       setHotspots(newHostpots);
+      setIsInProgress(false);
+      setSnackbarMessage(isUpdate ? 'Editare reuşită' : 'Adăugare reuşită');
+      setIsError(false);
+      setIsSnackbarVisible(true);
 
-      navigation.goBack();
+      delay(
+        function () {
+          navigation.goBack();
+        },
+        500,
+        'later'
+      );
     } else {
       setIsInProgress(false);
-      setSnackbarMessage(isUpdate ? 'Editare nereusita' : 'Adaugare nereusita');
+      setSnackbarMessage(isUpdate ? 'Editare nereuşită' : 'Adăugare nereuşită');
+      setIsError(true);
       setIsSnackbarVisible(true);
     }
   };
@@ -523,10 +540,13 @@ export const HotspotFormScreen = ({
       </View>
       {isInProgress && <FullScreenActivityIndicator />}
       <Snackbar
+        style={{
+          backgroundColor: isError ? theme.colors.error : theme.colors.success,
+        }}
         visible={isSnackbarVisible}
         onDismiss={() => setIsSnackbarVisible(false)}
       >
-        {snackbarMessage}
+        <Caption style={styles.snackLabel}> {snackbarMessage}</Caption>
       </Snackbar>
     </>
   );
@@ -544,8 +564,6 @@ const AddLocation = ({
 
   const navigation = useNavigation();
   const [location, setLocation] = useState<Location>();
-
-  const { hotspotDetails, setHotspotDetails } = useContext(HotspotContext);
 
   useEffect(() => {
     setLocation(routeLocation);
