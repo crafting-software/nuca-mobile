@@ -39,7 +39,7 @@ import { HotspotStatus, hotspotStatusList } from '../models/Hotspot';
 import { getFormattedAddress, Location } from '../models/Location';
 import { User } from '../models/User';
 import { RootStackScreenProps } from '../types';
-import { addHotspot, updateHotspot } from '../utils/hotspots';
+import { addHotspot, deleteHotspot, updateHotspot } from '../utils/hotspots';
 import { loadUsers } from '../utils/users';
 import { CatsView } from './HotspotDetailScreen';
 
@@ -311,6 +311,32 @@ export const HotspotFormScreen = ({
     }
   };
 
+  const deleteH = async () => {
+    setIsInProgress(true);
+    const { success } = await deleteHotspot(hotspotDetails.id);
+
+    if (success) {
+      setIsInProgress(false);
+      setSnackbarMessage('Ștergere reuşită');
+      setIsError(false);
+      setIsSnackbarVisible(true);
+
+      setHotspots(hotspots.filter(h => h.id !== hotspotDetails.id));
+      delay(
+        function () {
+          navigation.navigate('Main');
+        },
+        500,
+        'later'
+      );
+    } else {
+      setIsInProgress(false);
+      setSnackbarMessage('Ștergere nereuşită');
+      setIsError(true);
+      setIsSnackbarVisible(true);
+    }
+  };
+
   const deleteCat = (catId: string) => {
     const unsterilizedCats = hotspotDetails.unsterilizedCats.filter(
       c => c.id !== catId
@@ -524,7 +550,7 @@ export const HotspotFormScreen = ({
                 labelStyle={styles.deleteButtonLabel}
                 icon="close"
                 mode="contained"
-                onPress={() => alert('Delete hotspot')}
+                onPress={deleteH}
               >
                 Șterge adresa
               </Button>
