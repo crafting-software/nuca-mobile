@@ -83,7 +83,6 @@ export const toApiModel = (hotspot: HotspotDetails): Record<string, any> => ({
   ...hotspot,
   contact_name: hotspot.contactName,
   contact_phone: hotspot.contactPhone,
-  description: hotspot.description,
   latitude: hotspot.latitude.toString(),
   longitude: hotspot.longitude.toString(),
   status:
@@ -111,8 +110,8 @@ export const defaultHotspotDetails: HotspotDetails = {
   address: '',
   city: '',
   zip: '',
-  description: 'default test',
-  notes: 'Details',
+  description: '',
+  notes: '',
   sterilizedCats: [],
   unsterilizedCats: [],
   unsterilizedCatsCount: 0,

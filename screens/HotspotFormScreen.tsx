@@ -243,6 +243,7 @@ export const HotspotFormScreen = ({
 
   const [users, setUsers] = useState<User[]>([]);
   const isUpdate = route.params.isUpdate;
+  const location = route.params.location;
 
   const { hotspotDetails, setHotspotDetails } = useContext(HotspotContext);
 
@@ -256,6 +257,18 @@ export const HotspotFormScreen = ({
     };
     load();
   }, []);
+
+  useEffect(() => {
+    if (location)
+      setHotspotDetails({
+        ...hotspotDetails,
+        city: location.city || '',
+        zip: location.postalCode || '',
+        address: location.street + ' ' + location.streetNumber,
+        latitude: location.latitude,
+        longitude: location.longitude,
+      });
+  }, [location]);
 
   const save = async () => {
     const submitFunc = isUpdate ? updateHotspot : addHotspot;
@@ -309,7 +322,7 @@ export const HotspotFormScreen = ({
               />
             ) : (
               <Title style={styles.addressTitle}>
-                {`${hotspotDetails.address} ${hotspotDetails.city}, ${hotspotDetails.zip}`}
+                {`${hotspotDetails.address} ${hotspotDetails.city}, ${hotspotDetails.zip}, ${hotspotDetails.latitude}`}
               </Title>
             )}
             <InputField
@@ -531,6 +544,8 @@ const AddLocation = ({
 
   const navigation = useNavigation();
   const [location, setLocation] = useState<Location>();
+
+  const { hotspotDetails, setHotspotDetails } = useContext(HotspotContext);
 
   useEffect(() => {
     setLocation(routeLocation);
