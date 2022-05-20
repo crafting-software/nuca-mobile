@@ -82,3 +82,21 @@ export const addHotspot = async (
 
   return { success: true, hotspotDetails: castToHotspotDetails(data) };
 };
+
+export const deleteHotspot = async (
+  hotspotId: string
+): Promise<{
+  success: boolean;
+}> => {
+  const { error, data } = await makeRequest({
+    path: `/hotspots/${hotspotId}`,
+    method: 'DELETE',
+  });
+
+  if (error) {
+    console.error('delete hotspot failed', error);
+    return { success: false };
+  }
+
+  return { success: true };
+};
