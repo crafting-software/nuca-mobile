@@ -12,6 +12,7 @@ import {
   Nunito_800ExtraBold,
   useFonts,
 } from '@expo-google-fonts/nunito';
+import SnackbarContainer from './components/SnackbarContainer';
 import {
   AuthContextProvider,
   HotspotContextProvider,
@@ -43,6 +44,7 @@ export default () => {
             <HotspotContextProvider>
               <Navigation />
               <StatusBar />
+              <SnackbarContainer />
             </HotspotContextProvider>
           </SafeAreaProvider>
         </PaperProvider>

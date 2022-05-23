@@ -1,4 +1,4 @@
-import { capitalize, delay } from 'lodash';
+import { capitalize } from 'lodash';
 import { useContext, useEffect, useState } from 'react';
 import {
   Image,
@@ -14,7 +14,6 @@ import {
   Caption,
   FAB,
   Headline,
-  Snackbar,
   TextInput,
   Title,
   useTheme,
@@ -39,6 +38,7 @@ import { HotspotStatus, hotspotStatusList } from '../models/Hotspot';
 import { getFormattedAddress, Location } from '../models/Location';
 import { User } from '../models/User';
 import { RootStackScreenProps } from '../types';
+import SnackbarManager from '../utils/SnackbarManager';
 import { addHotspot, deleteHotspot, updateHotspot } from '../utils/hotspots';
 import { loadUsers } from '../utils/users';
 import { CatsView } from './HotspotDetailScreen';
@@ -239,9 +239,6 @@ export const HotspotFormScreen = ({
 }: RootStackScreenProps<'AddHotspot'>) => {
   const { hotspots, setHotspots } = useContext(MapContext);
   const [isInProgress, setIsInProgress] = useState(false);
-  const [isSnackbarVisible, setIsSnackbarVisible] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
-  const [isError, setIsError] = useState(false);
   const navigation = useNavigation();
 
   const theme = useTheme();
@@ -290,24 +287,20 @@ export const HotspotFormScreen = ({
         ...hotspots.filter(h => h.id !== newHotspot!.id),
         newHotspot!,
       ];
+      setHotspotDetails(newHotspot!);
       setHotspots(newHostpots);
       setIsInProgress(false);
-      setSnackbarMessage(isUpdate ? 'Editare reuşită' : 'Adăugare reuşită');
-      setIsError(false);
-      setIsSnackbarVisible(true);
-
-      delay(
-        function () {
-          navigation.goBack();
-        },
-        500,
-        'later'
+      SnackbarManager.success(
+        isUpdate ? 'Editare reuşită' : 'Adăugare reuşită'
       );
+      navigation.goBack();
     } else {
       setIsInProgress(false);
-      setSnackbarMessage(isUpdate ? 'Editare nereuşită' : 'Adăugare nereuşită');
-      setIsError(true);
-      setIsSnackbarVisible(true);
+
+      SnackbarManager.error(
+        'HotspotFormScreen - save func.',
+        isUpdate ? 'Editare nereuşită' : 'Adăugare nereuşită'
+      );
     }
   };
 
@@ -317,23 +310,16 @@ export const HotspotFormScreen = ({
 
     if (success) {
       setIsInProgress(false);
-      setSnackbarMessage('Ștergere reuşită');
-      setIsError(false);
-      setIsSnackbarVisible(true);
+      SnackbarManager.success('Ștergere reuşită');
 
       setHotspots(hotspots.filter(h => h.id !== hotspotDetails.id));
-      delay(
-        function () {
-          navigation.navigate('Main');
-        },
-        500,
-        'later'
-      );
+      navigation.navigate('Main');
     } else {
       setIsInProgress(false);
-      setSnackbarMessage('Ștergere nereuşită');
-      setIsError(true);
-      setIsSnackbarVisible(true);
+      SnackbarManager.error(
+        'HotspotFormScreen - delete func.',
+        'Ștergere nereuşită'
+      );
     }
   };
 
@@ -438,7 +424,7 @@ export const HotspotFormScreen = ({
             />
             <InputField
               label="Telefon persoana de contact"
-              placeholder="Telefon persoana de contact"
+              placeholder="numar de telefon"
               keyboardType="phone-pad"
               inputFieldStyle={styles.inputField}
               value={hotspotDetails.contactPhone}
@@ -565,15 +551,6 @@ export const HotspotFormScreen = ({
         </ScrollView>
       </View>
       {isInProgress && <FullScreenActivityIndicator />}
-      <Snackbar
-        style={{
-          backgroundColor: isError ? theme.colors.error : theme.colors.success,
-        }}
-        visible={isSnackbarVisible}
-        onDismiss={() => setIsSnackbarVisible(false)}
-      >
-        <Caption style={styles.snackLabel}> {snackbarMessage}</Caption>
-      </Snackbar>
     </>
   );
 };
