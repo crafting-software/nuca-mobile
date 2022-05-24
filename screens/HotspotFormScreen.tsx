@@ -279,7 +279,7 @@ export const HotspotFormScreen = ({
   }, [location]);
 
   const save = async () => {
-    if (!location) {
+    if (!location && !isUpdate) {
       SnackbarManager.error(
         'HotspotFormScreen - save func',
         'Locatia lipseste'

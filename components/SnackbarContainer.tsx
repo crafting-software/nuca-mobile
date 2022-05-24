@@ -14,7 +14,7 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
 
 export interface SnackbarViewProps {
   readonly severity?: 'success' | 'error';
-  readonly message: string;
+  readonly message?: string;
 }
 
 export default function SnackbarContainer() {

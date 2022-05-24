@@ -1,16 +1,16 @@
-import React from 'react';
+import { Component } from 'react';
 import { DeviceEventEmitter, Dimensions } from 'react-native';
 import { SnackbarViewProps } from '../components/SnackbarContainer';
 
-class SnackbarManager extends React.Component {
-  constructor(props: SnackbarViewProps | undefined) {
+class SnackbarManager extends Component {
+  constructor(props?: SnackbarViewProps) {
     super(props || {});
     this.state = {
       visibleHeight: Dimensions.get('window').height,
     };
   }
 
-  private props: SnackbarViewProps | undefined;
+  props: SnackbarViewProps = {};
 
   private show(props: SnackbarViewProps) {
     this.props = props;
@@ -31,7 +31,7 @@ class SnackbarManager extends React.Component {
   };
 
   remove() {
-    this.props = undefined;
+    this.props = {};
     this.emitChange();
   }
 
@@ -44,4 +44,4 @@ class SnackbarManager extends React.Component {
   }
 }
 
-export default new SnackbarManager(undefined);
+export default new SnackbarManager();
