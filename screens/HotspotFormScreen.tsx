@@ -34,7 +34,11 @@ import {
   defaultSterilizedCat,
   defaultUnSterilizedCat,
 } from '../models/Cat';
-import { HotspotStatus, hotspotStatusList } from '../models/Hotspot';
+import {
+  defaultHotspotDetails,
+  HotspotStatus,
+  hotspotStatusList,
+} from '../models/Hotspot';
 import { getFormattedAddress, Location } from '../models/Location';
 import { User } from '../models/User';
 import { RootStackScreenProps } from '../types';
@@ -253,6 +257,7 @@ export const HotspotFormScreen = ({
   const [newSterilizedCats, setNewSterilizedCats] = useState<Cat[]>([]);
 
   useEffect(() => {
+    if (!isUpdate) setHotspotDetails(defaultHotspotDetails);
     const load = async () => {
       const { success, users } = await loadUsers();
       if (!success) alert('Failed to load users');
@@ -274,6 +279,13 @@ export const HotspotFormScreen = ({
   }, [location]);
 
   const save = async () => {
+    if (!location) {
+      SnackbarManager.error(
+        'HotspotFormScreen - save func',
+        'Locatia lipseste'
+      );
+      return;
+    }
     const submitFunc = isUpdate ? updateHotspot : addHotspot;
 
     setIsInProgress(true);
