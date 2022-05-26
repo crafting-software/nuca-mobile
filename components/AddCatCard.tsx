@@ -12,6 +12,8 @@ import imagePlaceholder from '../assets/image-placeholder.png';
 import { HotspotContext } from '../context/HotspotDetailContext';
 import { Cat, defaultSterilizedCat } from '../models/Cat';
 import { User } from '../models/User';
+import SnackbarManager from '../utils/SnackbarManager';
+import { updateCat } from '../utils/cats';
 import { loadUsers } from '../utils/users';
 import { InputField } from './InputField';
 
@@ -175,9 +177,15 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
 export const AddCatCard = ({
   isEditingMode = false,
   cat,
+  addCat,
+  deleteCat,
+  saveChanges,
 }: {
   isEditingMode?: boolean;
   cat?: Cat;
+  addCat?: (cat: Cat) => void;
+  deleteCat?: (cat: Cat) => void;
+  saveChanges?: () => void;
 }) => {
   const theme = useTheme();
   const styles = getStyles(theme);
@@ -194,25 +202,32 @@ export const AddCatCard = ({
     load();
   }, []);
 
-  const saveCat = () => {
+  const saveCat = async () => {
+    if (saveChanges) saveChanges();
     if (isEditingMode) {
-      const catList = localCat.isSterilized
-        ? hotspotDetails.sterilizedCats
-        : hotspotDetails.unsterilizedCats;
-      const catIndex = catList.findIndex(c => c.id === localCat.id);
-      catList[catIndex] = localCat;
-      localCat.isSterilized
-        ? setHotspotDetails(prev => ({
-            ...prev,
-            sterilizedCats: catList,
-          }))
-        : setHotspotDetails(prev => ({ ...prev, unsterilizedCats: catList }));
+      const { success } = await updateCat(localCat);
+
+      if (success) {
+        SnackbarManager.success('Cat updated!');
+        const catList = localCat.isSterilized
+          ? hotspotDetails.sterilizedCats
+          : hotspotDetails.unsterilizedCats;
+        const catIndex = catList.findIndex((c: Cat) => c.id === localCat.id);
+        catList[catIndex] = localCat;
+        localCat.isSterilized
+          ? setHotspotDetails((prev: Cat[]) => ({
+              ...prev,
+              sterilizedCats: catList,
+            }))
+          : setHotspotDetails((prev: Cat[]) => ({
+              ...prev,
+              unsterilizedCats: catList,
+            }));
+      }
     } else {
-      console.log('Create cat does not work yet!');
+      if (addCat) addCat(localCat);
     }
   };
-
-  const deleteCat = () => {};
 
   return (
     <Card style={styles.mainContainer}>
@@ -377,7 +392,9 @@ export const AddCatCard = ({
             contentStyle={styles.buttonContent}
             labelStyle={styles.buttonLabel}
             icon="close"
-            onPress={deleteCat}
+            onPress={() => {
+              if (deleteCat) deleteCat(localCat);
+            }}
           >
             Șterge
           </Button>

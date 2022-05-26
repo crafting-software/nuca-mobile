@@ -3,14 +3,23 @@ import { castToUser, User } from './User';
 export type Cat = {
   id: string;
   sex: 'M' | 'F';
-  notes: string;
+  notes?: string;
   checkInDate: number;
   checkOutDate: number;
   isSterilized: boolean;
   capturedBy?: User;
   media: Record<string, string>;
   isNew?: boolean;
+  description?: string;
 };
+
+export const toCatApiModel = (cat: Cat): Record<string, any> => ({
+  ...cat,
+  check_in_date: cat.checkInDate,
+  check_out_date: cat.checkOutDate,
+  is_sterilized: cat.isSterilized,
+  capturer_id: cat.capturedBy?.id,
+});
 
 export const castToCat = (backendCat: Record<string, any>): Cat => ({
   id: backendCat.id,
@@ -23,6 +32,7 @@ export const castToCat = (backendCat: Record<string, any>): Cat => ({
   checkOutDate: backendCat.check_out_date,
   isSterilized: backendCat.is_sterilized,
   media: backendCat.media,
+  description: backendCat.description || '',
 });
 
 export const getDateText = (timestamp: number): string => {
@@ -49,7 +59,6 @@ export const getDateText = (timestamp: number): string => {
 export const defaultSterilizedCat: Cat = {
   id: (Math.floor(Math.random() * 100) + 1).toString(),
   sex: 'F',
-  notes: '',
   checkInDate: new Date().getTime() / 1000,
   checkOutDate: new Date().getTime() / 1000,
   isSterilized: true,
@@ -61,7 +70,6 @@ export const defaultSterilizedCat: Cat = {
 export const defaultUnSterilizedCat: Cat = {
   id: (Math.floor(Math.random() * 100) + 1).toString(),
   sex: 'F',
-  notes: '',
   checkInDate: new Date().getTime() / 1000,
   checkOutDate: new Date().getTime() / 1000,
   isSterilized: false,

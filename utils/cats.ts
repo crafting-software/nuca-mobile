@@ -1,0 +1,40 @@
+import { castToCat, Cat, toCatApiModel } from '../models/Cat';
+import { makeRequest } from './server';
+
+export const updateCat = async (
+  cat: Cat
+): Promise<{
+  success: boolean;
+  cat?: Cat;
+}> => {
+  const { error, data } = await makeRequest({
+    path: `/cats/${cat.id}`,
+    method: 'PATCH',
+    body: toCatApiModel(cat),
+  });
+
+  if (error) {
+    console.error('update cat failed', error);
+    return { success: false };
+  }
+
+  return { success: true, cat: castToCat(data) };
+};
+
+export const deleteCatRequest = async (
+  catId: string
+): Promise<{
+  success: boolean;
+}> => {
+  const { error, data } = await makeRequest({
+    path: `/cats/${catId}`,
+    method: 'DELETE',
+  });
+
+  if (error) {
+    console.error('delete hotspot failed', error);
+    return { success: false };
+  }
+
+  return { success: true };
+};

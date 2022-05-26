@@ -155,6 +155,10 @@ export const CatCard = ({
   const showModal = () => setVisible(true);
   const hideModal = () => setVisible(false);
 
+  const updateChanges = () => {
+    setShouldEdit(false);
+  };
+
   return (
     <>
       {!shouldEdit ? (
@@ -176,6 +180,11 @@ export const CatCard = ({
             </View>
             {!!cat.notes && (
               <Caption style={styles.notes}>Observatii: {cat.notes}</Caption>
+            )}
+            {!!cat.description && (
+              <Caption style={styles.notes}>
+                Descriere: {cat.description}
+              </Caption>
             )}
             {!!cat.isSterilized && (
               <View style={{ paddingTop: 8 }}>
@@ -265,7 +274,11 @@ export const CatCard = ({
           )}
         </Card>
       ) : (
-        <AddCatCard isEditingMode={isEditingMode} cat={cat} />
+        <AddCatCard
+          isEditingMode={isEditingMode}
+          cat={cat}
+          saveChanges={updateChanges}
+        />
       )}
     </>
   );
