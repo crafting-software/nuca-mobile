@@ -3,6 +3,7 @@ import { defaultHotspotDetails, HotspotDetails } from '../models/Hotspot';
 
 interface HotspotContext {
   hotspotDetails: HotspotDetails;
+  
   setHotspotDetails: Dispatch<SetStateAction<HotspotDetails>>;
 }
 

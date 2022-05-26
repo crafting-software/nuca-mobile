@@ -148,6 +148,28 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
       justifyContent: 'flex-start',
       alignItems: 'flex-start',
     },
+    editButton: {
+      height: 66,
+      width: '100%',
+      backgroundColor: theme.colors.accent,
+      borderRadius: 0,
+      borderBottomLeftRadius: 30,
+      marginRight: 4,
+    },
+    deleteButton: {
+      backgroundColor: theme.colors.accent,
+      height: 66,
+      width: '100%',
+      borderRadius: 0,
+      borderBottomRightRadius: 30,
+      textAlign: 'center',
+      marginLeft: 4,
+    },
+    buttonView: {
+      justifyContent: 'center',
+      width: '50%',
+      alignItems: 'center',
+    },
   });
 
 export const AddCatCard = ({
@@ -189,6 +211,8 @@ export const AddCatCard = ({
       console.log('Create cat does not work yet!');
     }
   };
+
+  const deleteCat = () => {};
 
   return (
     <Card style={styles.mainContainer}>
@@ -335,15 +359,30 @@ export const AddCatCard = ({
           <Image style={styles.media} source={imagePlaceholder} />
         </View>
       </View>
-      <Button
-        style={styles.saveButton}
-        contentStyle={styles.buttonContent}
-        labelStyle={styles.buttonLabel}
-        icon="check"
-        onPress={() => saveCat()}
-      >
-        Salvează
-      </Button>
+      <View style={{ flexDirection: 'row', paddingTop: 8 }}>
+        <View style={styles.buttonView}>
+          <Button
+            style={styles.editButton}
+            contentStyle={styles.buttonContent}
+            labelStyle={styles.buttonLabel}
+            icon="pencil"
+            onPress={() => saveCat()}
+          >
+            Salvează
+          </Button>
+        </View>
+        <View style={styles.buttonView}>
+          <Button
+            style={styles.deleteButton}
+            contentStyle={styles.buttonContent}
+            labelStyle={styles.buttonLabel}
+            icon="close"
+            onPress={deleteCat}
+          >
+            Șterge
+          </Button>
+        </View>
+      </View>
     </Card>
   );
 };
