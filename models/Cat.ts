@@ -56,6 +56,9 @@ export const getDateText = (timestamp: number): string => {
   } ${date.getFullYear()}`;
 };
 
+export const getUTCDate = (date: Date): Date =>
+  new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+
 export const defaultSterilizedCat: Cat = {
   id: (Math.floor(Math.random() * 100) + 1).toString(),
   sex: 'F',

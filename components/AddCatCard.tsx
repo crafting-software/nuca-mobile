@@ -10,7 +10,7 @@ import {
 import SelectDropdown from 'react-native-select-dropdown';
 import imagePlaceholder from '../assets/image-placeholder.png';
 import { HotspotContext } from '../context/HotspotDetailContext';
-import { Cat, defaultSterilizedCat } from '../models/Cat';
+import { Cat, defaultSterilizedCat, getUTCDate } from '../models/Cat';
 import { User } from '../models/User';
 import SnackbarManager from '../utils/SnackbarManager';
 import { updateCat } from '../utils/cats';
@@ -292,7 +292,7 @@ export const AddCatCard = ({
           textInputStyle={{ height: 100 }}
           value={localCat.notes}
           onTextInputChangeText={text => {
-            setCat(prev => ({
+            setCat((prev: Cat) => ({
               ...prev,
               notes: text,
             }));
@@ -307,11 +307,11 @@ export const AddCatCard = ({
                   autoComplete={false}
                   locale="en"
                   value={new Date(localCat.checkInDate)}
-                  onChange={selectedDate => {
+                  onChange={(selectedDate: Date) => {
                     if (selectedDate) {
-                      setCat(prev => ({
+                      setCat((prev: Cat) => ({
                         ...prev,
-                        checkInDate: selectedDate.getTime() / 1000,
+                        checkInDate: getUTCDate(selectedDate),
                       }));
                     }
                   }}
@@ -327,12 +327,21 @@ export const AddCatCard = ({
                   autoComplete={false}
                   locale="en"
                   value={new Date(localCat.checkOutDate)}
-                  onChange={selectedDate => {
+                  onChange={(selectedDate: Date) => {
                     if (selectedDate) {
-                      setCat(prev => ({
-                        ...prev,
-                        checkOutDate: selectedDate.getTime() / 1000,
-                      }));
+                      if (
+                        new Date(selectedDate) < new Date(localCat.checkInDate)
+                      ) {
+                        SnackbarManager.error(
+                          'AddCatCard - checkout date less than checkin',
+                          "Checkout date can't be earlier than checkin date"
+                        );
+                      } else {
+                        setCat((prev: Cat) => ({
+                          ...prev,
+                          checkOutDate: getUTCDate(selectedDate),
+                        }));
+                      }
                     }
                   }}
                   mode="outlined"
