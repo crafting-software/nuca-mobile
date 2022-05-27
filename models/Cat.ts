@@ -51,7 +51,7 @@ export const getDateText = (timestamp: number): string => {
     'noiembrie',
     'decembrie',
   ];
-  return `${date.getDay()} ${
+  return `${date.getDate()} ${
     monthNames[date.getMonth()]
   } ${date.getFullYear()}`;
 };
