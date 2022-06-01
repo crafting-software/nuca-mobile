@@ -18,8 +18,8 @@ export const toCatApiModel = (
   hotspotId?: string
 ): Record<string, any> => ({
   ...cat,
-  check_in_date: cat.checkInDate,
-  check_out_date: cat.checkOutDate,
+  check_in_date: getUTCDate(new Date(cat.checkInDate)),
+  check_out_date: getUTCDate(new Date(cat.checkOutDate)),
   is_sterilized: cat.isSterilized,
   capturer_id: cat.capturedBy?.id,
   hotspot_id: hotspotId,
@@ -27,9 +27,6 @@ export const toCatApiModel = (
 
 export const castToCat = (backendCat: Record<string, any>): Cat => ({
   id: backendCat.id,
-  capturedBy: backendCat.captured_by
-    ? castToUser(backendCat.captured_by)
-    : undefined,
   sex: backendCat.sex,
   notes: backendCat.notes || '',
   checkInDate: backendCat.check_in_date,
@@ -37,6 +34,9 @@ export const castToCat = (backendCat: Record<string, any>): Cat => ({
   isSterilized: backendCat.is_sterilized,
   media: backendCat.media,
   description: backendCat.description || '',
+  capturedBy: backendCat.captured_by
+    ? castToUser(backendCat.captured_by)
+    : undefined,
 });
 
 export const getDateText = (timestamp: number): string => {
@@ -66,8 +66,8 @@ export const getUTCDate = (date: Date): Date =>
 export const defaultSterilizedCat: Cat = {
   id: (Math.floor(Math.random() * 100) + 1).toString(),
   sex: 'F',
-  checkInDate: new Date().getMilliseconds(),
-  checkOutDate: new Date().getMilliseconds(),
+  checkInDate: Date.parse(new Date().toDateString()),
+  checkOutDate: Date.parse(new Date().toDateString()),
   isSterilized: true,
   capturedBy: undefined,
   media: {},
@@ -77,8 +77,8 @@ export const defaultSterilizedCat: Cat = {
 export const defaultUnSterilizedCat: Cat = {
   id: (Math.floor(Math.random() * 100) + 1).toString(),
   sex: 'F',
-  checkInDate: new Date().getMilliseconds(),
-  checkOutDate: new Date().getMilliseconds(),
+  checkInDate: Date.parse(new Date().toDateString()),
+  checkOutDate: Date.parse(new Date().toDateString()),
   isSterilized: false,
   capturedBy: undefined,
   media: {},

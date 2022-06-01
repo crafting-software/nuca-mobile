@@ -179,11 +179,8 @@ export const CatCard = ({
               <Caption style={styles.genderText}>{cat.sex}</Caption>
             </View>
             {!!cat.notes && (
-              <Caption style={styles.notes}>Observatii: {cat.notes}</Caption>
-            )}
-            {!!cat.description && (
               <Caption style={styles.notes}>
-                Descriere: {cat.description}
+                Observatii: {cat.notes.concat(cat.description || '')}
               </Caption>
             )}
             {!!cat.isSterilized && (

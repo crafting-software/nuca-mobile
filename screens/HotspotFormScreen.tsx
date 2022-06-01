@@ -373,13 +373,13 @@ export const HotspotFormScreen = ({
     if (success) {
       setIsInProgress(false);
       SnackbarManager.success('Adaugare reuşită');
-      console.log('hey ', cat);
+
       if (cat?.isSterilized) {
-        // setNewSterilizedCats([]);
-        // setHotspotDetails({
-        //   ...hotspotDetails,
-        //   sterilizedCats: [cat, ...hotspotDetails.sterilizedCats],
-        // });
+        setNewSterilizedCats([]);
+        setHotspotDetails({
+          ...hotspotDetails,
+          sterilizedCats: [cat, ...hotspotDetails.sterilizedCats],
+        });
       } else {
         setNewUnsterilizedCat([]);
         setHotspotDetails({
