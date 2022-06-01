@@ -13,12 +13,16 @@ export type Cat = {
   description?: string;
 };
 
-export const toCatApiModel = (cat: Cat): Record<string, any> => ({
+export const toCatApiModel = (
+  cat: Cat,
+  hotspotId?: string
+): Record<string, any> => ({
   ...cat,
   check_in_date: cat.checkInDate,
   check_out_date: cat.checkOutDate,
   is_sterilized: cat.isSterilized,
   capturer_id: cat.capturedBy?.id,
+  hotspot_id: hotspotId,
 });
 
 export const castToCat = (backendCat: Record<string, any>): Cat => ({
@@ -62,8 +66,8 @@ export const getUTCDate = (date: Date): Date =>
 export const defaultSterilizedCat: Cat = {
   id: (Math.floor(Math.random() * 100) + 1).toString(),
   sex: 'F',
-  checkInDate: new Date().getTime() / 1000,
-  checkOutDate: new Date().getTime() / 1000,
+  checkInDate: new Date().getMilliseconds(),
+  checkOutDate: new Date().getMilliseconds(),
   isSterilized: true,
   capturedBy: undefined,
   media: {},
@@ -73,8 +77,8 @@ export const defaultSterilizedCat: Cat = {
 export const defaultUnSterilizedCat: Cat = {
   id: (Math.floor(Math.random() * 100) + 1).toString(),
   sex: 'F',
-  checkInDate: new Date().getTime() / 1000,
-  checkOutDate: new Date().getTime() / 1000,
+  checkInDate: new Date().getMilliseconds(),
+  checkOutDate: new Date().getMilliseconds(),
   isSterilized: false,
   capturedBy: undefined,
   media: {},

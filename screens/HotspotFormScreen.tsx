@@ -43,7 +43,7 @@ import { getFormattedAddress, Location } from '../models/Location';
 import { User } from '../models/User';
 import { RootStackScreenProps } from '../types';
 import SnackbarManager from '../utils/SnackbarManager';
-import { deleteCatRequest } from '../utils/cats';
+import { addCat, deleteCatRequest } from '../utils/cats';
 import { addHotspot, deleteHotspot, updateHotspot } from '../utils/hotspots';
 import { loadUsers } from '../utils/users';
 import { CatsView } from './HotspotDetailScreen';
@@ -366,12 +366,34 @@ export const HotspotFormScreen = ({
     }
   };
 
-  const addNewCat = (cat: Cat) => {
-    console.log('Create cat does not work yet!');
+  const addNewCat = async (newCat: Cat) => {
+    setIsInProgress(true);
+    const { success, cat } = await addCat(newCat, hotspotDetails.id);
 
-    cat.isSterilized
-      ? setNewSterilizedCats([defaultSterilizedCat])
-      : setNewUnsterilizedCat([defaultUnSterilizedCat]);
+    if (success) {
+      setIsInProgress(false);
+      SnackbarManager.success('Adaugare reuşită');
+      console.log('hey ', cat);
+      if (cat?.isSterilized) {
+        // setNewSterilizedCats([]);
+        // setHotspotDetails({
+        //   ...hotspotDetails,
+        //   sterilizedCats: [cat, ...hotspotDetails.sterilizedCats],
+        // });
+      } else {
+        setNewUnsterilizedCat([]);
+        setHotspotDetails({
+          ...hotspotDetails,
+          unsterilizedCats: [cat, ...hotspotDetails.unsterilizedCats],
+        });
+      }
+    } else {
+      setIsInProgress(false);
+      SnackbarManager.error(
+        'HotspotFormScreen - addNewCat func.',
+        'Adaugare nereuşită'
+      );
+    }
   };
 
   const removeNewCat = (cat: Cat) => {

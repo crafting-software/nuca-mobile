@@ -11,7 +11,7 @@ import { Appbar } from '../components/Appbar';
 import { FullScreenActivityIndicator } from '../components/FullScreenActivityIndicator';
 import { MapContext } from '../context';
 import { findCurrentLocation } from '../context/MapContext';
-import { getHotspotMarker } from '../models/Hotspot';
+import { getHotspotMarker, Hotspot } from '../models/Hotspot';
 import { Location } from '../models/Location';
 import { loadHotspots } from '../utils/hotspots';
 
@@ -74,7 +74,7 @@ export const MapScreen = () => {
           showsUserLocation
           style={styles.map}
         >
-          {hotspots.map(h => (
+          {hotspots.map((h: Hotspot) => (
             <Marker
               key={`${h.latitude} ${h.longitude}`}
               coordinate={{
