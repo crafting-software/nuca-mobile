@@ -1,6 +1,26 @@
 import { castToCat, Cat, toCatApiModel } from '../models/Cat';
 import { makeRequest } from './server';
 
+export const addCat = async (
+  cat: Cat,
+  hotspotId: string
+): Promise<{
+  success: boolean;
+  cat?: Cat;
+}> => {
+  const { error, data } = await makeRequest({
+    path: '/cats',
+    method: 'POST',
+    body: toCatApiModel(cat, hotspotId),
+  });
+
+  if (error) {
+    console.error('add cat failed', error);
+    return { success: false };
+  }
+  return { success: true, cat: castToCat(data) };
+};
+
 export const updateCat = async (
   cat: Cat
 ): Promise<{
@@ -32,7 +52,7 @@ export const deleteCatRequest = async (
   });
 
   if (error) {
-    console.error('delete hotspot failed', error);
+    console.error('delete cat failed', error);
     return { success: false };
   }
 
