@@ -36,6 +36,7 @@ import {
 } from '../models/Cat';
 import {
   defaultHotspotDetails,
+  Hotspot,
   HotspotStatus,
   hotspotStatusList,
 } from '../models/Hotspot';
@@ -298,7 +299,7 @@ export const HotspotFormScreen = ({
 
     if (success) {
       const newHostpots = [
-        ...hotspots.filter(h => h.id !== newHotspot!.id),
+        ...hotspots.filter((h: Hotspot) => h.id !== newHotspot!.id),
         newHotspot!,
       ];
       setHotspotDetails(newHotspot!);
@@ -326,7 +327,7 @@ export const HotspotFormScreen = ({
       setIsInProgress(false);
       SnackbarManager.success('Ștergere reuşită');
 
-      setHotspots(hotspots.filter(h => h.id !== hotspotDetails.id));
+      setHotspots(hotspots.filter((h: Hotspot) => h.id !== hotspotDetails.id));
       navigation.navigate('Main');
     } else {
       setIsInProgress(false);
@@ -337,19 +338,26 @@ export const HotspotFormScreen = ({
     }
   };
 
-  const deleteCat = async (catId: string) => {
+  const deleteCat = async (cat: Cat) => {
+    if (
+      !hotspotDetails.sterilizedCats.includes(cat) &&
+      !hotspotDetails.unsterilizedCats.includes(cat)
+    ) {
+      cat.isSterilized ? setNewSterilizedCats([]) : setNewUnsterilizedCat([]);
+      return;
+    }
     setIsInProgress(true);
-    const { success } = await deleteCatRequest(catId);
+    const { success } = await deleteCatRequest(cat.id);
 
     if (success) {
       setIsInProgress(false);
       SnackbarManager.success('Cat deleted!');
 
       const unsterilizedCats = hotspotDetails.unsterilizedCats.filter(
-        c => c.id !== catId
+        (c: Cat) => c.id !== cat.id
       );
       const sterilizedCats = hotspotDetails.sterilizedCats.filter(
-        c => c.id !== catId
+        (c: Cat) => c.id !== cat.id
       );
 
       setHotspotDetails({
@@ -394,12 +402,6 @@ export const HotspotFormScreen = ({
         'Adaugare nereuşită'
       );
     }
-  };
-
-  const removeNewCat = (cat: Cat) => {
-    console.log('Remove cat does not work yet!');
-
-    cat.isSterilized ? setNewSterilizedCats([]) : setNewUnsterilizedCat([]);
   };
 
   return (
@@ -538,19 +540,15 @@ export const HotspotFormScreen = ({
                 style={styles.catCategoryAddButton}
                 small
                 onPress={() => {
-                  setHotspotDetails({
-                    ...hotspotDetails,
-                    unsterilizedCats: [defaultUnSterilizedCat].concat(
-                      hotspotDetails.unsterilizedCats
-                    ),
-                  });
+                  setNewUnsterilizedCat([defaultUnSterilizedCat]);
                 }}
               />
             </View>
             <CatsView
-              cats={hotspotDetails.unsterilizedCats}
+              cats={newUnsterilizedCat.concat(hotspotDetails.unsterilizedCats)}
               isEditMode={true}
               deleteFunction={deleteCat}
+              addNewCat={addNewCat}
             />
             <View style={styles.separator} />
             <View style={styles.catCategoriesContainer}>
@@ -578,7 +576,6 @@ export const HotspotFormScreen = ({
               isEditMode={true}
               deleteFunction={deleteCat}
               addNewCat={addNewCat}
-              deleteNewCat={removeNewCat}
             />
             <View style={styles.separator} />
             <Button

@@ -12,6 +12,7 @@ import {
 } from 'react-native-paper';
 import { Cat, getDateText } from '../models/Cat';
 import { AddCatCard } from './AddCatCard';
+import { DeleteModal } from './DeleteModal';
 
 const getStyles = (theme: ReactNativePaper.Theme) =>
   StyleSheet.create({
@@ -138,7 +139,7 @@ interface CatCardProps {
   cat: Cat;
   index: number;
   isEditingMode?: boolean;
-  deleteFunction?: (catId: string) => void;
+  deleteFunction?: (cat: Cat) => void;
 }
 
 export const CatCard = ({
@@ -166,7 +167,7 @@ export const CatCard = ({
           <Portal>
             <Modal visible={visible} onDismiss={hideModal}>
               <DeleteModal
-                catId={cat.id}
+                cat={cat}
                 hideModal={hideModal}
                 deleteCat={deleteFunction}
               />
@@ -275,103 +276,9 @@ export const CatCard = ({
           isEditingMode={isEditingMode}
           cat={cat}
           saveChanges={updateChanges}
+          deleteCat={deleteFunction}
         />
       )}
     </>
-  );
-};
-
-const getModalStyles = (theme: ReactNativePaper.Theme) =>
-  StyleSheet.create({
-    title: {
-      marginVertical: 38,
-      textAlign: 'center',
-      color: theme.colors.text,
-      fontSize: 16,
-      lineHeight: 22,
-      fontFamily: 'Nunito_700Bold',
-      paddingLeft: 8,
-    },
-    discardButton: {
-      height: 66,
-      width: '100%',
-      backgroundColor: theme.colors.surface,
-      borderRadius: 0,
-      borderBottomLeftRadius: 30,
-      marginRight: 4,
-    },
-    deleteButton: {
-      backgroundColor: theme.colors.accent,
-      height: 66,
-      width: '100%',
-      borderRadius: 0,
-      borderBottomRightRadius: 30,
-      textAlign: 'center',
-      marginLeft: 4,
-    },
-    buttonView: {
-      justifyContent: 'center',
-      width: '49.5%',
-      alignItems: 'center',
-    },
-    buttonContent: {
-      height: 66,
-      alignItems: 'center',
-      justifyContent: 'center',
-      flexDirection: 'row-reverse',
-    },
-    buttonLabel: {
-      color: theme.colors.text,
-      fontSize: 14,
-    },
-  });
-
-export const DeleteModal = ({
-  catId,
-  hideModal,
-  deleteCat,
-}: {
-  catId: string;
-  hideModal: () => void;
-  deleteCat?: (catId: string) => void;
-}) => {
-  const theme = useTheme();
-  const styles = getModalStyles(theme);
-
-  return (
-    <Card style={{ marginHorizontal: 20, backgroundColor: 'white' }}>
-      <Caption style={styles.title}>Ești sigur că vrei să ștergi?</Caption>
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'center',
-        }}
-      >
-        <View style={styles.buttonView}>
-          <Button
-            style={styles.discardButton}
-            contentStyle={styles.buttonContent}
-            labelStyle={styles.buttonLabel}
-            icon="pencil"
-            onPress={() => hideModal()}
-          >
-            Renunță
-          </Button>
-        </View>
-        <View style={styles.buttonView}>
-          <Button
-            style={styles.deleteButton}
-            contentStyle={styles.buttonContent}
-            labelStyle={styles.buttonLabel}
-            icon="close"
-            onPress={() => {
-              deleteCat && deleteCat(catId);
-            }}
-          >
-            Șterge
-          </Button>
-        </View>
-      </View>
-    </Card>
   );
 };

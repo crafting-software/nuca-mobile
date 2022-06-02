@@ -381,13 +381,11 @@ export const CatsView = ({
   isEditMode,
   deleteFunction,
   addNewCat,
-  deleteNewCat,
 }: {
   cats: Cat[];
   isEditMode?: boolean;
-  deleteFunction?: (catId: string) => void;
+  deleteFunction?: (cat: Cat) => void;
   addNewCat?: (cat: Cat) => void;
-  deleteNewCat?: (cat: Cat) => void;
 }) => {
   const theme = useTheme();
   const styles = getStyles(theme);
@@ -404,7 +402,7 @@ export const CatsView = ({
               key={index}
               cat={cat}
               addCat={addNewCat}
-              deleteCat={deleteNewCat}
+              deleteCat={deleteFunction}
             />
           ) : (
             <CatCard

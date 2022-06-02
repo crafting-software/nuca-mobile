@@ -1,7 +1,15 @@
 import { capitalize } from 'lodash';
 import React, { useContext, useEffect, useState } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
-import { Button, Caption, Card, TextInput, useTheme } from 'react-native-paper';
+import {
+  Button,
+  Caption,
+  Card,
+  Modal,
+  Portal,
+  TextInput,
+  useTheme,
+} from 'react-native-paper';
 import {
   DatePickerInput,
   en,
@@ -15,6 +23,7 @@ import { User } from '../models/User';
 import SnackbarManager from '../utils/SnackbarManager';
 import { updateCat } from '../utils/cats';
 import { loadUsers } from '../utils/users';
+import { DeleteModal } from './DeleteModal';
 import { InputField } from './InputField';
 
 registerTranslation('en', en);
@@ -229,8 +238,33 @@ export const AddCatCard = ({
     }
   };
 
+  const [visible, setVisible] = useState(false);
+
+  const showModal = () => setVisible(true);
+  const hideModal = () => setVisible(false);
+
+  const deleteC = () => {
+    if (
+      !hotspotDetails.sterilizedCats.includes(cat) &&
+      !hotspotDetails.unsterilizedCats.includes(cat)
+    ) {
+      if (deleteCat) deleteCat(localCat);
+      return;
+    }
+    showModal();
+  };
+
   return (
     <Card style={styles.mainContainer}>
+      <Portal>
+        <Modal visible={visible} onDismiss={hideModal}>
+          <DeleteModal
+            cat={localCat}
+            hideModal={hideModal}
+            deleteCat={deleteCat}
+          />
+        </Modal>
+      </Portal>
       <View style={styles.container}>
         <View style={styles.titleRow}>
           {isEditingMode ? (
@@ -401,9 +435,7 @@ export const AddCatCard = ({
             contentStyle={styles.buttonContent}
             labelStyle={styles.buttonLabel}
             icon="close"
-            onPress={() => {
-              if (deleteCat) deleteCat(localCat);
-            }}
+            onPress={deleteC}
           >
             Șterge
           </Button>
