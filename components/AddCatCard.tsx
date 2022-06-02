@@ -18,7 +18,7 @@ import {
 import SelectDropdown from 'react-native-select-dropdown';
 import imagePlaceholder from '../assets/image-placeholder.png';
 import { HotspotContext } from '../context/HotspotDetailContext';
-import { Cat, defaultSterilizedCat, getUTCDate } from '../models/Cat';
+import { Cat, defaultSterilizedCat } from '../models/Cat';
 import { User } from '../models/User';
 import SnackbarManager from '../utils/SnackbarManager';
 import { updateCat } from '../utils/cats';
@@ -345,7 +345,7 @@ export const AddCatCard = ({
                     if (selectedDate) {
                       setCat((prev: Cat) => ({
                         ...prev,
-                        checkInDate: getUTCDate(selectedDate),
+                        checkInDate: selectedDate,
                       }));
                     }
                   }}
@@ -373,7 +373,7 @@ export const AddCatCard = ({
                       } else {
                         setCat((prev: Cat) => ({
                           ...prev,
-                          checkOutDate: getUTCDate(selectedDate),
+                          checkOutDate: selectedDate,
                         }));
                       }
                     }
