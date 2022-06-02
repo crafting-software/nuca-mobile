@@ -37,6 +37,7 @@ import {
 import {
   defaultHotspotDetails,
   Hotspot,
+  HotspotDetails,
   HotspotStatus,
   hotspotStatusList,
 } from '../models/Hotspot';
@@ -281,13 +282,15 @@ export const HotspotFormScreen = ({
       });
   }, [location]);
 
-  const save = async () => {
+  const save = async (): Promise<{
+    hotspot?: HotspotDetails;
+  }> => {
     if (!location && !isUpdate) {
       SnackbarManager.error(
         'HotspotFormScreen - save func',
         'Locatia lipseste'
       );
-      return;
+      return { hotspot: undefined };
     }
     const submitFunc = isUpdate ? updateHotspot : addHotspot;
 
@@ -309,6 +312,7 @@ export const HotspotFormScreen = ({
         isUpdate ? 'Editare reuşită' : 'Adăugare reuşită'
       );
       navigation.goBack();
+      return { hotspot: newHotspot };
     } else {
       setIsInProgress(false);
 
@@ -316,6 +320,7 @@ export const HotspotFormScreen = ({
         'HotspotFormScreen - save func.',
         isUpdate ? 'Editare nereuşită' : 'Adăugare nereuşită'
       );
+      return { hotspot: undefined };
     }
   };
 
@@ -375,24 +380,36 @@ export const HotspotFormScreen = ({
   };
 
   const addNewCat = async (newCat: Cat) => {
-    setIsInProgress(true);
-    const { success, cat } = await addCat(newCat, hotspotDetails.id);
+    if (hotspotDetails.id === undefined || hotspotDetails.id === '') {
+      const hotspot = await save();
+      if (hotspot.hotspot) {
+        saveNewCat(newCat, hotspot.hotspot.id);
+      }
+    } else {
+      saveNewCat(newCat, hotspotDetails.id);
+      setIsInProgress(true);
+    }
+  };
+
+  const saveNewCat = async (newCat: Cat, hotspotId: string) => {
+    const { success, cat } = await addCat(newCat, hotspotId);
 
     if (success) {
       setIsInProgress(false);
+
       SnackbarManager.success('Adaugare reuşită');
 
       if (cat?.isSterilized) {
         setNewSterilizedCats([]);
         setHotspotDetails({
           ...hotspotDetails,
-          sterilizedCats: [cat, ...hotspotDetails.sterilizedCats],
+          sterilizedCats: [cat!, ...hotspotDetails.sterilizedCats],
         });
       } else {
         setNewUnsterilizedCat([]);
         setHotspotDetails({
           ...hotspotDetails,
-          unsterilizedCats: [cat, ...hotspotDetails.unsterilizedCats],
+          unsterilizedCats: [cat!, ...hotspotDetails.unsterilizedCats],
         });
       }
     } else {

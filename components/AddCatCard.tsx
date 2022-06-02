@@ -224,11 +224,11 @@ export const AddCatCard = ({
         const catIndex = catList.findIndex((c: Cat) => c.id === localCat.id);
         catList[catIndex] = localCat;
         localCat.isSterilized
-          ? setHotspotDetails((prev: Cat[]) => ({
+          ? setHotspotDetails(prev => ({
               ...prev,
               sterilizedCats: catList,
             }))
-          : setHotspotDetails((prev: Cat[]) => ({
+          : setHotspotDetails(prev => ({
               ...prev,
               unsterilizedCats: catList,
             }));
@@ -245,8 +245,8 @@ export const AddCatCard = ({
 
   const deleteC = () => {
     if (
-      !hotspotDetails.sterilizedCats.includes(cat) &&
-      !hotspotDetails.unsterilizedCats.includes(cat)
+      !hotspotDetails.sterilizedCats.includes(localCat) &&
+      !hotspotDetails.unsterilizedCats.includes(localCat)
     ) {
       if (deleteCat) deleteCat(localCat);
       return;
@@ -341,7 +341,7 @@ export const AddCatCard = ({
                   autoComplete={false}
                   locale="en"
                   value={new Date(localCat.checkInDate)}
-                  onChange={(selectedDate: Date) => {
+                  onChange={selectedDate => {
                     if (selectedDate) {
                       setCat((prev: Cat) => ({
                         ...prev,
@@ -361,7 +361,7 @@ export const AddCatCard = ({
                   autoComplete={false}
                   locale="en"
                   value={new Date(localCat.checkOutDate)}
-                  onChange={(selectedDate: Date) => {
+                  onChange={selectedDate => {
                     if (selectedDate) {
                       if (
                         new Date(selectedDate) < new Date(localCat.checkInDate)
