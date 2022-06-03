@@ -236,24 +236,38 @@ export const AddCatCard = ({
         ...prev,
         isSterilized: checked,
       }));
-      const { success } = await updateCat(localCat);
 
-      if (success) {
+      const { success, cat } = await updateCat({
+        ...localCat,
+        isSterilized: checked,
+      });
+
+      if (success && cat) {
         SnackbarManager.success('Cat updated!');
-        const catList = localCat.isSterilized
-          ? hotspotDetails.sterilizedCats
-          : hotspotDetails.unsterilizedCats;
-        const catIndex = catList.findIndex((c: Cat) => c.id === localCat.id);
-        catList[catIndex] = localCat;
-        localCat.isSterilized
-          ? setHotspotDetails(prev => ({
-              ...prev,
-              sterilizedCats: catList,
-            }))
-          : setHotspotDetails(prev => ({
-              ...prev,
-              unsterilizedCats: catList,
-            }));
+        if (checked) {
+          setHotspotDetails(prev => ({
+            ...prev,
+            sterilizedCats: [cat, ...hotspotDetails.sterilizedCats],
+            unsterilizedCats: hotspotDetails.unsterilizedCats.filter(
+              (c: Cat) => c.id !== cat.id
+            ),
+          }));
+        } else {
+          const catList = cat.isSterilized
+            ? hotspotDetails.sterilizedCats
+            : hotspotDetails.unsterilizedCats;
+          const catIndex = catList.findIndex((c: Cat) => c.id === cat.id);
+          catList[catIndex] = cat;
+          cat.isSterilized
+            ? setHotspotDetails(prev => ({
+                ...prev,
+                sterilizedCats: catList,
+              }))
+            : setHotspotDetails(prev => ({
+                ...prev,
+                unsterilizedCats: catList,
+              }));
+        }
       }
     } else {
       if (addCat) addCat(localCat);

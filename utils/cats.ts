@@ -39,7 +39,7 @@ export const updateCat = async (
     return { success: false };
   }
 
-  return { success: true, cat: castToCat(data) };
+  return { success: true, cat: castToCat(data.data) };
 };
 
 export const deleteCatRequest = async (
