@@ -1,7 +1,15 @@
 import { capitalize } from 'lodash';
 import React, { useContext, useEffect, useState } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
-import { Button, Caption, Card, TextInput, useTheme } from 'react-native-paper';
+import {
+  Button,
+  Caption,
+  Card,
+  Modal,
+  Portal,
+  TextInput,
+  useTheme,
+} from 'react-native-paper';
 import {
   DatePickerInput,
   en,
@@ -12,7 +20,10 @@ import imagePlaceholder from '../assets/image-placeholder.png';
 import { HotspotContext } from '../context/HotspotDetailContext';
 import { Cat, defaultSterilizedCat } from '../models/Cat';
 import { User } from '../models/User';
+import SnackbarManager from '../utils/SnackbarManager';
+import { updateCat } from '../utils/cats';
 import { loadUsers } from '../utils/users';
+import { DeleteModal } from './DeleteModal';
 import { InputField } from './InputField';
 
 registerTranslation('en', en);
@@ -148,14 +159,42 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
       justifyContent: 'flex-start',
       alignItems: 'flex-start',
     },
+    editButton: {
+      height: 66,
+      width: '100%',
+      backgroundColor: theme.colors.accent,
+      borderRadius: 0,
+      borderBottomLeftRadius: 30,
+      marginRight: 4,
+    },
+    deleteButton: {
+      backgroundColor: theme.colors.accent,
+      height: 66,
+      width: '100%',
+      borderRadius: 0,
+      borderBottomRightRadius: 30,
+      textAlign: 'center',
+      marginLeft: 4,
+    },
+    buttonView: {
+      justifyContent: 'center',
+      width: '50%',
+      alignItems: 'center',
+    },
   });
 
 export const AddCatCard = ({
   isEditingMode = false,
   cat,
+  addCat,
+  deleteCat,
+  saveChanges,
 }: {
   isEditingMode?: boolean;
   cat?: Cat;
+  addCat?: (cat: Cat) => void;
+  deleteCat?: (cat: Cat) => void;
+  saveChanges?: () => void;
 }) => {
   const theme = useTheme();
   const styles = getStyles(theme);
@@ -172,26 +211,60 @@ export const AddCatCard = ({
     load();
   }, []);
 
-  const saveCat = () => {
+  const saveCat = async () => {
+    if (saveChanges) saveChanges();
     if (isEditingMode) {
-      const catList = localCat.isSterilized
-        ? hotspotDetails.sterilizedCats
-        : hotspotDetails.unsterilizedCats;
-      const catIndex = catList.findIndex(c => c.id === localCat.id);
-      catList[catIndex] = localCat;
-      localCat.isSterilized
-        ? setHotspotDetails(prev => ({
-            ...prev,
-            sterilizedCats: catList,
-          }))
-        : setHotspotDetails(prev => ({ ...prev, unsterilizedCats: catList }));
+      const { success } = await updateCat(localCat);
+
+      if (success) {
+        SnackbarManager.success('Cat updated!');
+        const catList = localCat.isSterilized
+          ? hotspotDetails.sterilizedCats
+          : hotspotDetails.unsterilizedCats;
+        const catIndex = catList.findIndex((c: Cat) => c.id === localCat.id);
+        catList[catIndex] = localCat;
+        localCat.isSterilized
+          ? setHotspotDetails(prev => ({
+              ...prev,
+              sterilizedCats: catList,
+            }))
+          : setHotspotDetails(prev => ({
+              ...prev,
+              unsterilizedCats: catList,
+            }));
+      }
     } else {
-      console.log('Create cat does not work yet!');
+      if (addCat) addCat(localCat);
     }
+  };
+
+  const [visible, setVisible] = useState(false);
+
+  const showModal = () => setVisible(true);
+  const hideModal = () => setVisible(false);
+
+  const deleteC = () => {
+    if (
+      !hotspotDetails.sterilizedCats.includes(localCat) &&
+      !hotspotDetails.unsterilizedCats.includes(localCat)
+    ) {
+      if (deleteCat) deleteCat(localCat);
+      return;
+    }
+    showModal();
   };
 
   return (
     <Card style={styles.mainContainer}>
+      <Portal>
+        <Modal visible={visible} onDismiss={hideModal}>
+          <DeleteModal
+            cat={localCat}
+            hideModal={hideModal}
+            deleteCat={deleteCat}
+          />
+        </Modal>
+      </Portal>
       <View style={styles.container}>
         <View style={styles.titleRow}>
           {isEditingMode ? (
@@ -253,7 +326,7 @@ export const AddCatCard = ({
           textInputStyle={{ height: 100 }}
           value={localCat.notes}
           onTextInputChangeText={text => {
-            setCat(prev => ({
+            setCat((prev: Cat) => ({
               ...prev,
               notes: text,
             }));
@@ -270,9 +343,9 @@ export const AddCatCard = ({
                   value={new Date(localCat.checkInDate)}
                   onChange={selectedDate => {
                     if (selectedDate) {
-                      setCat(prev => ({
+                      setCat((prev: Cat) => ({
                         ...prev,
-                        checkInDate: selectedDate.getTime() / 1000,
+                        checkInDate: Date.parse(selectedDate.toDateString()),
                       }));
                     }
                   }}
@@ -290,10 +363,19 @@ export const AddCatCard = ({
                   value={new Date(localCat.checkOutDate)}
                   onChange={selectedDate => {
                     if (selectedDate) {
-                      setCat(prev => ({
-                        ...prev,
-                        checkOutDate: selectedDate.getTime() / 1000,
-                      }));
+                      if (
+                        new Date(selectedDate) < new Date(localCat.checkInDate)
+                      ) {
+                        SnackbarManager.error(
+                          'AddCatCard - checkout date less than checkin',
+                          "Checkout date can't be earlier than checkin date"
+                        );
+                      } else {
+                        setCat((prev: Cat) => ({
+                          ...prev,
+                          checkOutDate: Date.parse(selectedDate.toDateString()),
+                        }));
+                      }
                     }
                   }}
                   mode="outlined"
@@ -335,15 +417,30 @@ export const AddCatCard = ({
           <Image style={styles.media} source={imagePlaceholder} />
         </View>
       </View>
-      <Button
-        style={styles.saveButton}
-        contentStyle={styles.buttonContent}
-        labelStyle={styles.buttonLabel}
-        icon="check"
-        onPress={() => saveCat()}
-      >
-        Salvează
-      </Button>
+      <View style={{ flexDirection: 'row', paddingTop: 8 }}>
+        <View style={styles.buttonView}>
+          <Button
+            style={styles.editButton}
+            contentStyle={styles.buttonContent}
+            labelStyle={styles.buttonLabel}
+            icon="pencil"
+            onPress={() => saveCat()}
+          >
+            Salvează
+          </Button>
+        </View>
+        <View style={styles.buttonView}>
+          <Button
+            style={styles.deleteButton}
+            contentStyle={styles.buttonContent}
+            labelStyle={styles.buttonLabel}
+            icon="close"
+            onPress={deleteC}
+          >
+            Șterge
+          </Button>
+        </View>
+      </View>
     </Card>
   );
 };

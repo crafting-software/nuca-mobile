@@ -24,10 +24,6 @@ export const makeRequest = async ({
 
     if (!!token) requestHeaders.set('Authorization', `Bearer ${token}`);
 
-    console.log(
-      'request method',
-      method + ' path ' + path + ' body ' + JSON.stringify(body)
-    );
     const response = await fetch(`${server}/api${path}`, {
       method,
       headers: requestHeaders,

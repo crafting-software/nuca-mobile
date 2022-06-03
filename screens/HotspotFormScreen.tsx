@@ -36,6 +36,8 @@ import {
 } from '../models/Cat';
 import {
   defaultHotspotDetails,
+  Hotspot,
+  HotspotDetails,
   HotspotStatus,
   hotspotStatusList,
 } from '../models/Hotspot';
@@ -43,6 +45,7 @@ import { getFormattedAddress, Location } from '../models/Location';
 import { User } from '../models/User';
 import { RootStackScreenProps } from '../types';
 import SnackbarManager from '../utils/SnackbarManager';
+import { addCat, deleteCatRequest } from '../utils/cats';
 import { addHotspot, deleteHotspot, updateHotspot } from '../utils/hotspots';
 import { loadUsers } from '../utils/users';
 import { CatsView } from './HotspotDetailScreen';
@@ -255,6 +258,7 @@ export const HotspotFormScreen = ({
   const { hotspotDetails, setHotspotDetails } = useContext(HotspotContext);
 
   const [newSterilizedCats, setNewSterilizedCats] = useState<Cat[]>([]);
+  const [newUnsterilizedCat, setNewUnsterilizedCat] = useState<Cat[]>([]);
 
   useEffect(() => {
     if (!isUpdate) setHotspotDetails(defaultHotspotDetails);
@@ -278,13 +282,15 @@ export const HotspotFormScreen = ({
       });
   }, [location]);
 
-  const save = async () => {
+  const save = async (): Promise<{
+    hotspot?: HotspotDetails;
+  }> => {
     if (!location && !isUpdate) {
       SnackbarManager.error(
         'HotspotFormScreen - save func',
         'Locatia lipseste'
       );
-      return;
+      return { hotspot: undefined };
     }
     const submitFunc = isUpdate ? updateHotspot : addHotspot;
 
@@ -296,7 +302,7 @@ export const HotspotFormScreen = ({
 
     if (success) {
       const newHostpots = [
-        ...hotspots.filter(h => h.id !== newHotspot!.id),
+        ...hotspots.filter((h: Hotspot) => h.id !== newHotspot!.id),
         newHotspot!,
       ];
       setHotspotDetails(newHotspot!);
@@ -306,6 +312,7 @@ export const HotspotFormScreen = ({
         isUpdate ? 'Editare reuşită' : 'Adăugare reuşită'
       );
       navigation.goBack();
+      return { hotspot: newHotspot };
     } else {
       setIsInProgress(false);
 
@@ -313,6 +320,7 @@ export const HotspotFormScreen = ({
         'HotspotFormScreen - save func.',
         isUpdate ? 'Editare nereuşită' : 'Adăugare nereuşită'
       );
+      return { hotspot: undefined };
     }
   };
 
@@ -324,7 +332,7 @@ export const HotspotFormScreen = ({
       setIsInProgress(false);
       SnackbarManager.success('Ștergere reuşită');
 
-      setHotspots(hotspots.filter(h => h.id !== hotspotDetails.id));
+      setHotspots(hotspots.filter((h: Hotspot) => h.id !== hotspotDetails.id));
       navigation.navigate('Main');
     } else {
       setIsInProgress(false);
@@ -335,19 +343,82 @@ export const HotspotFormScreen = ({
     }
   };
 
-  const deleteCat = (catId: string) => {
-    const unsterilizedCats = hotspotDetails.unsterilizedCats.filter(
-      c => c.id !== catId
-    );
-    const sterilizedCats = hotspotDetails.sterilizedCats.filter(
-      c => c.id !== catId
-    );
+  const deleteCat = async (cat: Cat) => {
+    if (
+      !hotspotDetails.sterilizedCats.includes(cat) &&
+      !hotspotDetails.unsterilizedCats.includes(cat)
+    ) {
+      cat.isSterilized ? setNewSterilizedCats([]) : setNewUnsterilizedCat([]);
+      return;
+    }
+    setIsInProgress(true);
+    const { success } = await deleteCatRequest(cat.id);
 
-    setHotspotDetails({
-      ...hotspotDetails,
-      unsterilizedCats: unsterilizedCats,
-      sterilizedCats: sterilizedCats,
-    });
+    if (success) {
+      setIsInProgress(false);
+      SnackbarManager.success('Cat deleted!');
+
+      const unsterilizedCats = hotspotDetails.unsterilizedCats.filter(
+        (c: Cat) => c.id !== cat.id
+      );
+      const sterilizedCats = hotspotDetails.sterilizedCats.filter(
+        (c: Cat) => c.id !== cat.id
+      );
+
+      setHotspotDetails({
+        ...hotspotDetails,
+        unsterilizedCats: unsterilizedCats,
+        sterilizedCats: sterilizedCats,
+      });
+    } else {
+      setIsInProgress(false);
+      SnackbarManager.error(
+        'HotspotFormScreen - deleteCat func.',
+        'Cat not deleted'
+      );
+    }
+  };
+
+  const addNewCat = async (newCat: Cat) => {
+    if (hotspotDetails.id === undefined || hotspotDetails.id === '') {
+      const hotspot = await save();
+      if (hotspot.hotspot) {
+        saveNewCat(newCat, hotspot.hotspot.id);
+      }
+    } else {
+      saveNewCat(newCat, hotspotDetails.id);
+      setIsInProgress(true);
+    }
+  };
+
+  const saveNewCat = async (newCat: Cat, hotspotId: string) => {
+    const { success, cat } = await addCat(newCat, hotspotId);
+
+    if (success) {
+      setIsInProgress(false);
+
+      SnackbarManager.success('Adaugare reuşită');
+
+      if (cat?.isSterilized) {
+        setNewSterilizedCats([]);
+        setHotspotDetails({
+          ...hotspotDetails,
+          sterilizedCats: [cat!, ...hotspotDetails.sterilizedCats],
+        });
+      } else {
+        setNewUnsterilizedCat([]);
+        setHotspotDetails({
+          ...hotspotDetails,
+          unsterilizedCats: [cat!, ...hotspotDetails.unsterilizedCats],
+        });
+      }
+    } else {
+      setIsInProgress(false);
+      SnackbarManager.error(
+        'HotspotFormScreen - addNewCat func.',
+        'Adaugare nereuşită'
+      );
+    }
   };
 
   return (
@@ -486,19 +557,15 @@ export const HotspotFormScreen = ({
                 style={styles.catCategoryAddButton}
                 small
                 onPress={() => {
-                  setHotspotDetails({
-                    ...hotspotDetails,
-                    unsterilizedCats: [defaultUnSterilizedCat].concat(
-                      hotspotDetails.unsterilizedCats
-                    ),
-                  });
+                  setNewUnsterilizedCat([defaultUnSterilizedCat]);
                 }}
               />
             </View>
             <CatsView
-              cats={hotspotDetails.unsterilizedCats}
+              cats={newUnsterilizedCat.concat(hotspotDetails.unsterilizedCats)}
               isEditMode={true}
               deleteFunction={deleteCat}
+              addNewCat={addNewCat}
             />
             <View style={styles.separator} />
             <View style={styles.catCategoriesContainer}>
@@ -517,9 +584,7 @@ export const HotspotFormScreen = ({
                 style={styles.catCategoryAddButton}
                 small
                 onPress={() => {
-                  setNewSterilizedCats(
-                    [defaultSterilizedCat].concat(newSterilizedCats)
-                  );
+                  setNewSterilizedCats([defaultSterilizedCat]);
                 }}
               />
             </View>
@@ -527,6 +592,7 @@ export const HotspotFormScreen = ({
               cats={newSterilizedCats.concat(hotspotDetails.sterilizedCats)}
               isEditMode={true}
               deleteFunction={deleteCat}
+              addNewCat={addNewCat}
             />
             <View style={styles.separator} />
             <Button

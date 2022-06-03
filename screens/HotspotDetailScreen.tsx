@@ -380,10 +380,12 @@ export const CatsView = ({
   cats = [],
   isEditMode,
   deleteFunction,
+  addNewCat,
 }: {
   cats: Cat[];
   isEditMode?: boolean;
-  deleteFunction?: (catId: string) => void;
+  deleteFunction?: (cat: Cat) => void;
+  addNewCat?: (cat: Cat) => void;
 }) => {
   const theme = useTheme();
   const styles = getStyles(theme);
@@ -396,7 +398,12 @@ export const CatsView = ({
         .slice(0, visibleCat)
         .map((cat, index) =>
           cat.isNew ? (
-            <AddCatCard key={index} cat={cat} />
+            <AddCatCard
+              key={index}
+              cat={cat}
+              addCat={addNewCat}
+              deleteCat={deleteFunction}
+            />
           ) : (
             <CatCard
               key={cat.id}
