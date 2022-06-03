@@ -5,6 +5,7 @@ import {
   Button,
   Caption,
   Card,
+  Checkbox,
   Modal,
   Portal,
   TextInput,
@@ -43,6 +44,7 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
     titleRow: {
       flexDirection: 'row',
       alignItems: 'baseline',
+      paddingBottom: 12,
     },
     media: {
       width: 64,
@@ -181,6 +183,21 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
       width: '50%',
       alignItems: 'center',
     },
+    checkbox: {
+      marginTop: 16,
+      borderRadius: 5,
+      borderWidth: 1,
+      borderColor: theme.colors.disabled,
+    },
+    checkboxView: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      backgroundColor: '#E8ECEE',
+      marginHorizontal: -20,
+      paddingHorizontal: 20,
+      alignItems: 'center',
+      paddingBottom: 18,
+    },
   });
 
 export const AddCatCard = ({
@@ -201,6 +218,7 @@ export const AddCatCard = ({
   const [users, setUsers] = useState<User[]>([]);
   const [localCat, setCat] = useState<Cat>(cat || defaultSterilizedCat);
   const { hotspotDetails, setHotspotDetails } = useContext(HotspotContext);
+  const [checked, setChecked] = React.useState(false);
 
   useEffect(() => {
     const load = async () => {
@@ -214,6 +232,10 @@ export const AddCatCard = ({
   const saveCat = async () => {
     if (saveChanges) saveChanges();
     if (isEditingMode) {
+      setCat((prev: Cat) => ({
+        ...prev,
+        isSterilized: checked,
+      }));
       const { success } = await updateCat(localCat);
 
       if (success) {
@@ -291,6 +313,22 @@ export const AddCatCard = ({
             </>
           )}
         </View>
+        {isEditingMode && !localCat.isSterilized && (
+          <View style={styles.checkboxView}>
+            <Caption style={styles.textInputTitle}>
+              am sterilizat pisica
+            </Caption>
+            <View style={styles.checkbox}>
+              <Checkbox
+                color={theme.colors.text}
+                status={checked ? 'checked' : 'unchecked'}
+                onPress={() => {
+                  setChecked(!checked);
+                }}
+              />
+            </View>
+          </View>
+        )}
         <Caption style={styles.textInputTitle}>Sex</Caption>
         <SelectDropdown
           data={['M', 'F']}
@@ -332,7 +370,7 @@ export const AddCatCard = ({
             }));
           }}
         />
-        {localCat.isSterilized && (
+        {(localCat.isSterilized || checked) && (
           <>
             <View style={styles.pickerContainer}>
               <View style={styles.datePickerContainer}>
