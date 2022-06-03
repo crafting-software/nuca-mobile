@@ -345,7 +345,7 @@ export const AddCatCard = ({
                     if (selectedDate) {
                       setCat((prev: Cat) => ({
                         ...prev,
-                        checkInDate: selectedDate,
+                        checkInDate: Date.parse(selectedDate.toDateString()),
                       }));
                     }
                   }}
@@ -373,7 +373,7 @@ export const AddCatCard = ({
                       } else {
                         setCat((prev: Cat) => ({
                           ...prev,
-                          checkOutDate: selectedDate,
+                          checkOutDate: Date.parse(selectedDate.toDateString()),
                         }));
                       }
                     }
