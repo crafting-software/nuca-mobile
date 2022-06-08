@@ -5,6 +5,7 @@ import {
   Button,
   Caption,
   Card,
+  Checkbox,
   Modal,
   Portal,
   TextInput,
@@ -43,6 +44,7 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
     titleRow: {
       flexDirection: 'row',
       alignItems: 'baseline',
+      paddingBottom: 12,
     },
     media: {
       width: 64,
@@ -181,6 +183,21 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
       width: '50%',
       alignItems: 'center',
     },
+    checkbox: {
+      marginTop: 16,
+      borderRadius: 5,
+      borderWidth: 1,
+      borderColor: theme.colors.disabled,
+    },
+    checkboxView: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      backgroundColor: '#E8ECEE',
+      marginHorizontal: -20,
+      paddingHorizontal: 20,
+      alignItems: 'center',
+      paddingBottom: 18,
+    },
   });
 
 export const AddCatCard = ({
@@ -201,6 +218,7 @@ export const AddCatCard = ({
   const [users, setUsers] = useState<User[]>([]);
   const [localCat, setCat] = useState<Cat>(cat || defaultSterilizedCat);
   const { hotspotDetails, setHotspotDetails } = useContext(HotspotContext);
+  const [checked, setChecked] = React.useState(false);
 
   useEffect(() => {
     const load = async () => {
@@ -214,24 +232,41 @@ export const AddCatCard = ({
   const saveCat = async () => {
     if (saveChanges) saveChanges();
     if (isEditingMode) {
-      const { success } = await updateCat(localCat);
+      const { success, cat } = await updateCat(
+        checked
+          ? {
+              ...localCat,
+              isSterilized: checked,
+            }
+          : localCat
+      );
 
-      if (success) {
+      if (success && cat) {
         SnackbarManager.success('Cat updated!');
-        const catList = localCat.isSterilized
-          ? hotspotDetails.sterilizedCats
-          : hotspotDetails.unsterilizedCats;
-        const catIndex = catList.findIndex((c: Cat) => c.id === localCat.id);
-        catList[catIndex] = localCat;
-        localCat.isSterilized
-          ? setHotspotDetails(prev => ({
-              ...prev,
-              sterilizedCats: catList,
-            }))
-          : setHotspotDetails(prev => ({
-              ...prev,
-              unsterilizedCats: catList,
-            }));
+        if (checked) {
+          setHotspotDetails(prev => ({
+            ...prev,
+            sterilizedCats: [cat, ...hotspotDetails.sterilizedCats],
+            unsterilizedCats: hotspotDetails.unsterilizedCats.filter(
+              (c: Cat) => c.id !== cat.id
+            ),
+          }));
+        } else {
+          const catList = cat.isSterilized
+            ? hotspotDetails.sterilizedCats
+            : hotspotDetails.unsterilizedCats;
+          const catIndex = catList.findIndex((c: Cat) => c.id === cat.id);
+          catList[catIndex] = cat;
+          cat.isSterilized
+            ? setHotspotDetails(prev => ({
+                ...prev,
+                sterilizedCats: catList,
+              }))
+            : setHotspotDetails(prev => ({
+                ...prev,
+                unsterilizedCats: catList,
+              }));
+        }
       }
     } else {
       if (addCat) addCat(localCat);
@@ -291,6 +326,22 @@ export const AddCatCard = ({
             </>
           )}
         </View>
+        {isEditingMode && !localCat.isSterilized && (
+          <View style={styles.checkboxView}>
+            <Caption style={styles.textInputTitle}>
+              am sterilizat pisica
+            </Caption>
+            <View style={styles.checkbox}>
+              <Checkbox
+                color={theme.colors.text}
+                status={checked ? 'checked' : 'unchecked'}
+                onPress={() => {
+                  setChecked(!checked);
+                }}
+              />
+            </View>
+          </View>
+        )}
         <Caption style={styles.textInputTitle}>Sex</Caption>
         <SelectDropdown
           data={['M', 'F']}
@@ -332,7 +383,7 @@ export const AddCatCard = ({
             }));
           }}
         />
-        {localCat.isSterilized && (
+        {(localCat.isSterilized || checked) && (
           <>
             <View style={styles.pickerContainer}>
               <View style={styles.datePickerContainer}>

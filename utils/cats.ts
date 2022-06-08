@@ -38,8 +38,7 @@ export const updateCat = async (
     console.error('update cat failed', error);
     return { success: false };
   }
-
-  return { success: true, cat: castToCat(data) };
+  return { success: true, cat: castToCat(data.data) };
 };
 
 export const deleteCatRequest = async (
