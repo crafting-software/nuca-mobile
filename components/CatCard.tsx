@@ -181,7 +181,7 @@ export const CatCard = ({
             </View>
             {!!cat.notes && (
               <Caption style={styles.notes}>
-                Observatii: {cat.notes.concat(cat.description || '')}
+                Observatii: {cat.notes + ' ' + cat.description}
               </Caption>
             )}
             {!!cat.isSterilized && (

@@ -38,7 +38,6 @@ export const updateCat = async (
     console.error('update cat failed', error);
     return { success: false };
   }
-
   return { success: true, cat: castToCat(data.data) };
 };
 

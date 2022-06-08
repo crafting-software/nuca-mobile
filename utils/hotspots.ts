@@ -36,7 +36,7 @@ export const loadHotspotDetails = async (
   });
 
   if (error) {
-    console.log('loading hotspots failed', error);
+    console.log('loading hotspot details failed', error);
     return { success: false };
   }
 

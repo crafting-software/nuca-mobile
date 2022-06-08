@@ -232,15 +232,14 @@ export const AddCatCard = ({
   const saveCat = async () => {
     if (saveChanges) saveChanges();
     if (isEditingMode) {
-      setCat((prev: Cat) => ({
-        ...prev,
-        isSterilized: checked,
-      }));
-
-      const { success, cat } = await updateCat({
-        ...localCat,
-        isSterilized: checked,
-      });
+      const { success, cat } = await updateCat(
+        checked
+          ? {
+              ...localCat,
+              isSterilized: checked,
+            }
+          : localCat
+      );
 
       if (success && cat) {
         SnackbarManager.success('Cat updated!');
