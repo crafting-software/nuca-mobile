@@ -188,8 +188,6 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
       borderRadius: 5,
       borderWidth: 1,
       borderColor: theme.colors.disabled,
-      // width: 32,
-      // height: 32,
     },
     checkboxView: {
       flexDirection: 'row',
@@ -290,75 +288,6 @@ export const AddCatCard = ({
     }
     showModal();
   };
-
-  // let options = {
-  //   title: 'Select Image',
-  //   customButtons: [
-  //     { name: 'customOptionKey', title: 'Choose Photo from Custom Option' },
-  //   ],
-  //   storageOptions: {
-  //     skipBackup: true,
-  //     path: 'images',
-  //   },
-  // };
-
-  // ImagePicker.showImagePicker(options, response => {
-  //   console.log('Response = ', response);
-
-  //   if (response.didCancel) {
-  //     console.log('User cancelled image picker');
-  //   } else if (response.error) {
-  //     console.log('ImagePicker Error: ', response.error);
-  //   } else if (response.customButton) {
-  //     console.log('User tapped custom button: ', response.customButton);
-  //   } else {
-  //     const source = { uri: response.uri };
-
-  //     // You can also display the image using data:
-  //     // const source = { uri: 'data:image/jpeg;base64,' + response.data };
-
-  //     this.setState({
-  //       filePath: response,
-  //       fileData: response.data,
-  //       fileUri: response.uri,
-  //     });
-  //   }
-  // });
-
-  // const chooseImage = async () => {
-  //   let options = {
-  //     title: 'Upload Prescription',
-  //     takePhotoButtonTitle: 'Take a Photo',
-  //     chooseFromLibraryButtonTitle: 'Select From Gallery',
-  //     storageOptions: {
-  //       skipBackup: true,
-  //       path: 'images',
-  //     },
-  //   };
-  //   let result =  ImagePicker.launchImageLibraryAsync({
-  //     mediaTypes: ImagePicker.MediaTypeOptions.All,
-  //     allowsEditing: true,
-  //     aspect: [4, 3],
-  //     quality: 1,
-  //   } );
-
-  //     if (result.didCancel) {
-  //       console.log('User cancelled image picker');
-  //     } else if (response.error) {
-  //       console.log('ImagePicker Error: ', response.error);
-  //     } else if (response.customButton) {
-  //       console.log('User tapped custom button: ', response.customButton);
-  //       alert(response.customButton);
-  //     } else {
-  //       const file = {
-  //         uri: response.uri,
-  //         name: response.fileName,
-  //         type: 'image/jpeg',
-  //       };
-  //       // uploadImageOnS3(file);
-  //     }
-  //   });
-  // };
 
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
