@@ -1,6 +1,7 @@
+import * as ImagePicker from 'expo-image-picker';
 import { capitalize } from 'lodash';
 import React, { useContext, useEffect, useState } from 'react';
-import { Image, StyleSheet, View } from 'react-native';
+import { Image, ImagePickerResult, StyleSheet, View } from 'react-native';
 import {
   Button,
   Caption,
@@ -50,7 +51,6 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
       width: 64,
       height: 64,
       borderRadius: 15,
-      marginRight: 8,
     },
     saveButton: {
       height: 66,
@@ -184,10 +184,12 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
       alignItems: 'center',
     },
     checkbox: {
-      marginTop: 16,
+      marginTop: 12,
       borderRadius: 5,
       borderWidth: 1,
       borderColor: theme.colors.disabled,
+      // width: 32,
+      // height: 32,
     },
     checkboxView: {
       flexDirection: 'row',
@@ -196,7 +198,7 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
       marginHorizontal: -20,
       paddingHorizontal: 20,
       alignItems: 'center',
-      paddingBottom: 18,
+      paddingBottom: 12,
     },
   });
 
@@ -287,6 +289,96 @@ export const AddCatCard = ({
       return;
     }
     showModal();
+  };
+
+  // let options = {
+  //   title: 'Select Image',
+  //   customButtons: [
+  //     { name: 'customOptionKey', title: 'Choose Photo from Custom Option' },
+  //   ],
+  //   storageOptions: {
+  //     skipBackup: true,
+  //     path: 'images',
+  //   },
+  // };
+
+  // ImagePicker.showImagePicker(options, response => {
+  //   console.log('Response = ', response);
+
+  //   if (response.didCancel) {
+  //     console.log('User cancelled image picker');
+  //   } else if (response.error) {
+  //     console.log('ImagePicker Error: ', response.error);
+  //   } else if (response.customButton) {
+  //     console.log('User tapped custom button: ', response.customButton);
+  //   } else {
+  //     const source = { uri: response.uri };
+
+  //     // You can also display the image using data:
+  //     // const source = { uri: 'data:image/jpeg;base64,' + response.data };
+
+  //     this.setState({
+  //       filePath: response,
+  //       fileData: response.data,
+  //       fileUri: response.uri,
+  //     });
+  //   }
+  // });
+
+  // const chooseImage = async () => {
+  //   let options = {
+  //     title: 'Upload Prescription',
+  //     takePhotoButtonTitle: 'Take a Photo',
+  //     chooseFromLibraryButtonTitle: 'Select From Gallery',
+  //     storageOptions: {
+  //       skipBackup: true,
+  //       path: 'images',
+  //     },
+  //   };
+  //   let result =  ImagePicker.launchImageLibraryAsync({
+  //     mediaTypes: ImagePicker.MediaTypeOptions.All,
+  //     allowsEditing: true,
+  //     aspect: [4, 3],
+  //     quality: 1,
+  //   } );
+
+  //     if (result.didCancel) {
+  //       console.log('User cancelled image picker');
+  //     } else if (response.error) {
+  //       console.log('ImagePicker Error: ', response.error);
+  //     } else if (response.customButton) {
+  //       console.log('User tapped custom button: ', response.customButton);
+  //       alert(response.customButton);
+  //     } else {
+  //       const file = {
+  //         uri: response.uri,
+  //         name: response.fileName,
+  //         type: 'image/jpeg',
+  //       };
+  //       // uploadImageOnS3(file);
+  //     }
+  //   });
+  // };
+
+  const pickImage = async () => {
+    // No permissions request is necessary for launching the image library
+    let result: ImagePickerResult = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    console.log(result, result.uri);
+
+    const file = {
+      uri: result.uri,
+      name: result.fileName,
+      type: 'image/jpeg',
+    };
+    if (!result.cancelled) {
+      // uploadImageOnS3(file);
+    }
   };
 
   return (
@@ -464,8 +556,15 @@ export const AddCatCard = ({
         {!isEditingMode && (
           <Caption style={styles.textInputTitle}>Adaugă poze/video</Caption>
         )}
-        <View style={{ paddingTop: 8 }}>
-          <Image style={styles.media} source={imagePlaceholder} />
+        <View
+          style={{
+            paddingTop: 8,
+            alignItems: 'flex-start',
+          }}
+        >
+          <Button onPress={pickImage} style={{ height: 74 }}>
+            <Image style={styles.media} source={imagePlaceholder} />
+          </Button>
         </View>
       </View>
       <View style={{ flexDirection: 'row', paddingTop: 8 }}>
