@@ -22,7 +22,7 @@
         "NSLocationAlwaysUsageDescription": "App requires geolocation to retrieve the current location in order to be easier to mark the hotspots.",
         "NSLocationWhenInUseUsageDescription": "App requires geolocation to retrieve the current location in order to be easier to mark the hotspots.",
         "NSCameraUsageDescription": "App requires access to your phone’s camera.",
-        "NSPhotoLibraryUsageDescription": "This app requires access to the photo library."
+        "NSPhotoLibraryAddUsageDescription": "This app requires access to the photo library."
       }
     },
     "android": {
