@@ -8,7 +8,6 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-// import * as ImagePicker from 'react-native-image-picker';
 import {
   Button,
   Caption,
@@ -213,6 +212,20 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
       alignItems: 'center',
       paddingBottom: 12,
     },
+    actionView: {
+      flexDirection: 'row',
+      paddingTop: 8,
+    },
+    imagesView: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginTop: 12,
+    },
+    deleteImageIcon: {
+      position: 'absolute',
+      right: -14,
+      top: -14,
+    },
   });
 
 export const AddCatCard = ({
@@ -320,16 +333,14 @@ export const AddCatCard = ({
         quality: 1,
       });
 
-    console.log('result ', result);
-
-    const file = {
-      uri: result.uri,
-      name: result.fileName,
-      type: 'image/jpeg',
-    };
     if (!result.cancelled) {
-      // uploadImageOnS3(file);
+      uploadImageOnS3(result);
     }
+  };
+
+  const uploadImageOnS3 = (imageInfo: ImagePicker.ImageInfo) => {
+    //TODO first upload on S3
+    setImages(images.concat(imageInfo.uri));
   };
 
   const removeImage = (uri: string) => {
@@ -511,13 +522,7 @@ export const AddCatCard = ({
         {!isEditingMode && (
           <Caption style={styles.textInputTitle}>Adaugă poze/video</Caption>
         )}
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            marginTop: 12,
-          }}
-        >
+        <View style={styles.imagesView}>
           <View style={{ maxWidth: '80%' }}>
             <FlatList
               horizontal
@@ -528,11 +533,7 @@ export const AddCatCard = ({
                   <Image style={styles.media} source={{ uri: item }} />
                   <IconButton
                     icon="close-circle"
-                    style={{
-                      position: 'absolute',
-                      right: -14,
-                      top: -14,
-                    }}
+                    style={styles.deleteImageIcon}
                     onPress={() => removeImage(item)}
                   />
                 </View>
@@ -544,7 +545,7 @@ export const AddCatCard = ({
           </TouchableOpacity>
         </View>
       </View>
-      <View style={{ flexDirection: 'row', paddingTop: 8 }}>
+      <View style={styles.actionView}>
         <View style={styles.buttonView}>
           <Button
             style={styles.editButton}
