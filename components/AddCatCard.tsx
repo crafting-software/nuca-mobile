@@ -226,6 +226,9 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
       right: -14,
       top: -14,
     },
+    imageContainer: {
+      maxWidth: '80%',
+    },
   });
 
 export const AddCatCard = ({
@@ -324,7 +327,6 @@ export const AddCatCard = ({
   };
 
   const pickImage = async () => {
-    // No permissions request is necessary for launching the image library
     let result: ImagePicker.ImagePickerResult =
       await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -523,7 +525,7 @@ export const AddCatCard = ({
           <Caption style={styles.textInputTitle}>Adaugă poze/video</Caption>
         )}
         <View style={styles.imagesView}>
-          <View style={{ maxWidth: '80%' }}>
+          <View style={styles.imageContainer}>
             <FlatList
               horizontal
               data={images /*cat.media*/}

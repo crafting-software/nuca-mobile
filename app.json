@@ -21,8 +21,7 @@
         "NSLocationAlwaysAndWhenInUseUsageDescription": "App requires geolocation to retrieve the current location in order to be easier to mark the hotspots.",
         "NSLocationAlwaysUsageDescription": "App requires geolocation to retrieve the current location in order to be easier to mark the hotspots.",
         "NSLocationWhenInUseUsageDescription": "App requires geolocation to retrieve the current location in order to be easier to mark the hotspots.",
-        "NSCameraUsageDescription": "App requires access to your phone’s camera.",
-        "NSPhotoLibraryAddUsageDescription": "This app requires access to the photo library."
+        "NSPhotoLibraryAddUsageDescription": "Photo library access is required to share photos of cats."
       }
     },
     "android": {
@@ -44,7 +43,7 @@
       [
         "expo-image-picker",
         {
-          "photosPermission": "The app accesses your photos to let you share them with your friends."
+          "photosPermission": "Photo library access is required to share photos of cats."
         }
       ]
     ]
