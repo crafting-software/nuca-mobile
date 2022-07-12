@@ -1,11 +1,18 @@
 import * as SecureStore from 'expo-secure-store';
+import { Platform } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { server } from '../config';
 
 const getAuthorizationHeader = async () => {
-  const authString = await SecureStore.getItemAsync('auth');
-
-  const { token = '' } = authString ? JSON.parse(authString) : {};
-  return token;
+  if (Platform.OS === 'web') {
+    const value = await AsyncStorage.getItem('auth');
+    const { token = '' } = value ? JSON.parse(value) : {};
+    return token;
+  } else {
+    const authString = await SecureStore.getItemAsync('auth');
+    const { token = '' } = authString ? JSON.parse(authString) : {};
+    return token;
+  }
 };
 
 export const makeRequest = async ({
@@ -20,6 +27,7 @@ export const makeRequest = async ({
   try {
     const requestHeaders: HeadersInit = new Headers();
     requestHeaders.set('Content-Type', 'application/json');
+
     const token = await getAuthorizationHeader();
 
     if (!!token) requestHeaders.set('Authorization', `Bearer ${token}`);
