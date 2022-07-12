@@ -18,6 +18,7 @@
     "expo-app-loading": "~1.3.0",
     "expo-asset": "^8.4.6",
     "expo-font": "^10.0.5",
+    "expo-image-picker": "^13.1.1",
     "expo-linking": "^3.0.0",
     "expo-location": "~14.0.1",
     "expo-module-scripts": "^2.0.0",
@@ -35,7 +36,8 @@
     "react-native-paper-dates": "^0.8.7",
     "react-native-safe-area-context": "3.3.2",
     "react-native-select-dropdown": "^1.8.0",
-    "react-native-web": "0.17.1"
+    "react-native-web": "0.17.1",
+    "types": "lib/typescript/index.d.ts"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",

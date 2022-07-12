@@ -20,7 +20,8 @@
       "infoPlist": {
         "NSLocationAlwaysAndWhenInUseUsageDescription": "App requires geolocation to retrieve the current location in order to be easier to mark the hotspots.",
         "NSLocationAlwaysUsageDescription": "App requires geolocation to retrieve the current location in order to be easier to mark the hotspots.",
-        "NSLocationWhenInUseUsageDescription": "App requires geolocation to retrieve the current location in order to be easier to mark the hotspots."
+        "NSLocationWhenInUseUsageDescription": "App requires geolocation to retrieve the current location in order to be easier to mark the hotspots.",
+        "NSPhotoLibraryAddUsageDescription": "Photo library access is required to share photos of cats."
       }
     },
     "android": {
@@ -28,10 +29,23 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
       },
-      "permissions": ["ACCESS_COARSE_LOCATION", "ACCESS_FINE_LOCATION"]
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "CAMERA",
+        "WRITE_EXTERNAL_STORAGE"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Photo library access is required to share photos of cats."
+        }
+      ]
+    ]
   }
 }
