@@ -35,7 +35,7 @@ export const makeRequest = async ({
     const response = await fetch(`${server}/api${path}`, {
       method,
       headers: requestHeaders,
-      body: body ? JSON.stringify(body) : '',
+      body: body ? JSON.stringify(body) : null,
     });
 
     if (!response.ok) {

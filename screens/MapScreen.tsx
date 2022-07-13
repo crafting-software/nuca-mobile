@@ -13,6 +13,7 @@ import { MapContext } from '../context';
 import { findCurrentLocation } from '../context/MapContext';
 import { getHotspotMarker, Hotspot } from '../models/Hotspot';
 import { Location } from '../models/Location';
+import SnackbarManager from '../utils/SnackbarManager';
 import { loadHotspots } from '../utils/hotspots';
 
 export const MapScreen = () => {
@@ -34,7 +35,12 @@ export const MapScreen = () => {
       const { success, hotspots = [] } = await loadHotspots();
       setIsLoading(false);
 
-      if (!success) alert('Failed to load hotspots');
+      if (!success)
+        SnackbarManager.error(
+          'MapScreen - useEffect',
+          'Failed to load hotspots'
+        );
+      console.log('bent ', hotspots.length);
       setHotspots(hotspots);
     };
     load();
