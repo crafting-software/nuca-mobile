@@ -40,7 +40,6 @@ export const MapScreen = () => {
           'MapScreen - useEffect',
           'Failed to load hotspots'
         );
-      console.log('bent ', hotspots.length);
       setHotspots(hotspots);
     };
     load();
