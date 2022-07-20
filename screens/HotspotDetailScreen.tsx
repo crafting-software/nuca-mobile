@@ -7,7 +7,6 @@ import {
   StyleSheet,
   View,
 } from 'react-native';
-import { Region } from 'react-native-maps';
 import {
   Button,
   Caption,
@@ -24,7 +23,7 @@ import { CatCard } from '../components/CatCard';
 import { HotspotContext } from '../context/HotspotDetailContext';
 import { Cat } from '../models/Cat';
 import { HotspotStatus } from '../models/Hotspot';
-import { RootStackParamList } from '../types';
+import { Region, RootStackParamList } from '../types';
 import { loadHotspotDetails } from '../utils/hotspots';
 
 const getStyles = (theme: ReactNativePaper.Theme) =>

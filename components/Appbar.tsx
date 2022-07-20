@@ -1,7 +1,6 @@
 import * as SecureStore from 'expo-secure-store';
 import { useContext, useState } from 'react';
 import { Image, Platform, StyleSheet } from 'react-native';
-import { EdgeInsets } from 'react-native-maps';
 import {
   Appbar as PaperAppbar,
   Divider,
@@ -14,6 +13,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import logo from '../assets/logo.png';
 import { AuthContext } from '../context';
+import { EdgeInsets } from '../types';
 
 export const Appbar = ({
   forDetailScreen = false,

@@ -2,9 +2,22 @@
  * Learn more about using TypeScript with React Navigation:
  * https://reactnavigation.org/docs/typescript/
  */
-import { Region } from 'react-native-maps';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Location } from './models/Location';
+
+export interface Region {
+  latitude: number;
+  longitude: number;
+  latitudeDelta: number;
+  longitudeDelta: number;
+}
+
+export type EdgeInsets = {
+  top: Number;
+  right: Number;
+  bottom: Number;
+  left: Number;
+};
 
 declare global {
   namespace ReactNavigation {

@@ -1,7 +1,7 @@
 import * as LocationProvider from 'expo-location';
 import { useContext, useEffect, useRef, useState } from 'react';
 import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
-import MapView, { EdgeInsets, Marker, Region } from 'react-native-maps';
+import MapView from 'react-native-maps';
 import { Caption, FAB, TextInput, Title, useTheme } from 'react-native-paper';
 import { Theme } from 'react-native-paper/lib/typescript/types';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -11,8 +11,10 @@ import { Appbar } from '../components/Appbar';
 import { FullScreenActivityIndicator } from '../components/FullScreenActivityIndicator';
 import { MapContext } from '../context';
 import { findCurrentLocation } from '../context/MapContext';
+import { Marker } from '../maps';
 import { getHotspotMarker, Hotspot } from '../models/Hotspot';
 import { Location } from '../models/Location';
+import { EdgeInsets, Region } from '../types';
 import SnackbarManager from '../utils/SnackbarManager';
 import { loadHotspots } from '../utils/hotspots';
 

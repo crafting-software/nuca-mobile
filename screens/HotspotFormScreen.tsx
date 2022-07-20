@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { Region } from 'react-native-maps';
 import {
   Avatar,
   Button,
@@ -43,7 +42,7 @@ import {
 } from '../models/Hotspot';
 import { getFormattedAddress, Location } from '../models/Location';
 import { User } from '../models/User';
-import { RootStackScreenProps } from '../types';
+import { Region, RootStackScreenProps } from '../types';
 import SnackbarManager from '../utils/SnackbarManager';
 import { addCat, deleteCatRequest } from '../utils/cats';
 import { addHotspot, deleteHotspot, updateHotspot } from '../utils/hotspots';
