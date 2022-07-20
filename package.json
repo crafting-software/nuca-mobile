@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@expo-google-fonts/nunito": "^0.2.2",
+    "@react-native-async-storage/async-storage": "^1.17.7",
     "@react-navigation/native": "^6.0.8",
     "@react-navigation/native-stack": "^6.5.0",
     "expo": "~44.0.0",
@@ -37,10 +38,12 @@
     "react-native-safe-area-context": "3.3.2",
     "react-native-select-dropdown": "^1.8.0",
     "react-native-web": "0.17.1",
+    "react-native-web-maps": "^0.3.0",
     "types": "lib/typescript/index.d.ts"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",
+    "@expo/webpack-config": "^0.16.26",
     "@trivago/prettier-plugin-sort-imports": "^3.2.0",
     "@types/lodash": "^4.14.178",
     "@types/react": "~17.0.21",

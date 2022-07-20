@@ -1,6 +1,9 @@
 import { makeRequest } from './server';
 
-export const signIn = async (username: string, password: string) => {
+export const signIn2 = async (
+  username: string,
+  password: string
+): Promise<{ success: boolean; message?: string; token?: string }> => {
   const { error, data } = await makeRequest({
     path: '/login',
     method: 'POST',
@@ -8,7 +11,6 @@ export const signIn = async (username: string, password: string) => {
   });
 
   if (error) {
-    console.log('sign in failed', error);
     const message = typeof error === 'string' ? error : (error as any).message;
     return { success: false, message };
   }

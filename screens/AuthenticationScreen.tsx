@@ -15,9 +15,11 @@ import {
   Title,
   useTheme,
 } from 'react-native-paper';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import catLady from '../assets/cat-lady.png';
 import { AuthContext } from '../context';
-import { signIn as serverSignIn } from '../utils/sign-in';
+import SnackbarManager from '../utils/SnackbarManager';
+import { signIn2 } from '../utils/sign-in';
 
 const getStyles = (theme: ReactNativePaper.Theme) =>
   StyleSheet.create({
@@ -72,23 +74,33 @@ export const AuthenticationScreen = () => {
   const [isInvalidUserName, setIsInvalidUserName] = useState(false);
   const [isInvalidPassword, setIsInvalidPassword] = useState(false);
 
-  useEffect(() => {
-    const restoreAuth = async () => {
+  const restoreAuth = async () => {
+    if (Platform.OS === 'web') {
       try {
-        const authString = await SecureStore.getItemAsync('auth');
-
-        if (!authString) {
-          setAuth({ token: '', username: '', inProgress: false });
-        } else {
-          const { token, username } = JSON.parse(authString);
+        const value = await AsyncStorage.getItem('auth');
+        if (value !== null) {
+          const { token, username } = JSON.parse(value);
           setAuth({ token, username, inProgress: false });
         }
       } catch (e) {
-        alert('restoring auth token failed');
         setAuth({ token: '', username: '', inProgress: false });
       }
-    };
+    } else {
+      const authString = await SecureStore.getItemAsync('auth');
+      if (!authString) {
+        setAuth({ token: '', username: '', inProgress: false });
+        SnackbarManager.error(
+          'AuthenticationScreen - restoreAuth func.',
+          'No values stored under that key.'
+        );
+      } else {
+        const { token, username } = JSON.parse(authString);
+        setAuth({ token, username, inProgress: false });
+      }
+    }
+  };
 
+  useEffect(() => {
     restoreAuth();
   }, []);
 
@@ -99,15 +111,28 @@ export const AuthenticationScreen = () => {
     if (!username || !password) return;
 
     setInProgress(true);
-    const { success, message, token } = await serverSignIn(username, password);
+    const { success, message, token } = await signIn2(username, password);
 
     if (success) {
-      await SecureStore.setItemAsync(
-        'auth',
-        JSON.stringify({ username, token })
-      );
-      setAuth({ username, token, inProgress: false });
+      if (Platform.OS === 'web') {
+        try {
+          await AsyncStorage.setItem(
+            'auth',
+            JSON.stringify({ username, token })
+          );
+        } catch (e) {
+          console.log('Failed to save to AsyncStorage');
+        }
+        setAuth({ username, token, inProgress: false });
+      } else {
+        await SecureStore.setItemAsync(
+          'auth',
+          JSON.stringify({ username, token })
+        );
+        setAuth({ username, token, inProgress: false });
+      }
     } else {
+      console.log('Error signIn ', message);
       setLoginFailedVisible(true);
       setInProgress(false);
     }

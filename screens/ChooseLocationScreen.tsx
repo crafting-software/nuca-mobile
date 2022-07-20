@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import MapView, { EdgeInsets, Marker, Region } from 'react-native-maps';
+import MapView from 'react-native-maps';
 import { Caption, FAB, TextInput, useTheme } from 'react-native-paper';
 import { Theme } from 'react-native-paper/lib/typescript/types';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -17,9 +17,10 @@ import markerNewImage from '../assets/marker-new.png';
 import { Appbar } from '../components/Appbar';
 import { MapContext } from '../context';
 import { findCurrentLocation, findPlace } from '../context/MapContext';
+import { Marker } from '../maps';
 import { getHotspotMarker } from '../models/Hotspot';
 import { getFormattedAddress, Location } from '../models/Location';
-import { RootStackScreenProps } from '../types';
+import { EdgeInsets, Region, RootStackScreenProps } from '../types';
 
 export const ChooseLocationScreen = ({
   route,

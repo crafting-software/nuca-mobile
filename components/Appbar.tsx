@@ -1,7 +1,6 @@
 import * as SecureStore from 'expo-secure-store';
 import { useContext, useState } from 'react';
-import { Image, StyleSheet } from 'react-native';
-import { EdgeInsets } from 'react-native-maps';
+import { Image, Platform, StyleSheet } from 'react-native';
 import {
   Appbar as PaperAppbar,
   Divider,
@@ -10,9 +9,11 @@ import {
   useTheme,
 } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import logo from '../assets/logo.png';
 import { AuthContext } from '../context';
+import { EdgeInsets } from '../types';
 
 export const Appbar = ({
   forDetailScreen = false,
@@ -21,7 +22,11 @@ export const Appbar = ({
 }) => {
   const { setAuth } = useContext(AuthContext);
   const signOut = () => {
-    SecureStore.deleteItemAsync('auth');
+    if (Platform.OS === 'web') {
+      AsyncStorage.removeItem('auth');
+    } else {
+      SecureStore.deleteItemAsync('auth');
+    }
     setAuth({ username: '', token: '', inProgress: false });
   };
 
