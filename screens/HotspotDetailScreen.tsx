@@ -228,97 +228,99 @@ export const HotspotDetailScreen = ({
   return (
     <>
       <Appbar forDetailScreen />
-      <View style={styles.container}>
-        <ScrollView style={styles.scrollView}>
-          <View style={styles.contentCotainer}>
-            <View style={styles.addressContainer}>
-              <Title style={styles.addressTitle}>{address}</Title>
-              <Button
-                style={styles.editButton}
-                contentStyle={styles.buttonContent}
-                labelStyle={styles.buttonLabel}
-                icon="pencil-outline"
-                mode="contained"
-                onPress={() => {
-                  navigation.navigate('AddHotspot', {
-                    region: region!,
-                    isUpdate: true,
-                  });
-                }}
-                compact
-              >
-                Editează
-              </Button>
+      <View style={{ alignItems: 'center' }}>
+        <View style={styles.container}>
+          <ScrollView style={styles.scrollView}>
+            <View style={styles.contentCotainer}>
+              <View style={styles.addressContainer}>
+                <Title style={styles.addressTitle}>{address}</Title>
+                <Button
+                  style={styles.editButton}
+                  contentStyle={styles.buttonContent}
+                  labelStyle={styles.buttonLabel}
+                  icon="pencil-outline"
+                  mode="contained"
+                  onPress={() => {
+                    navigation.navigate('AddHotspot', {
+                      region: region!,
+                      isUpdate: true,
+                    });
+                  }}
+                  compact
+                >
+                  Editează
+                </Button>
+              </View>
+              <Caption style={styles.subTitle}>
+                {hotspotDetails.description}
+              </Caption>
+              <View style={styles.separator} />
+              {!!hotspotDetails.notes && (
+                <Caption style={styles.notes}>{hotspotDetails.notes}</Caption>
+              )}
+              <View style={styles.informationContainer}>
+                <StatusView status={hotspotDetails.status}></StatusView>
+                <InformationView
+                  title={'pisici \nnesterilizate'}
+                  count={`${
+                    hotspotDetails.unsterilizedCatsCount ||
+                    hotspotDetails.unsterilizedCats.length
+                  }`}
+                ></InformationView>
+                <InformationView
+                  title={'pisici sterilizate'}
+                  count={`${hotspotDetails.sterilizedCats.length}`}
+                ></InformationView>
+              </View>
+              <View style={styles.informationContainer}>
+                <InformationView
+                  title={'Contact'}
+                  subtitle={`${hotspotDetails.contactName || '-'}\n${
+                    hotspotDetails.contactPhone || '-'
+                  }`}
+                ></InformationView>
+                <InformationView
+                  title={'Voluntar'}
+                  subtitle={`${hotspotDetails.volunteer?.name || '-'}\n${
+                    hotspotDetails.volunteer?.phone || '-'
+                  }`}
+                ></InformationView>
+              </View>
+              <View style={styles.catCategoryContainer}>
+                <IconButton
+                  size={24}
+                  icon="close-circle"
+                  color={theme.colors.text}
+                  style={styles.catCategoryIcon}
+                />
+                <Title style={styles.catCategoryTitleLabel}>
+                  Pisici nesterilizate
+                </Title>
+              </View>
+              <CatsView cats={hotspotDetails.unsterilizedCats} />
+              <View style={styles.separator} />
+              <View style={styles.catCategoryContainer}>
+                <IconButton
+                  size={24}
+                  icon="check-circle"
+                  color={theme.colors.text}
+                  style={styles.catCategoryIcon}
+                />
+                <Title style={styles.catCategoryTitleLabel}>
+                  Pisici sterilizate
+                </Title>
+              </View>
+              <CatsView cats={hotspotDetails.sterilizedCats} />
             </View>
-            <Caption style={styles.subTitle}>
-              {hotspotDetails.description}
-            </Caption>
-            <View style={styles.separator} />
-            {!!hotspotDetails.notes && (
-              <Caption style={styles.notes}>{hotspotDetails.notes}</Caption>
-            )}
-            <View style={styles.informationContainer}>
-              <StatusView status={hotspotDetails.status}></StatusView>
-              <InformationView
-                title={'pisici \nnesterilizate'}
-                count={`${
-                  hotspotDetails.unsterilizedCatsCount ||
-                  hotspotDetails.unsterilizedCats.length
-                }`}
-              ></InformationView>
-              <InformationView
-                title={'pisici sterilizate'}
-                count={`${hotspotDetails.sterilizedCats.length}`}
-              ></InformationView>
-            </View>
-            <View style={styles.informationContainer}>
-              <InformationView
-                title={'Contact'}
-                subtitle={`${hotspotDetails.contactName || '-'}\n${
-                  hotspotDetails.contactPhone || '-'
-                }`}
-              ></InformationView>
-              <InformationView
-                title={'Voluntar'}
-                subtitle={`${hotspotDetails.volunteer?.name || '-'}\n${
-                  hotspotDetails.volunteer?.phone || '-'
-                }`}
-              ></InformationView>
-            </View>
-            <View style={styles.catCategoryContainer}>
-              <IconButton
-                size={24}
-                icon="close-circle"
-                color={theme.colors.text}
-                style={styles.catCategoryIcon}
+            <View style={styles.imageView}>
+              <Image
+                source={catLady3}
+                style={styles.image}
+                resizeMode="contain"
               />
-              <Title style={styles.catCategoryTitleLabel}>
-                Pisici nesterilizate
-              </Title>
             </View>
-            <CatsView cats={hotspotDetails.unsterilizedCats} />
-            <View style={styles.separator} />
-            <View style={styles.catCategoryContainer}>
-              <IconButton
-                size={24}
-                icon="check-circle"
-                color={theme.colors.text}
-                style={styles.catCategoryIcon}
-              />
-              <Title style={styles.catCategoryTitleLabel}>
-                Pisici sterilizate
-              </Title>
-            </View>
-            <CatsView cats={hotspotDetails.sterilizedCats} />
-          </View>
-          <View style={styles.imageView}>
-            <Image
-              source={catLady3}
-              style={styles.image}
-              resizeMode="contain"
-            />
-          </View>
-        </ScrollView>
+          </ScrollView>
+        </View>
       </View>
     </>
   );

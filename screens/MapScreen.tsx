@@ -80,7 +80,9 @@ export const MapScreen = () => {
           // use intial region + animateToRegion instead of region as react state because
           // gestures don't work well https://github.com/react-native-maps/react-native-maps/issues/3639
           initialRegion={region}
-          onRegionChange={setRegion}
+          onRegionChange={() => {
+            setRegion;
+          }}
           showsUserLocation
           style={styles.map}
         >
