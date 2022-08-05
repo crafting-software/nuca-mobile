@@ -1,6 +1,12 @@
 import * as LocationProvider from 'expo-location';
 import { useContext, useEffect, useRef, useState } from 'react';
-import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
+import {
+  Image,
+  Platform,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import MapView from 'react-native-maps';
 import { Caption, FAB, TextInput, Title, useTheme } from 'react-native-paper';
 import { Theme } from 'react-native-paper/lib/typescript/types';
@@ -88,12 +94,16 @@ export const MapScreen = () => {
         >
           {hotspots.map((h: Hotspot) => (
             <Marker
-              icon={{
-                url: getHotspotMarker(h),
-                scaledSize: new google.maps.Size(40, 40),
-                origin: new google.maps.Point(0, 0),
-                anchor: new google.maps.Point(0, 0),
-              }}
+              icon={
+                Platform.OS === 'web'
+                  ? {
+                      url: getHotspotMarker(h),
+                      scaledSize: new google.maps.Size(40, 40),
+                      origin: new google.maps.Point(0, 0),
+                      anchor: new google.maps.Point(0, 0),
+                    }
+                  : {}
+              }
               key={`${h.latitude} ${h.longitude}`}
               coordinate={{
                 latitude: h.latitude,

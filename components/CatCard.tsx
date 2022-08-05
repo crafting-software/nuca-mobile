@@ -59,7 +59,7 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
     },
     baseText: {
       color: theme.colors.placeholder,
-      fontSize: 16,
+      fontSize: 14,
       fontFamily: 'Nunito_700Bold',
       letterSpacing: 0.01,
       margin: 0,
@@ -67,7 +67,7 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
     },
     infoText: {
       color: theme.colors.placeholder,
-      fontSize: 16,
+      fontSize: 15,
       fontFamily: 'Nunito_400Regular',
       flexWrap: 'wrap',
     },
@@ -81,7 +81,6 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
       flexDirection: 'row',
       alignItems: 'center',
       marginTop: 12,
-      flexWrap: 'wrap',
     },
     icon: {
       margin: 0,
@@ -190,7 +189,7 @@ export const CatCard = ({
                   <View style={styles.iconAndText}>
                     <IconButton
                       icon="calendar-arrow-left"
-                      size={20}
+                      size={16}
                       color={theme.colors.placeholder}
                       style={styles.icon}
                     />
@@ -204,7 +203,7 @@ export const CatCard = ({
                   <View style={styles.iconAndText}>
                     <IconButton
                       icon="calendar-arrow-right"
-                      size={20}
+                      size={16}
                       color={theme.colors.placeholder}
                       style={styles.icon}
                     />
@@ -218,7 +217,7 @@ export const CatCard = ({
                   <View style={styles.iconAndText}>
                     <IconButton
                       icon="account"
-                      size={20}
+                      size={16}
                       color={theme.colors.placeholder}
                       style={styles.icon}
                     />

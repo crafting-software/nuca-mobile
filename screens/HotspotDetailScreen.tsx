@@ -2,7 +2,10 @@ import { trim } from 'lodash';
 import { useContext, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
+  Dimensions,
+  FlatList,
   Image,
+  Platform,
   ScrollView,
   StyleSheet,
   View,
@@ -36,6 +39,7 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
     container: {
       backgroundColor: theme.colors.background,
       flex: 1,
+      // alignItems: Platform.OS === 'web' ? 'center' : 'flex-start',
     },
     separator: {
       borderColor: theme.colors.disabled,
@@ -63,6 +67,7 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
     editButton: {
       flexGrow: 1,
       flexShrink: 0,
+      maxWidth: 150,
     },
     buttonContent: {
       flexDirection: 'row-reverse',
@@ -160,8 +165,12 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
       flexDirection: 'row',
       alignItems: 'flex-start',
       paddingTop: 18,
+      justifyContent: 'space-between',
     },
-    contentCotainer: { padding: 20 },
+    contentCotainer: {
+      padding: 20,
+      width: Platform.OS === 'web' ? '85%' : '100%',
+    },
     moreButton: {
       height: 40,
       marginTop: 24,
@@ -228,9 +237,13 @@ export const HotspotDetailScreen = ({
   return (
     <>
       <Appbar forDetailScreen />
-      <View style={{ alignItems: 'center' }}>
-        <View style={styles.container}>
-          <ScrollView style={styles.scrollView}>
+      <View style={styles.container}>
+        <ScrollView style={styles.scrollView}>
+          <View
+            style={{
+              alignItems: 'center',
+            }}
+          >
             <View style={styles.contentCotainer}>
               <View style={styles.addressContainer}>
                 <Title style={styles.addressTitle}>{address}</Title>
@@ -312,15 +325,16 @@ export const HotspotDetailScreen = ({
               </View>
               <CatsView cats={hotspotDetails.sterilizedCats} />
             </View>
-            <View style={styles.imageView}>
-              <Image
-                source={catLady3}
-                style={styles.image}
-                resizeMode="contain"
-              />
-            </View>
-          </ScrollView>
-        </View>
+          </View>
+
+          <View style={styles.imageView}>
+            <Image
+              source={catLady3}
+              style={styles.image}
+              resizeMode="contain"
+            />
+          </View>
+        </ScrollView>
       </View>
     </>
   );
@@ -393,7 +407,51 @@ export const CatsView = ({
   const maxVisibleCat = 2;
   const [visibleCat, setVisible] = useState<number>(maxVisibleCat);
 
-  return (
+  return Platform.OS === 'web' ? (
+    <View
+      style={{
+        justifyContent: 'space-between',
+        marginVertical: 10,
+        flexDirection: 'row',
+      }}
+    >
+      <FlatList
+        data={cats}
+        renderItem={({ item, index }) => (
+          <View
+            style={{
+              maxWidth: Dimensions.get('window').width / 4,
+              flex: 0.5,
+              margin: 6,
+              marginBottom: 10,
+              flexDirection: 'column',
+            }}
+          >
+            {cats[index].isNew ? (
+              <AddCatCard
+                key={index}
+                cat={cats[index]}
+                addCat={addNewCat}
+                deleteCat={deleteFunction}
+              />
+            ) : (
+              <CatCard
+                key={cats[index].id}
+                cat={cats[index]}
+                index={index + 1}
+                isEditingMode={isEditMode}
+                deleteFunction={deleteFunction}
+              />
+            )}
+          </View>
+        )}
+        columnWrapperStyle={{ flexWrap: 'wrap', flex: 1, marginTop: 5 }}
+        //Setting the number of column
+        numColumns={3}
+        keyExtractor={(item, index) => index.toString()}
+      />
+    </View>
+  ) : (
     <View>
       {cats
         .slice(0, visibleCat)
