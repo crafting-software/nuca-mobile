@@ -25,7 +25,7 @@ import { Appbar } from '../components/Appbar';
 import { CatCard } from '../components/CatCard';
 import { HotspotContext } from '../context/HotspotDetailContext';
 import { Cat } from '../models/Cat';
-import { HotspotStatus } from '../models/Hotspot';
+import { HotspotDetails, HotspotStatus } from '../models/Hotspot';
 import { Region, RootStackParamList } from '../types';
 import { loadHotspotDetails } from '../utils/hotspots';
 
@@ -39,7 +39,6 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
     container: {
       backgroundColor: theme.colors.background,
       flex: 1,
-      // alignItems: Platform.OS === 'web' ? 'center' : 'flex-start',
     },
     separator: {
       borderColor: theme.colors.disabled,
@@ -271,34 +270,7 @@ export const HotspotDetailScreen = ({
               {!!hotspotDetails.notes && (
                 <Caption style={styles.notes}>{hotspotDetails.notes}</Caption>
               )}
-              <View style={styles.informationContainer}>
-                <StatusView status={hotspotDetails.status}></StatusView>
-                <InformationView
-                  title={'pisici \nnesterilizate'}
-                  count={`${
-                    hotspotDetails.unsterilizedCatsCount ||
-                    hotspotDetails.unsterilizedCats.length
-                  }`}
-                ></InformationView>
-                <InformationView
-                  title={'pisici sterilizate'}
-                  count={`${hotspotDetails.sterilizedCats.length}`}
-                ></InformationView>
-              </View>
-              <View style={styles.informationContainer}>
-                <InformationView
-                  title={'Contact'}
-                  subtitle={`${hotspotDetails.contactName || '-'}\n${
-                    hotspotDetails.contactPhone || '-'
-                  }`}
-                ></InformationView>
-                <InformationView
-                  title={'Voluntar'}
-                  subtitle={`${hotspotDetails.volunteer?.name || '-'}\n${
-                    hotspotDetails.volunteer?.phone || '-'
-                  }`}
-                ></InformationView>
-              </View>
+              <SummaryView hotspotDetails={hotspotDetails} />
               <View style={styles.catCategoryContainer}>
                 <IconButton
                   size={24}
@@ -360,7 +332,7 @@ const StatusView = ({ status }: { status: HotspotStatus }) => {
               : theme.colors.text,
         }}
       >
-        {status.replace(' ', '\n')}
+        {status.toUpperCase()}
       </Caption>
     </View>
   );
@@ -385,6 +357,75 @@ const InformationView = ({
         <Caption style={styles.informationSubtitle}>{subtitle}</Caption>
       )}
       {!!count && <Title style={styles.informationCount}>{count}</Title>}
+    </View>
+  );
+};
+
+const SummaryView = ({
+  hotspotDetails,
+}: {
+  hotspotDetails: HotspotDetails;
+}) => {
+  const theme = useTheme();
+  const styles = getStyles(theme);
+
+  return Platform.OS === 'web' ? (
+    <View style={styles.informationContainer}>
+      <StatusView status={hotspotDetails.status}></StatusView>
+      <InformationView
+        title={'pisici \nnesterilizate'}
+        count={`${
+          hotspotDetails.unsterilizedCatsCount ||
+          hotspotDetails.unsterilizedCats.length
+        }`}
+      ></InformationView>
+      <InformationView
+        title={'pisici sterilizate'}
+        count={`${hotspotDetails.sterilizedCats.length}`}
+      ></InformationView>
+      <InformationView
+        title={'Contact'}
+        subtitle={`${hotspotDetails.contactName || '-'}\n${
+          hotspotDetails.contactPhone || '-'
+        }`}
+      ></InformationView>
+      <InformationView
+        title={'Voluntar'}
+        subtitle={`${hotspotDetails.volunteer?.name || '-'}\n${
+          hotspotDetails.volunteer?.phone || '-'
+        }`}
+      ></InformationView>
+    </View>
+  ) : (
+    <View>
+      <View style={styles.informationContainer}>
+        <StatusView status={hotspotDetails.status}></StatusView>
+        <InformationView
+          title={'pisici \nnesterilizate'}
+          count={`${
+            hotspotDetails.unsterilizedCatsCount ||
+            hotspotDetails.unsterilizedCats.length
+          }`}
+        ></InformationView>
+        <InformationView
+          title={'pisici sterilizate'}
+          count={`${hotspotDetails.sterilizedCats.length}`}
+        ></InformationView>
+      </View>
+      <View style={styles.informationContainer}>
+        <InformationView
+          title={'Contact'}
+          subtitle={`${hotspotDetails.contactName || '-'}\n${
+            hotspotDetails.contactPhone || '-'
+          }`}
+        ></InformationView>
+        <InformationView
+          title={'Voluntar'}
+          subtitle={`${hotspotDetails.volunteer?.name || '-'}\n${
+            hotspotDetails.volunteer?.phone || '-'
+          }`}
+        ></InformationView>
+      </View>
     </View>
   );
 };

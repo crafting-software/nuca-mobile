@@ -17,6 +17,7 @@ import { DeleteModal } from './DeleteModal';
 const getStyles = (theme: ReactNativePaper.Theme) =>
   StyleSheet.create({
     mainContainer: {
+      minWidth: 250,
       width: '100%',
       backgroundColor: theme.colors.surface,
       borderRadius: 30,
