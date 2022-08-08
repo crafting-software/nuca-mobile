@@ -20,6 +20,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import catLady3 from '../assets/cat-lady3.png';
+import catLady3Web from '../assets/cat-lady3W.png';
 import { AddCatCard } from '../components/AddCatCard';
 import { Appbar } from '../components/Appbar';
 import { CatCard } from '../components/CatCard';
@@ -90,6 +91,7 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
     },
     image: {
       height: 375,
+      minHeight: 430,
       flex: 1,
       width: undefined,
     },
@@ -301,9 +303,9 @@ export const HotspotDetailScreen = ({
 
           <View style={styles.imageView}>
             <Image
-              source={catLady3}
+              source={Platform.OS === 'web' ? catLady3Web : catLady3}
               style={styles.image}
-              resizeMode="contain"
+              resizeMode={Platform.OS === 'web' ? 'cover' : 'contain'}
             />
           </View>
         </ScrollView>
