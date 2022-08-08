@@ -79,6 +79,7 @@ export const MapScreen = () => {
       <Appbar />
       <View style={styles.mapContainer}>
         <MapView
+          // @ts-ignore
           options={{
             disableDefaultUI: true,
           }}
