@@ -189,6 +189,18 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
       fontSize: 12,
       fontFamily: 'Nunito_700Bold',
     },
+    catsWebViewContainer: {
+      justifyContent: 'space-between',
+      marginVertical: 10,
+      flexDirection: 'row',
+    },
+    catsWebView: {
+      maxWidth: Dimensions.get('window').width / 4,
+      flex: 0.5,
+      margin: 6,
+      marginBottom: 10,
+      flexDirection: 'column',
+    },
   });
 
 export const HotspotDetailScreen = ({
@@ -373,7 +385,7 @@ const SummaryView = ({
 
   return Platform.OS === 'web' ? (
     <View style={styles.informationContainer}>
-      <StatusView status={hotspotDetails.status}></StatusView>
+      <StatusView status={hotspotDetails.status} />
       <InformationView
         title={'pisici \nnesterilizate'}
         count={`${
@@ -401,7 +413,7 @@ const SummaryView = ({
   ) : (
     <View>
       <View style={styles.informationContainer}>
-        <StatusView status={hotspotDetails.status}></StatusView>
+        <StatusView status={hotspotDetails.status} />
         <InformationView
           title={'pisici \nnesterilizate'}
           count={`${
@@ -451,25 +463,11 @@ export const CatsView = ({
   const [visibleCat, setVisible] = useState<number>(maxVisibleCat);
 
   return Platform.OS === 'web' ? (
-    <View
-      style={{
-        justifyContent: 'space-between',
-        marginVertical: 10,
-        flexDirection: 'row',
-      }}
-    >
+    <View style={styles.catsWebViewContainer}>
       <FlatList
         data={cats}
         renderItem={({ item, index }) => (
-          <View
-            style={{
-              maxWidth: Dimensions.get('window').width / 4,
-              flex: 0.5,
-              margin: 6,
-              marginBottom: 10,
-              flexDirection: 'column',
-            }}
-          >
+          <View style={styles.catsWebView}>
             {cats[index].isNew ? (
               <AddCatCard
                 key={index}
