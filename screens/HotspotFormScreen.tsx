@@ -2,6 +2,7 @@ import { capitalize } from 'lodash';
 import { useContext, useEffect, useState } from 'react';
 import {
   Image,
+  Platform,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
@@ -19,8 +20,10 @@ import {
 } from 'react-native-paper';
 import SelectDropdown from 'react-native-select-dropdown';
 import { useNavigation } from '@react-navigation/native';
-import catLadyImage from '../assets/cat-lady2.png';
+import catLady2 from '../assets/cat-lady2.png';
 import catLady4 from '../assets/cat-lady4.png';
+import catLady4Web from '../assets/cat-lady4W.png';
+import catLady5Web from '../assets/cat-lady5W.png';
 import currentLocationIcon from '../assets/current-location.png';
 import mapPinIcon from '../assets/map-pin.png';
 import { Appbar } from '../components/Appbar';
@@ -45,6 +48,7 @@ import { User } from '../models/User';
 import { Region, RootStackScreenProps } from '../types';
 import SnackbarManager from '../utils/SnackbarManager';
 import { addCat, deleteCatRequest } from '../utils/cats';
+import { isSmallScreen } from '../utils/helperFunc';
 import { addHotspot, deleteHotspot, updateHotspot } from '../utils/hotspots';
 import { loadUsers } from '../utils/users';
 import { CatsView } from './HotspotDetailScreen';
@@ -57,6 +61,7 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
     },
     form: {
       padding: 20,
+      width: Platform.OS === 'web' ? '80%' : '100%',
     },
     screenTitleContainer: {
       flexDirection: 'row',
@@ -218,7 +223,9 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
       marginTop: 32,
     },
     image: {
+      paddingTop: 12,
       height: 375,
+      minHeight: 430,
       flex: 1,
       width: undefined,
     },
@@ -425,204 +432,221 @@ export const HotspotFormScreen = ({
       <Appbar forDetailScreen />
       <View style={styles.container}>
         <ScrollView>
-          <View style={styles.form}>
-            {!isUpdate ? (
-              <AddLocation
-                routeLocation={route.params.location}
-                routeRegion={route.params.region}
-              />
-            ) : (
-              <Title style={styles.addressTitle}>
-                {`${hotspotDetails.address} ${hotspotDetails.city}, ${hotspotDetails.zip}, ${hotspotDetails.latitude}`}
-              </Title>
-            )}
-            <InputField
-              label="Detalii adresă"
-              placeholder="Nume"
-              inputFieldStyle={{ marginTop: 54 }}
-              value={hotspotDetails.description}
-              onTextInputChangeText={text =>
-                setHotspotDetails({ ...hotspotDetails, description: text })
-              }
-            />
-            <Caption style={styles.textInputTitle}>STATUS</Caption>
-            <SelectDropdown
-              defaultButtonText="Alege status"
-              data={hotspotStatusList}
-              buttonStyle={styles.dropdownButton}
-              buttonTextStyle={styles.dropdownText}
-              dropdownStyle={styles.statusDropdown}
-              rowTextStyle={styles.statusRowText}
-              dropdownIconPosition="right"
-              renderDropdownIcon={(_selectedItem, _index) => (
-                <TextInput.Icon
-                  name="chevron-down"
-                  color={theme.colors.text}
-                  style={{ marginRight: 40 }}
+          <View
+            style={{
+              alignItems: 'center',
+            }}
+          >
+            <View style={styles.form}>
+              {!isUpdate ? (
+                <AddLocation
+                  routeLocation={route.params.location}
+                  routeRegion={route.params.region}
                 />
+              ) : (
+                <Title style={styles.addressTitle}>
+                  {`${hotspotDetails.address} ${hotspotDetails.city}, ${hotspotDetails.zip}, ${hotspotDetails.latitude}`}
+                </Title>
               )}
-              onSelect={(selectedItem: HotspotStatus) =>
-                setHotspotDetails({ ...hotspotDetails, status: selectedItem })
-              }
-              buttonTextAfterSelection={(selectedItem: HotspotStatus) =>
-                capitalize(selectedItem as HotspotStatus)
-              }
-              rowTextForSelection={(item: HotspotStatus) =>
-                capitalize(item as HotspotStatus)
-              }
-              defaultValue={hotspotDetails.status}
-            />
-            <InputField
-              multiline={true}
-              label="Observații"
-              placeholder="Scrie aici"
-              inputFieldStyle={styles.inputField}
-              textInputStyle={{ height: 100 }}
-              value={hotspotDetails.notes}
-              onTextInputChangeText={text =>
-                setHotspotDetails({ ...hotspotDetails, notes: text })
-              }
-            />
-            <InputField
-              label="Pisici nesterilizate"
-              placeholder="0"
-              keyboardType="number-pad"
-              value={String(hotspotDetails.unsterilizedCatsCount || 0)}
-              onTextInputChangeText={text =>
-                setHotspotDetails({
-                  ...hotspotDetails,
-                  unsterilizedCatsCount: Number(text),
-                })
-              }
-            />
-            <InputField
-              label="Persoana de contact"
-              placeholder="Nume persoana de contact"
-              inputFieldStyle={styles.inputField}
-              value={hotspotDetails.contactName}
-              onTextInputChangeText={text =>
-                setHotspotDetails({ ...hotspotDetails, contactName: text })
-              }
-            />
-            <InputField
-              label="Telefon persoana de contact"
-              placeholder="numar de telefon"
-              keyboardType="phone-pad"
-              inputFieldStyle={styles.inputField}
-              value={hotspotDetails.contactPhone}
-              onTextInputChangeText={text =>
-                setHotspotDetails({ ...hotspotDetails, contactPhone: text })
-              }
-            />
-            <Caption style={styles.textInputTitle}>VOLUNTAR</Caption>
-            <SelectDropdown
-              defaultButtonText={
-                hotspotDetails.volunteer?.name || 'Alege voluntar'
-              }
-              data={users}
-              buttonStyle={styles.dropdownButton}
-              buttonTextStyle={styles.dropdownText}
-              dropdownStyle={styles.statusDropdown}
-              rowTextStyle={styles.statusRowText}
-              dropdownIconPosition="right"
-              renderDropdownIcon={() => (
-                <TextInput.Icon
-                  name="chevron-down"
-                  color={theme.colors.text}
-                  style={{ marginRight: 40 }}
-                />
-              )}
-              onSelect={(user: User) =>
-                setHotspotDetails({ ...hotspotDetails, volunteer: user })
-              }
-              rowTextForSelection={(user: User) => user.name}
-              buttonTextAfterSelection={(user: User) => user.name}
-            />
-            <View style={styles.separator} />
-            <View style={styles.catCategoriesContainer}>
-              <Avatar.Icon
-                size={24}
-                icon="close"
-                color={theme.colors.background}
-                style={styles.catCategoryTitleIcon}
+              <InputField
+                label="Detalii adresă"
+                placeholder="Nume"
+                inputFieldStyle={{ marginTop: 54 }}
+                value={hotspotDetails.description}
+                onTextInputChangeText={text =>
+                  setHotspotDetails({ ...hotspotDetails, description: text })
+                }
               />
+              <Caption style={styles.textInputTitle}>STATUS</Caption>
+              <SelectDropdown
+                defaultButtonText="Alege status"
+                data={hotspotStatusList}
+                buttonStyle={styles.dropdownButton}
+                buttonTextStyle={styles.dropdownText}
+                dropdownStyle={styles.statusDropdown}
+                rowTextStyle={styles.statusRowText}
+                dropdownIconPosition="right"
+                renderDropdownIcon={(_selectedItem, _index) => (
+                  <TextInput.Icon
+                    name="chevron-down"
+                    color={theme.colors.text}
+                    style={{ marginRight: 40 }}
+                  />
+                )}
+                onSelect={(selectedItem: HotspotStatus) =>
+                  setHotspotDetails({ ...hotspotDetails, status: selectedItem })
+                }
+                buttonTextAfterSelection={(selectedItem: HotspotStatus) =>
+                  capitalize(selectedItem as HotspotStatus)
+                }
+                rowTextForSelection={(item: HotspotStatus) =>
+                  capitalize(item as HotspotStatus)
+                }
+                defaultValue={hotspotDetails.status}
+              />
+              <InputField
+                multiline={true}
+                label="Observații"
+                placeholder="Scrie aici"
+                inputFieldStyle={styles.inputField}
+                textInputStyle={{ height: 100 }}
+                value={hotspotDetails.notes}
+                onTextInputChangeText={text =>
+                  setHotspotDetails({ ...hotspotDetails, notes: text })
+                }
+              />
+              <InputField
+                label="Pisici nesterilizate"
+                placeholder="0"
+                keyboardType="number-pad"
+                value={String(hotspotDetails.unsterilizedCatsCount || 0)}
+                onTextInputChangeText={text =>
+                  setHotspotDetails({
+                    ...hotspotDetails,
+                    unsterilizedCatsCount: Number(text),
+                  })
+                }
+              />
+              <InputField
+                label="Persoana de contact"
+                placeholder="Nume persoana de contact"
+                inputFieldStyle={styles.inputField}
+                value={hotspotDetails.contactName}
+                onTextInputChangeText={text =>
+                  setHotspotDetails({ ...hotspotDetails, contactName: text })
+                }
+              />
+              <InputField
+                label="Telefon persoana de contact"
+                placeholder="numar de telefon"
+                keyboardType="phone-pad"
+                inputFieldStyle={styles.inputField}
+                value={hotspotDetails.contactPhone}
+                onTextInputChangeText={text =>
+                  setHotspotDetails({ ...hotspotDetails, contactPhone: text })
+                }
+              />
+              <Caption style={styles.textInputTitle}>VOLUNTAR</Caption>
+              <SelectDropdown
+                defaultButtonText={
+                  hotspotDetails.volunteer?.name || 'Alege voluntar'
+                }
+                data={users}
+                buttonStyle={styles.dropdownButton}
+                buttonTextStyle={styles.dropdownText}
+                dropdownStyle={styles.statusDropdown}
+                rowTextStyle={styles.statusRowText}
+                dropdownIconPosition="right"
+                renderDropdownIcon={() => (
+                  <TextInput.Icon
+                    name="chevron-down"
+                    color={theme.colors.text}
+                    style={{ marginRight: 40 }}
+                  />
+                )}
+                onSelect={(user: User) =>
+                  setHotspotDetails({ ...hotspotDetails, volunteer: user })
+                }
+                rowTextForSelection={(user: User) => user.name}
+                buttonTextAfterSelection={(user: User) => user.name}
+              />
+              <View style={styles.separator} />
+              <View style={styles.catCategoriesContainer}>
+                <Avatar.Icon
+                  size={24}
+                  icon="close"
+                  color={theme.colors.background}
+                  style={styles.catCategoryTitleIcon}
+                />
 
-              <Caption style={styles.catCategoryTitleLabel}>
-                Pisici nesterilizate
-              </Caption>
-              <FAB
-                color={theme.colors.background}
-                icon="plus"
-                style={styles.catCategoryAddButton}
-                small
-                onPress={() => {
-                  setNewUnsterilizedCat([defaultUnSterilizedCat]);
-                }}
+                <Caption style={styles.catCategoryTitleLabel}>
+                  Pisici nesterilizate
+                </Caption>
+                <FAB
+                  color={theme.colors.background}
+                  icon="plus"
+                  style={styles.catCategoryAddButton}
+                  small
+                  onPress={() => {
+                    setNewUnsterilizedCat([defaultUnSterilizedCat]);
+                  }}
+                />
+              </View>
+              <CatsView
+                cats={newUnsterilizedCat.concat(
+                  hotspotDetails.unsterilizedCats
+                )}
+                isEditMode={true}
+                deleteFunction={deleteCat}
+                addNewCat={addNewCat}
               />
-            </View>
-            <CatsView
-              cats={newUnsterilizedCat.concat(hotspotDetails.unsterilizedCats)}
-              isEditMode={true}
-              deleteFunction={deleteCat}
-              addNewCat={addNewCat}
-            />
-            <View style={styles.separator} />
-            <View style={styles.catCategoriesContainer}>
-              <Avatar.Icon
-                size={24}
-                icon="check"
-                color={theme.colors.background}
-                style={styles.catCategoryTitleIcon}
+              <View style={styles.separator} />
+              <View style={styles.catCategoriesContainer}>
+                <Avatar.Icon
+                  size={24}
+                  icon="check"
+                  color={theme.colors.background}
+                  style={styles.catCategoryTitleIcon}
+                />
+                <Caption style={styles.catCategoryTitleLabel}>
+                  Pisici sterilizate
+                </Caption>
+                <FAB
+                  color={theme.colors.background}
+                  icon="plus"
+                  style={styles.catCategoryAddButton}
+                  small
+                  onPress={() => {
+                    setNewSterilizedCats([defaultSterilizedCat]);
+                  }}
+                />
+              </View>
+              <CatsView
+                cats={newSterilizedCats.concat(hotspotDetails.sterilizedCats)}
+                isEditMode={true}
+                deleteFunction={deleteCat}
+                addNewCat={addNewCat}
               />
-              <Caption style={styles.catCategoryTitleLabel}>
-                Pisici sterilizate
-              </Caption>
-              <FAB
-                color={theme.colors.background}
-                icon="plus"
-                style={styles.catCategoryAddButton}
-                small
-                onPress={() => {
-                  setNewSterilizedCats([defaultSterilizedCat]);
-                }}
-              />
-            </View>
-            <CatsView
-              cats={newSterilizedCats.concat(hotspotDetails.sterilizedCats)}
-              isEditMode={true}
-              deleteFunction={deleteCat}
-              addNewCat={addNewCat}
-            />
-            <View style={styles.separator} />
-            <Button
-              uppercase={false}
-              style={styles.saveButton}
-              contentStyle={styles.saveButtonContent}
-              labelStyle={styles.saveButtonLabel}
-              icon="check"
-              mode="contained"
-              onPress={save}
-            >
-              Salvează
-            </Button>
-            {isUpdate && (
+              <View style={styles.separator} />
               <Button
                 uppercase={false}
-                style={styles.deleteButton}
+                style={styles.saveButton}
                 contentStyle={styles.saveButtonContent}
-                labelStyle={styles.deleteButtonLabel}
-                icon="close"
+                labelStyle={styles.saveButtonLabel}
+                icon="check"
                 mode="contained"
-                onPress={deleteH}
+                onPress={save}
               >
-                Șterge adresa
+                Salvează
               </Button>
-            )}
+              {isUpdate && (
+                <Button
+                  uppercase={false}
+                  style={styles.deleteButton}
+                  contentStyle={styles.saveButtonContent}
+                  labelStyle={styles.deleteButtonLabel}
+                  icon="close"
+                  mode="contained"
+                  onPress={deleteH}
+                >
+                  Șterge adresa
+                </Button>
+              )}
+            </View>
           </View>
           <View style={styles.imageView}>
             <Image
-              source={isUpdate ? catLady4 : catLadyImage}
+              source={
+                isUpdate
+                  ? isSmallScreen()
+                    ? catLady4
+                    : catLady4Web
+                  : isSmallScreen()
+                  ? catLady2
+                  : catLady5Web
+              }
               style={styles.image}
+              resizeMode={isSmallScreen() ? 'contain' : 'cover'}
             />
           </View>
         </ScrollView>
