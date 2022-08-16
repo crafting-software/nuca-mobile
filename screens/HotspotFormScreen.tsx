@@ -2,7 +2,6 @@ import { capitalize } from 'lodash';
 import { useContext, useEffect, useState } from 'react';
 import {
   Image,
-  Platform,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
@@ -61,7 +60,7 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
     },
     form: {
       padding: 20,
-      width: Platform.OS === 'web' ? '80%' : '100%',
+      width: isSmallScreen() ? '100%' : '80%',
     },
     screenTitleContainer: {
       flexDirection: 'row',

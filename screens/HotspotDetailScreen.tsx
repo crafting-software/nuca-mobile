@@ -28,6 +28,7 @@ import { HotspotContext } from '../context/HotspotDetailContext';
 import { Cat } from '../models/Cat';
 import { HotspotDetails, HotspotStatus } from '../models/Hotspot';
 import { Region, RootStackParamList } from '../types';
+import { isSmallScreen } from '../utils/helperFunc';
 import { loadHotspotDetails } from '../utils/hotspots';
 
 const getStyles = (theme: ReactNativePaper.Theme) =>
@@ -170,7 +171,7 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
     },
     contentCotainer: {
       padding: 20,
-      width: Platform.OS === 'web' ? '85%' : '100%',
+      width: isSmallScreen() ? '100%' : '85%',
     },
     moreButton: {
       height: 40,
@@ -315,9 +316,9 @@ export const HotspotDetailScreen = ({
 
           <View style={styles.imageView}>
             <Image
-              source={Platform.OS === 'web' ? catLady3Web : catLady3}
+              source={isSmallScreen() ? catLady3 : catLady3Web}
               style={styles.image}
-              resizeMode={Platform.OS === 'web' ? 'cover' : 'contain'}
+              resizeMode={isSmallScreen() ? 'contain' : 'cover'}
             />
           </View>
         </ScrollView>
@@ -383,7 +384,7 @@ const SummaryView = ({
   const theme = useTheme();
   const styles = getStyles(theme);
 
-  return Platform.OS === 'web' ? (
+  return !isSmallScreen() ? (
     <View style={styles.informationContainer}>
       <StatusView status={hotspotDetails.status} />
       <InformationView
