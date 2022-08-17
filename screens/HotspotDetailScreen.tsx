@@ -4,7 +4,6 @@ import {
   ActivityIndicator,
   Dimensions,
   FlatList,
-  Platform,
   ScrollView,
   StyleSheet,
   View,
@@ -454,37 +453,7 @@ export const CatsView = ({
   const maxVisibleCat = 2;
   const [visibleCat, setVisible] = useState<number>(maxVisibleCat);
 
-  return Platform.OS === 'web' ? (
-    <View style={styles.catsWebViewContainer}>
-      <FlatList
-        data={cats}
-        renderItem={({ item, index }) => (
-          <View style={styles.catsWebView}>
-            {cats[index].isNew ? (
-              <AddCatCard
-                key={index}
-                cat={cats[index]}
-                addCat={addNewCat}
-                deleteCat={deleteFunction}
-              />
-            ) : (
-              <CatCard
-                key={cats[index].id}
-                cat={cats[index]}
-                index={index + 1}
-                isEditingMode={isEditMode}
-                deleteFunction={deleteFunction}
-              />
-            )}
-          </View>
-        )}
-        columnWrapperStyle={{ flexWrap: 'wrap', flex: 1, marginTop: 5 }}
-        //Setting the number of column
-        numColumns={3}
-        keyExtractor={(item, index) => index.toString()}
-      />
-    </View>
-  ) : (
+  return isSmallScreen() ? (
     <View>
       {cats
         .slice(0, visibleCat)
@@ -520,6 +489,36 @@ export const CatsView = ({
           </Button>
         </View>
       )}
+    </View>
+  ) : (
+    <View style={styles.catsWebViewContainer}>
+      <FlatList
+        data={cats}
+        renderItem={({ item, index }) => (
+          <View style={styles.catsWebView}>
+            {cats[index].isNew ? (
+              <AddCatCard
+                key={index}
+                cat={cats[index]}
+                addCat={addNewCat}
+                deleteCat={deleteFunction}
+              />
+            ) : (
+              <CatCard
+                key={cats[index].id}
+                cat={cats[index]}
+                index={index + 1}
+                isEditingMode={isEditMode}
+                deleteFunction={deleteFunction}
+              />
+            )}
+          </View>
+        )}
+        columnWrapperStyle={{ flexWrap: 'wrap', flex: 1, marginTop: 5 }}
+        //Setting the number of column
+        numColumns={3}
+        keyExtractor={(item, index) => index.toString()}
+      />
     </View>
   );
 };
