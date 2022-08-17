@@ -1,6 +1,12 @@
 import * as LocationProvider from 'expo-location';
 import { useContext, useEffect, useRef, useState } from 'react';
-import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
+import {
+  Image,
+  Platform,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import MapView from 'react-native-maps';
 import { Caption, FAB, TextInput, Title, useTheme } from 'react-native-paper';
 import { Theme } from 'react-native-paper/lib/typescript/types';
@@ -73,16 +79,32 @@ export const MapScreen = () => {
       <Appbar />
       <View style={styles.mapContainer}>
         <MapView
+          // @ts-ignore
+          options={{
+            disableDefaultUI: true,
+          }}
           ref={mapRef}
           // use intial region + animateToRegion instead of region as react state because
           // gestures don't work well https://github.com/react-native-maps/react-native-maps/issues/3639
           initialRegion={region}
-          onRegionChange={setRegion}
+          onRegionChange={() => {
+            setRegion;
+          }}
           showsUserLocation
           style={styles.map}
         >
           {hotspots.map((h: Hotspot) => (
             <Marker
+              icon={
+                Platform.OS === 'web'
+                  ? {
+                      url: getHotspotMarker(h),
+                      scaledSize: new google.maps.Size(40, 40),
+                      origin: new google.maps.Point(0, 0),
+                      anchor: new google.maps.Point(0, 0),
+                    }
+                  : {}
+              }
               key={`${h.latitude} ${h.longitude}`}
               coordinate={{
                 latitude: h.latitude,
@@ -100,21 +122,22 @@ export const MapScreen = () => {
             </Marker>
           ))}
         </MapView>
-        <TextInput
-          outlineColor={theme.colors.disabled}
-          mode="outlined"
-          style={styles.searchInput}
-          autoCorrect={false}
-          placeholder="Caută"
-          autoComplete={false}
-          right={
-            <TextInput.Icon name="magnify" color={theme.colors.placeholder} />
-          }
-          returnKeyType="search"
-          onSubmitEditing={async ({ nativeEvent: { text } }) =>
-            searchForAddress(text)
-          }
-        />
+        <View style={styles.searchInput}>
+          <TextInput
+            outlineColor={theme.colors.disabled}
+            mode="outlined"
+            autoCorrect={false}
+            placeholder="Caută"
+            autoComplete={false}
+            right={
+              <TextInput.Icon name="magnify" color={theme.colors.placeholder} />
+            }
+            returnKeyType="search"
+            onSubmitEditing={async ({ nativeEvent: { text } }) =>
+              searchForAddress(text)
+            }
+          />
+        </View>
       </View>
       <TouchableOpacity
         style={styles.addLocationButton}
@@ -215,11 +238,11 @@ const getStyles = (theme: Theme, insets: EdgeInsets) =>
       left: 20,
       right: 20,
       elevation: 6,
-      paddingHorizontal: 8,
-
       shadowColor: theme.colors.text,
-      shadowOffset: { width: 2, height: 4 },
-      shadowOpacity: 0.2,
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.22,
+      shadowRadius: 0.22,
+      borderRadius: 30,
     },
     marker: {
       width: 40,

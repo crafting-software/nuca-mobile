@@ -2,7 +2,8 @@ import { trim } from 'lodash';
 import { useContext, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
-  Image,
+  Dimensions,
+  FlatList,
   ScrollView,
   StyleSheet,
   View,
@@ -16,14 +17,15 @@ import {
 } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import catLady3 from '../assets/cat-lady3.png';
 import { AddCatCard } from '../components/AddCatCard';
 import { Appbar } from '../components/Appbar';
 import { CatCard } from '../components/CatCard';
+import { FooterScreens, FooterView } from '../components/Footer';
 import { HotspotContext } from '../context/HotspotDetailContext';
 import { Cat } from '../models/Cat';
-import { HotspotStatus } from '../models/Hotspot';
+import { HotspotDetails, HotspotStatus } from '../models/Hotspot';
 import { Region, RootStackParamList } from '../types';
+import { isSmallScreen } from '../utils/helperFunc';
 import { loadHotspotDetails } from '../utils/hotspots';
 
 const getStyles = (theme: ReactNativePaper.Theme) =>
@@ -63,6 +65,7 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
     editButton: {
       flexGrow: 1,
       flexShrink: 0,
+      maxWidth: 150,
     },
     buttonContent: {
       flexDirection: 'row-reverse',
@@ -86,6 +89,7 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
     },
     image: {
       height: 375,
+      minHeight: 430,
       flex: 1,
       width: undefined,
     },
@@ -160,8 +164,12 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
       flexDirection: 'row',
       alignItems: 'flex-start',
       paddingTop: 18,
+      justifyContent: 'space-between',
     },
-    contentCotainer: { padding: 20 },
+    contentCotainer: {
+      padding: 20,
+      width: isSmallScreen() ? '100%' : '85%',
+    },
     moreButton: {
       height: 40,
       marginTop: 24,
@@ -178,6 +186,18 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
       color: theme.colors.background,
       fontSize: 12,
       fontFamily: 'Nunito_700Bold',
+    },
+    catsWebViewContainer: {
+      justifyContent: 'space-between',
+      marginVertical: 10,
+      flexDirection: 'row',
+    },
+    catsWebView: {
+      maxWidth: Dimensions.get('window').width / 4,
+      flex: 0.5,
+      margin: 6,
+      marginBottom: 10,
+      flexDirection: 'column',
     },
   });
 
@@ -230,94 +250,67 @@ export const HotspotDetailScreen = ({
       <Appbar forDetailScreen />
       <View style={styles.container}>
         <ScrollView style={styles.scrollView}>
-          <View style={styles.contentCotainer}>
-            <View style={styles.addressContainer}>
-              <Title style={styles.addressTitle}>{address}</Title>
-              <Button
-                style={styles.editButton}
-                contentStyle={styles.buttonContent}
-                labelStyle={styles.buttonLabel}
-                icon="pencil-outline"
-                mode="contained"
-                onPress={() => {
-                  navigation.navigate('AddHotspot', {
-                    region: region!,
-                    isUpdate: true,
-                  });
-                }}
-                compact
-              >
-                Editează
-              </Button>
+          <View
+            style={{
+              alignItems: 'center',
+            }}
+          >
+            <View style={styles.contentCotainer}>
+              <View style={styles.addressContainer}>
+                <Title style={styles.addressTitle}>{address}</Title>
+                <Button
+                  style={styles.editButton}
+                  contentStyle={styles.buttonContent}
+                  labelStyle={styles.buttonLabel}
+                  icon="pencil-outline"
+                  mode="contained"
+                  onPress={() => {
+                    navigation.navigate('AddHotspot', {
+                      region: region!,
+                      isUpdate: true,
+                    });
+                  }}
+                  compact
+                >
+                  Editează
+                </Button>
+              </View>
+              <Caption style={styles.subTitle}>
+                {hotspotDetails.description}
+              </Caption>
+              <View style={styles.separator} />
+              {!!hotspotDetails.notes && (
+                <Caption style={styles.notes}>{hotspotDetails.notes}</Caption>
+              )}
+              <SummaryView hotspotDetails={hotspotDetails} />
+              <View style={styles.catCategoryContainer}>
+                <IconButton
+                  size={24}
+                  icon="close-circle"
+                  color={theme.colors.text}
+                  style={styles.catCategoryIcon}
+                />
+                <Title style={styles.catCategoryTitleLabel}>
+                  Pisici nesterilizate
+                </Title>
+              </View>
+              <CatsView cats={hotspotDetails.unsterilizedCats} />
+              <View style={styles.separator} />
+              <View style={styles.catCategoryContainer}>
+                <IconButton
+                  size={24}
+                  icon="check-circle"
+                  color={theme.colors.text}
+                  style={styles.catCategoryIcon}
+                />
+                <Title style={styles.catCategoryTitleLabel}>
+                  Pisici sterilizate
+                </Title>
+              </View>
+              <CatsView cats={hotspotDetails.sterilizedCats} />
             </View>
-            <Caption style={styles.subTitle}>
-              {hotspotDetails.description}
-            </Caption>
-            <View style={styles.separator} />
-            {!!hotspotDetails.notes && (
-              <Caption style={styles.notes}>{hotspotDetails.notes}</Caption>
-            )}
-            <View style={styles.informationContainer}>
-              <StatusView status={hotspotDetails.status}></StatusView>
-              <InformationView
-                title={'pisici \nnesterilizate'}
-                count={`${
-                  hotspotDetails.unsterilizedCatsCount ||
-                  hotspotDetails.unsterilizedCats.length
-                }`}
-              ></InformationView>
-              <InformationView
-                title={'pisici sterilizate'}
-                count={`${hotspotDetails.sterilizedCats.length}`}
-              ></InformationView>
-            </View>
-            <View style={styles.informationContainer}>
-              <InformationView
-                title={'Contact'}
-                subtitle={`${hotspotDetails.contactName || '-'}\n${
-                  hotspotDetails.contactPhone || '-'
-                }`}
-              ></InformationView>
-              <InformationView
-                title={'Voluntar'}
-                subtitle={`${hotspotDetails.volunteer?.name || '-'}\n${
-                  hotspotDetails.volunteer?.phone || '-'
-                }`}
-              ></InformationView>
-            </View>
-            <View style={styles.catCategoryContainer}>
-              <IconButton
-                size={24}
-                icon="close-circle"
-                color={theme.colors.text}
-                style={styles.catCategoryIcon}
-              />
-              <Title style={styles.catCategoryTitleLabel}>
-                Pisici nesterilizate
-              </Title>
-            </View>
-            <CatsView cats={hotspotDetails.unsterilizedCats} />
-            <View style={styles.separator} />
-            <View style={styles.catCategoryContainer}>
-              <IconButton
-                size={24}
-                icon="check-circle"
-                color={theme.colors.text}
-                style={styles.catCategoryIcon}
-              />
-              <Title style={styles.catCategoryTitleLabel}>
-                Pisici sterilizate
-              </Title>
-            </View>
-            <CatsView cats={hotspotDetails.sterilizedCats} />
           </View>
-          <View style={styles.imageView}>
-            <Image
-              source={catLady3}
-              style={styles.image}
-              resizeMode="contain"
-            />
-          </View>
+          <FooterView screen={FooterScreens.HotspotDetailScreen} />
         </ScrollView>
       </View>
     </>
@@ -344,7 +337,7 @@ const StatusView = ({ status }: { status: HotspotStatus }) => {
               : theme.colors.text,
         }}
       >
-        {status.replace(' ', '\n')}
+        {status.toUpperCase()}
       </Caption>
     </View>
   );
@@ -373,6 +366,75 @@ const InformationView = ({
   );
 };
 
+const SummaryView = ({
+  hotspotDetails,
+}: {
+  hotspotDetails: HotspotDetails;
+}) => {
+  const theme = useTheme();
+  const styles = getStyles(theme);
+
+  return !isSmallScreen() ? (
+    <View style={styles.informationContainer}>
+      <StatusView status={hotspotDetails.status} />
+      <InformationView
+        title={'pisici \nnesterilizate'}
+        count={`${
+          hotspotDetails.unsterilizedCatsCount ||
+          hotspotDetails.unsterilizedCats.length
+        }`}
+      ></InformationView>
+      <InformationView
+        title={'pisici sterilizate'}
+        count={`${hotspotDetails.sterilizedCats.length}`}
+      ></InformationView>
+      <InformationView
+        title={'Contact'}
+        subtitle={`${hotspotDetails.contactName || '-'}\n${
+          hotspotDetails.contactPhone || '-'
+        }`}
+      ></InformationView>
+      <InformationView
+        title={'Voluntar'}
+        subtitle={`${hotspotDetails.volunteer?.name || '-'}\n${
+          hotspotDetails.volunteer?.phone || '-'
+        }`}
+      ></InformationView>
+    </View>
+  ) : (
+    <View>
+      <View style={styles.informationContainer}>
+        <StatusView status={hotspotDetails.status} />
+        <InformationView
+          title={'pisici \nnesterilizate'}
+          count={`${
+            hotspotDetails.unsterilizedCatsCount ||
+            hotspotDetails.unsterilizedCats.length
+          }`}
+        ></InformationView>
+        <InformationView
+          title={'pisici sterilizate'}
+          count={`${hotspotDetails.sterilizedCats.length}`}
+        ></InformationView>
+      </View>
+      <View style={styles.informationContainer}>
+        <InformationView
+          title={'Contact'}
+          subtitle={`${hotspotDetails.contactName || '-'}\n${
+            hotspotDetails.contactPhone || '-'
+          }`}
+        ></InformationView>
+        <InformationView
+          title={'Voluntar'}
+          subtitle={`${hotspotDetails.volunteer?.name || '-'}\n${
+            hotspotDetails.volunteer?.phone || '-'
+          }`}
+        ></InformationView>
+      </View>
+    </View>
+  );
+};
+
 export type CatsViewTypes = 'create' | 'detail';
 
 export const CatsView = ({
@@ -391,7 +453,7 @@ export const CatsView = ({
   const maxVisibleCat = 2;
   const [visibleCat, setVisible] = useState<number>(maxVisibleCat);
 
-  return (
+  return isSmallScreen() ? (
     <View>
       {cats
         .slice(0, visibleCat)
@@ -427,6 +489,36 @@ export const CatsView = ({
           </Button>
         </View>
       )}
+    </View>
+  ) : (
+    <View style={styles.catsWebViewContainer}>
+      <FlatList
+        data={cats}
+        renderItem={({ item, index }) => (
+          <View style={styles.catsWebView}>
+            {cats[index].isNew ? (
+              <AddCatCard
+                key={index}
+                cat={cats[index]}
+                addCat={addNewCat}
+                deleteCat={deleteFunction}
+              />
+            ) : (
+              <CatCard
+                key={cats[index].id}
+                cat={cats[index]}
+                index={index + 1}
+                isEditingMode={isEditMode}
+                deleteFunction={deleteFunction}
+              />
+            )}
+          </View>
+        )}
+        columnWrapperStyle={{ flexWrap: 'wrap', flex: 1, marginTop: 5 }}
+        //Setting the number of column
+        numColumns={3}
+        keyExtractor={(item, index) => index.toString()}
+      />
     </View>
   );
 };
