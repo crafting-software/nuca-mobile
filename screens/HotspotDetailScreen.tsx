@@ -4,7 +4,6 @@ import {
   ActivityIndicator,
   Dimensions,
   FlatList,
-  Image,
   Platform,
   ScrollView,
   StyleSheet,
@@ -19,11 +18,10 @@ import {
 } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import catLady3 from '../assets/cat-lady3.png';
-import catLady3Web from '../assets/cat-lady3W.png';
 import { AddCatCard } from '../components/AddCatCard';
 import { Appbar } from '../components/Appbar';
 import { CatCard } from '../components/CatCard';
+import { FooterScreens, FooterView } from '../components/Footer';
 import { HotspotContext } from '../context/HotspotDetailContext';
 import { Cat } from '../models/Cat';
 import { HotspotDetails, HotspotStatus } from '../models/Hotspot';
@@ -313,14 +311,7 @@ export const HotspotDetailScreen = ({
               <CatsView cats={hotspotDetails.sterilizedCats} />
             </View>
           </View>
-
-          <View style={styles.imageView}>
-            <Image
-              source={isSmallScreen() ? catLady3 : catLady3Web}
-              style={styles.image}
-              resizeMode={isSmallScreen() ? 'contain' : 'cover'}
-            />
-          </View>
+          <FooterView screen={FooterScreens.HotspotDetailScreen} />
         </ScrollView>
       </View>
     </>

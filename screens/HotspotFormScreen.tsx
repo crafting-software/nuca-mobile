@@ -19,13 +19,10 @@ import {
 } from 'react-native-paper';
 import SelectDropdown from 'react-native-select-dropdown';
 import { useNavigation } from '@react-navigation/native';
-import catLady2 from '../assets/cat-lady2.png';
-import catLady4 from '../assets/cat-lady4.png';
-import catLady4Web from '../assets/cat-lady4W.png';
-import catLady5Web from '../assets/cat-lady5W.png';
 import currentLocationIcon from '../assets/current-location.png';
 import mapPinIcon from '../assets/map-pin.png';
 import { Appbar } from '../components/Appbar';
+import { FooterScreens, FooterView } from '../components/Footer';
 import { FullScreenActivityIndicator } from '../components/FullScreenActivityIndicator';
 import { InputField } from '../components/InputField';
 import { findCurrentLocation, MapContext } from '../context';
@@ -633,21 +630,10 @@ export const HotspotFormScreen = ({
               )}
             </View>
           </View>
-          <View style={styles.imageView}>
-            <Image
-              source={
-                isUpdate
-                  ? isSmallScreen()
-                    ? catLady4
-                    : catLady4Web
-                  : isSmallScreen()
-                  ? catLady2
-                  : catLady5Web
-              }
-              style={styles.image}
-              resizeMode={isSmallScreen() ? 'contain' : 'cover'}
-            />
-          </View>
+          <FooterView
+            screen={FooterScreens.HotspotFormScreen}
+            isUpdate={isUpdate}
+          />
         </ScrollView>
       </View>
       {isInProgress && <FullScreenActivityIndicator />}
