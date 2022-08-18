@@ -7,6 +7,7 @@ import {
   Platform,
   StyleSheet,
   TextInput as NativeTextInput,
+  View,
 } from 'react-native';
 import {
   Button,
@@ -19,6 +20,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import catLady from '../assets/cat-lady.png';
 import { AuthContext } from '../context';
 import SnackbarManager from '../utils/SnackbarManager';
+import { isSmallScreen } from '../utils/helperFunc';
 import { signIn2 } from '../utils/sign-in';
 
 const getStyles = (theme: ReactNativePaper.Theme) =>
@@ -27,13 +29,25 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
       margin: 20,
       flex: 1,
       justifyContent: 'center',
+      width: isSmallScreen() ? '95%' : '60%',
+      alignContent: 'center',
+      alignItems: 'center',
     },
     image: {
       margin: 40,
       maxWidth: '90%',
       maxHeight: '30%',
     },
+    imageWeb: {
+      margin: 40,
+      minWidth: 200,
+      flex: 1,
+      width: '90%',
+      height: '30%',
+      maxHeight: 350,
+    },
     button: {
+      maxWidth: 336,
       marginTop: 24,
       width: '100%',
     },
@@ -59,6 +73,17 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
       paddingHorizontal: 8,
       borderRadius: theme.roundness,
       marginBottom: 15,
+      width: isSmallScreen() ? '100%' : '48%',
+    },
+    inputContainer: {
+      flexDirection: isSmallScreen() ? 'column' : 'row',
+      width: '100%',
+      justifyContent: 'space-between',
+    },
+    mainContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
     },
   });
 
@@ -143,65 +168,75 @@ export const AuthenticationScreen = () => {
   const passRef = useRef<NativeTextInput>(null);
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
-      <Image style={styles.image} source={catLady} resizeMode="contain" />
-      <Title style={styles.title}>Intră în cont</Title>
-      <TextInput
-        disabled={inProgress}
-        autoCapitalize="none"
-        outlineColor={theme.colors.disabled}
-        mode="outlined"
-        style={styles.input}
-        placeholder="Utilizator"
-        value={username}
-        onChangeText={setUsername}
-        autoComplete={false}
-        left={<TextInput.Icon name="account" color={theme.colors.primary} />}
-        returnKeyType="next"
-        error={isInvalidUserName}
-        onChange={() => setIsInvalidUserName(false)}
-        onSubmitEditing={() => passRef.current?.focus()}
-      />
-      <TextInput
-        ref={passRef}
-        disabled={inProgress}
-        autoCapitalize="none"
-        outlineColor={theme.colors.disabled}
-        mode="outlined"
-        secureTextEntry
-        style={styles.input}
-        placeholder="Parola"
-        value={password}
-        onChangeText={setPassword}
-        autoComplete={false}
-        left={<TextInput.Icon name="lock" color={theme.colors.primary} />}
-        returnKeyType="go"
-        onSubmitEditing={signIn}
-        error={isInvalidPassword}
-        onChange={() => setIsInvalidUserName(false)}
-      />
-      <Button
-        disabled={inProgress}
-        loading={inProgress}
-        uppercase={false}
-        style={styles.button}
-        contentStyle={styles.buttonContent}
-        labelStyle={styles.buttonLabel}
-        icon="arrow-right"
-        mode="contained"
-        onPress={signIn}
+    <View style={styles.mainContainer}>
+      <KeyboardAvoidingView
+        style={styles.container}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
-        Intră în cont
-      </Button>
-      <Snackbar
-        visible={loginFailedVisible}
-        onDismiss={() => setLoginFailedVisible(false)}
-      >
-        Autentificare nereușită!
-      </Snackbar>
-    </KeyboardAvoidingView>
+        <Image
+          style={isSmallScreen() ? styles.image : styles.imageWeb}
+          source={catLady}
+          resizeMode="contain"
+        />
+        <Title style={styles.title}>Intră în cont</Title>
+        <View style={styles.inputContainer}>
+          <TextInput
+            disabled={inProgress}
+            autoCapitalize="none"
+            outlineColor={theme.colors.disabled}
+            mode="outlined"
+            style={styles.input}
+            placeholder="Utilizator"
+            value={username}
+            onChangeText={setUsername}
+            autoComplete={false}
+            left={
+              <TextInput.Icon name="account" color={theme.colors.primary} />
+            }
+            returnKeyType="next"
+            error={isInvalidUserName}
+            onChange={() => setIsInvalidUserName(false)}
+            onSubmitEditing={() => passRef.current?.focus()}
+          />
+          <TextInput
+            ref={passRef}
+            disabled={inProgress}
+            autoCapitalize="none"
+            outlineColor={theme.colors.disabled}
+            mode="outlined"
+            secureTextEntry
+            style={styles.input}
+            placeholder="Parola"
+            value={password}
+            onChangeText={setPassword}
+            autoComplete={false}
+            left={<TextInput.Icon name="lock" color={theme.colors.primary} />}
+            returnKeyType="go"
+            onSubmitEditing={signIn}
+            error={isInvalidPassword}
+            onChange={() => setIsInvalidUserName(false)}
+          />
+        </View>
+        <Button
+          disabled={inProgress}
+          loading={inProgress}
+          uppercase={false}
+          style={styles.button}
+          contentStyle={styles.buttonContent}
+          labelStyle={styles.buttonLabel}
+          icon="arrow-right"
+          mode="contained"
+          onPress={signIn}
+        >
+          Intră în cont
+        </Button>
+        <Snackbar
+          visible={loginFailedVisible}
+          onDismiss={() => setLoginFailedVisible(false)}
+        >
+          Autentificare nereușită!
+        </Snackbar>
+      </KeyboardAvoidingView>
+    </View>
   );
 };
