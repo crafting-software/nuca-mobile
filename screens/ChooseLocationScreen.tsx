@@ -2,6 +2,7 @@ import * as LocationProvider from 'expo-location';
 import { useContext, useEffect, useRef, useState } from 'react';
 import {
   Image,
+  Platform,
   StyleSheet,
   TextInput as BaseTextInput,
   TouchableOpacity,
@@ -77,14 +78,38 @@ export const ChooseLocationScreen = ({
       <Appbar forDetailScreen />
       <View style={styles.mapContainer}>
         <MapView
+          // @ts-ignore
+          options={{
+            disableDefaultUI: true,
+          }}
           ref={mapRef}
           // use intial region + animateToRegion instead of region as react state because
           // gestures don't work well https://github.com/react-native-maps/react-native-maps/issues/3639
           initialRegion={region}
-          onRegionChange={setRegion}
+          onRegionChange={() => {
+            setRegion;
+          }}
           showsUserLocation
           style={styles.map}
+          onRegionChangeComplete={async region => {
+            console.log('Bent1 ', region);
+            const { latitude, longitude } = region;
+            const isSameMarker =
+              selectedLocation?.longitude === longitude &&
+              selectedLocation?.latitude === latitude;
+
+            if (!isSameMarker) {
+              const location = await findPlace(latitude, longitude);
+              setSelectedLocation(location);
+            }
+          }}
           onPress={async e => {
+            console.log(
+              'Bent ',
+              e.currentTarget,
+              e.defaultPrevented,
+              e.eventPhase
+            );
             const { latitude, longitude } = e.nativeEvent.coordinate;
             const isSameMarker =
               selectedLocation?.longitude === longitude &&
@@ -98,6 +123,16 @@ export const ChooseLocationScreen = ({
         >
           {hotspots.map(h => (
             <Marker
+              icon={
+                Platform.OS === 'web'
+                  ? {
+                      url: getHotspotMarker(h),
+                      scaledSize: new google.maps.Size(40, 40),
+                      origin: new google.maps.Point(0, 0),
+                      anchor: new google.maps.Point(0, 0),
+                    }
+                  : {}
+              }
               key={`${h.latitude} ${h.longitude}`}
               coordinate={{
                 latitude: h.latitude,

@@ -157,13 +157,17 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
     },
     saveButton: {
       height: 64,
-      marginTop: 54,
+      maxWidth: 340,
+      minWidth: isSmallScreen() ? 64 : 340,
     },
     deleteButton: {
       height: 64,
       backgroundColor: theme.colors.surface,
       color: 'black',
-      marginTop: 10,
+      minWidth: isSmallScreen() ? 64 : 340,
+      maxWidth: 340,
+      marginRight: isSmallScreen() ? 0 : 12,
+      marginBottom: 10,
     },
     saveButtonContent: {
       height: 64,
@@ -604,30 +608,38 @@ export const HotspotFormScreen = ({
                 addNewCat={addNewCat}
               />
               <View style={styles.separator} />
-              <Button
-                uppercase={false}
-                style={styles.saveButton}
-                contentStyle={styles.saveButtonContent}
-                labelStyle={styles.saveButtonLabel}
-                icon="check"
-                mode="contained"
-                onPress={save}
+              <View
+                style={{
+                  justifyContent: 'flex-end',
+                  flexDirection: isSmallScreen() ? 'column' : 'row',
+                  marginTop: 54,
+                }}
               >
-                Salvează
-              </Button>
-              {isUpdate && (
+                {isUpdate && (
+                  <Button
+                    uppercase={false}
+                    style={styles.deleteButton}
+                    contentStyle={styles.saveButtonContent}
+                    labelStyle={styles.deleteButtonLabel}
+                    icon="close"
+                    mode="contained"
+                    onPress={deleteH}
+                  >
+                    Șterge adresa
+                  </Button>
+                )}
                 <Button
                   uppercase={false}
-                  style={styles.deleteButton}
+                  style={styles.saveButton}
                   contentStyle={styles.saveButtonContent}
-                  labelStyle={styles.deleteButtonLabel}
-                  icon="close"
+                  labelStyle={styles.saveButtonLabel}
+                  icon="check"
                   mode="contained"
-                  onPress={deleteH}
+                  onPress={save}
                 >
-                  Șterge adresa
+                  Salvează
                 </Button>
-              )}
+              </View>
             </View>
           </View>
           <FooterView
