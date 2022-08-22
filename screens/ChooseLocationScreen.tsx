@@ -91,6 +91,7 @@ export const ChooseLocationScreen = ({
           }}
           showsUserLocation
           style={styles.map}
+          //am incercat si cu asta, asta merge, dar nu face ceea ce vrem noi
           onRegionChangeComplete={async region => {
             console.log('Bent1 ', region);
             const { latitude, longitude } = region;
@@ -103,13 +104,9 @@ export const ChooseLocationScreen = ({
               setSelectedLocation(location);
             }
           }}
+          //e.nativeEvent.coordinate is undefined on web
           onPress={async e => {
-            console.log(
-              'Bent ',
-              e.currentTarget,
-              e.defaultPrevented,
-              e.eventPhase
-            );
+            console.log('Bent ', e);
             const { latitude, longitude } = e.nativeEvent.coordinate;
             const isSameMarker =
               selectedLocation?.longitude === longitude &&

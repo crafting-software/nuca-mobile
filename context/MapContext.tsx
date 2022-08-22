@@ -28,6 +28,7 @@ export const findPlace = async (
   lat: number,
   long: number
 ): Promise<Location> => {
+  LocationProvider.setGoogleApiKey('AIzaSyDgAde1GooxomdvTUlNtsfH16NWlkdKMpg');
   const place = await LocationProvider.reverseGeocodeAsync({
     latitude: lat,
     longitude: long,
