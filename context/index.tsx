@@ -3,21 +3,14 @@ import {
   defaultHotspotDetails,
   Hotspot,
   HotspotDetails,
-  HotspotStatus,
 } from '../models/Hotspot';
 import { Auth, AuthContext } from './AuthContext';
 import { HotspotContext } from './HotspotDetailContext';
-import { findCurrentLocation, MapContext } from './MapContext';
+import { MapContext } from './MapContext';
 
-export {
-  AuthContext,
-  Auth,
-  MapContext,
-  Hotspot,
-  HotspotStatus,
-  HotspotDetails,
-  findCurrentLocation,
-};
+export * from './AuthContext';
+export * from './MapContext';
+export * from '../models/Hotspot';
 
 export const AuthContextProvider = ({ children }: { children: ReactNode }) => {
   const [auth, setAuth] = useState<Auth>({ inProgress: false });

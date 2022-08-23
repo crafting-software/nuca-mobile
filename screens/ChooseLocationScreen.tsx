@@ -104,10 +104,17 @@ export const ChooseLocationScreen = ({
               setSelectedLocation(location);
             }
           }}
-          //e.nativeEvent.coordinate is undefined on web
           onPress={async e => {
-            console.log('Bent ', e);
-            const { latitude, longitude } = e.nativeEvent.coordinate;
+            const getCoords = () => {
+              if (Platform.OS === 'web') {
+                const coords = (e as any).latLng;
+                return { latitude: coords.lat(), longitude: coords.lng() };
+              }
+              return e.nativeEvent.coordinate;
+            };
+
+            const { latitude, longitude } = getCoords();
+
             const isSameMarker =
               selectedLocation?.longitude === longitude &&
               selectedLocation?.latitude === latitude;

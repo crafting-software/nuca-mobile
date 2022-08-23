@@ -1,12 +1,12 @@
 import { Dispatch, SetStateAction, createContext } from 'react';
 
-export type Auth = {
+export interface Auth {
   username?: string;
   inProgress: boolean;
   token?: string;
-};
+}
 
-interface AuthContext {
+export interface AuthContext {
   auth: Auth;
   setAuth: Dispatch<SetStateAction<Auth>>;
 }
