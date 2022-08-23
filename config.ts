@@ -3,7 +3,7 @@ import Constants from 'expo-constants';
 const getEnvConfig = () => {
   const { releaseChannel } = Constants.manifest || {};
 
-  if (releaseChannel === 'prod') {
+  if (releaseChannel === 'prod' || process.env.RELEASE_CHANNEL === 'prod') {
     const server = 'https://nuca.api.craftingsoftware.com';
     return {
       server,
