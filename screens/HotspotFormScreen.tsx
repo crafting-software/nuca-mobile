@@ -27,6 +27,7 @@ import { FullScreenActivityIndicator } from '../components/FullScreenActivityInd
 import { InputField } from '../components/InputField';
 import { findCurrentLocation, MapContext } from '../context';
 import { HotspotContext } from '../context/HotspotDetailContext';
+import { Region, RootStackScreenProps } from '../domain-types';
 import {
   Cat,
   defaultSterilizedCat,
@@ -41,7 +42,6 @@ import {
 } from '../models/Hotspot';
 import { getFormattedAddress, Location } from '../models/Location';
 import { User } from '../models/User';
-import { Region, RootStackScreenProps } from '../types';
 import SnackbarManager from '../utils/SnackbarManager';
 import { addCat, deleteCatRequest } from '../utils/cats';
 import { isSmallScreen } from '../utils/helperFunc';

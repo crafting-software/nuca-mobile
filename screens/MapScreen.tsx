@@ -17,10 +17,10 @@ import { Appbar } from '../components/Appbar';
 import { FullScreenActivityIndicator } from '../components/FullScreenActivityIndicator';
 import { MapContext } from '../context';
 import { findCurrentLocation } from '../context/MapContext';
+import { EdgeInsets, Region } from '../domain-types';
 import { Marker } from '../maps';
 import { getHotspotMarker, Hotspot } from '../models/Hotspot';
 import { Location } from '../models/Location';
-import { EdgeInsets, Region } from '../types';
 import SnackbarManager from '../utils/SnackbarManager';
 import { loadHotspots } from '../utils/hotspots';
 

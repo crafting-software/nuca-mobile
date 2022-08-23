@@ -13,7 +13,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import logo from '../assets/logo.png';
 import { AuthContext } from '../context';
-import { EdgeInsets } from '../types';
+import { EdgeInsets } from '../domain-types';
 
 export const Appbar = ({
   forDetailScreen = false,

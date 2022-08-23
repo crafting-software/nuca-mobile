@@ -17,10 +17,10 @@ import markerNewImage from '../assets/marker-new.png';
 import { Appbar } from '../components/Appbar';
 import { MapContext } from '../context';
 import { findCurrentLocation, findPlace } from '../context/MapContext';
+import { EdgeInsets, Region, RootStackScreenProps } from '../domain-types';
 import { Marker } from '../maps';
 import { getHotspotMarker } from '../models/Hotspot';
 import { getFormattedAddress, Location } from '../models/Location';
-import { EdgeInsets, Region, RootStackScreenProps } from '../types';
 
 export const ChooseLocationScreen = ({
   route,

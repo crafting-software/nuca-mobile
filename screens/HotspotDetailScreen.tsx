@@ -22,9 +22,9 @@ import { Appbar } from '../components/Appbar';
 import { CatCard } from '../components/CatCard';
 import { FooterScreens, FooterView } from '../components/Footer';
 import { HotspotContext } from '../context/HotspotDetailContext';
+import { Region, RootStackParamList } from '../domain-types';
 import { Cat } from '../models/Cat';
 import { HotspotDetails, HotspotStatus } from '../models/Hotspot';
-import { Region, RootStackParamList } from '../types';
 import { isSmallScreen } from '../utils/helperFunc';
 import { loadHotspotDetails } from '../utils/hotspots';
 
