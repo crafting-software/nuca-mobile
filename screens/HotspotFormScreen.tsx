@@ -344,7 +344,7 @@ export const HotspotFormScreen = ({
       setIsInProgress(false);
       SnackbarManager.error(
         'HotspotFormScreen - delete func.',
-        'Ștergere nereuşită'
+        'Ștergere nereuşită, verifică dacă ai sters profilele pisicilor asociate zonei de interes.'
       );
     }
   };
