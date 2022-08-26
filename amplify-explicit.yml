@@ -14,7 +14,7 @@ frontend:
           fi
     build:
       commands:
-        - RELEASE_CHANNEL=prod expo build:web
+        - expo build:web
   artifacts:
     baseDirectory: web-build
     files:
