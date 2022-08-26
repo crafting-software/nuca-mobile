@@ -8,7 +8,7 @@ const getEnvConfig = () => {
       : Constants.manifest?.releaseChannel;
 
   if (releaseChannel === 'prod') {
-    const server = 'https://nuca.api.craftingsoftware.com';
+    const server = 'https://api.nuca.craftingsoftware.com';
     return {
       server,
       environment: 'prod',
