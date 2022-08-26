@@ -45,6 +45,20 @@ const getModalStyles = (theme: ReactNativePaper.Theme) =>
       color: theme.colors.text,
       fontSize: 14,
     },
+    mainContainer: {
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    cardStyle: {
+      marginHorizontal: 20,
+      backgroundColor: 'white',
+      maxWidth: 400,
+      width: '100%',
+    },
+    actionView: {
+      flexDirection: 'row',
+      justifyContent: 'center',
+    },
   });
 
 export const DeleteModal = ({
@@ -60,39 +74,36 @@ export const DeleteModal = ({
   const styles = getModalStyles(theme);
 
   return (
-    <Card style={{ marginHorizontal: 20, backgroundColor: 'white' }}>
-      <Caption style={styles.title}>Ești sigur că vrei să ștergi?</Caption>
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'center',
-        }}
-      >
-        <View style={styles.buttonView}>
-          <Button
-            style={styles.discardButton}
-            contentStyle={styles.buttonContent}
-            labelStyle={styles.buttonLabel}
-            icon="pencil"
-            onPress={() => hideModal()}
-          >
-            Renunță
-          </Button>
+    <View style={styles.mainContainer}>
+      <Card style={styles.cardStyle}>
+        <Caption style={styles.title}>Ești sigur că vrei să ștergi?</Caption>
+        <View style={styles.actionView}>
+          <View style={styles.buttonView}>
+            <Button
+              style={styles.discardButton}
+              contentStyle={styles.buttonContent}
+              labelStyle={styles.buttonLabel}
+              icon="pencil"
+              onPress={() => hideModal()}
+            >
+              Renunță
+            </Button>
+          </View>
+          <View style={styles.buttonView}>
+            <Button
+              style={styles.deleteButton}
+              contentStyle={styles.buttonContent}
+              labelStyle={styles.buttonLabel}
+              icon="close"
+              onPress={() => {
+                deleteCat && deleteCat(cat);
+              }}
+            >
+              Șterge
+            </Button>
+          </View>
         </View>
-        <View style={styles.buttonView}>
-          <Button
-            style={styles.deleteButton}
-            contentStyle={styles.buttonContent}
-            labelStyle={styles.buttonLabel}
-            icon="close"
-            onPress={() => {
-              deleteCat && deleteCat(cat);
-            }}
-          >
-            Șterge
-          </Button>
-        </View>
-      </View>
-    </Card>
+      </Card>
+    </View>
   );
 };

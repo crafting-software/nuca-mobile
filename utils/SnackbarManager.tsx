@@ -15,7 +15,7 @@ class SnackbarManager extends Component {
   private show(props: SnackbarViewProps) {
     this.props = props;
     this.emitChange();
-    setTimeout(() => DeviceEventEmitter.emit('info', undefined), 2000);
+    setTimeout(() => DeviceEventEmitter.emit('info', undefined), 2500);
   }
 
   public success = (message: string, timeout?: number) =>
