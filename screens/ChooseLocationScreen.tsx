@@ -142,7 +142,6 @@ export const ChooseLocationScreen = ({
                 latitude: h.latitude,
                 longitude: h.longitude,
               }}
-              onPress={() => navigation.navigate('Modal')}
             >
               <Image
                 source={getHotspotMarker(h)}
@@ -171,31 +170,33 @@ export const ChooseLocationScreen = ({
             </Marker>
           ) : null}
         </MapView>
-        <TextInput
-          ref={searchAddressRef}
-          multiline={false}
-          dense={true}
-          scrollEnabled={true}
-          blurOnSubmit={true}
-          outlineColor={theme.colors.disabled}
-          mode="outlined"
-          style={[styles.searchInput, { height: 60 }]}
-          autoCorrect={false}
-          placeholder="Caută"
-          autoComplete={false}
-          right={
-            <TextInput.Icon name="magnify" color={theme.colors.placeholder} />
-          }
-          returnKeyType="search"
-          onSubmitEditing={async ({ nativeEvent: { text } }) => {
-            setSelectedAddress(text);
-            searchForAddress(text);
-          }}
-          onChangeText={text => {
-            setSelectedAddress(text);
-          }}
-          value={selectedAddress}
-        />
+        <View style={styles.searchInput}>
+          <TextInput
+            ref={searchAddressRef}
+            multiline={false}
+            dense={true}
+            scrollEnabled={true}
+            style={{ height: 60 }}
+            blurOnSubmit={true}
+            outlineColor={theme.colors.disabled}
+            mode="outlined"
+            autoCorrect={false}
+            placeholder="Caută"
+            autoComplete={false}
+            right={
+              <TextInput.Icon name="magnify" color={theme.colors.placeholder} />
+            }
+            returnKeyType="search"
+            onSubmitEditing={async ({ nativeEvent: { text } }) => {
+              setSelectedAddress(text);
+              searchForAddress(text);
+            }}
+            onChangeText={text => {
+              setSelectedAddress(text);
+            }}
+            value={selectedAddress}
+          />
+        </View>
       </View>
 
       {selectedLocation ? (
@@ -287,12 +288,12 @@ const getStyles = (theme: Theme, insets: EdgeInsets) =>
       left: 20,
       right: 20,
       elevation: 6,
-      paddingHorizontal: 8,
       height: 60,
-
       shadowColor: theme.colors.text,
-      shadowOffset: { width: 2, height: 4 },
-      shadowOpacity: 0.2,
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.22,
+      shadowRadius: 0.22,
+      borderRadius: 30,
     },
     marker: {
       width: 40,
