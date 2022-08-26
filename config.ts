@@ -1,10 +1,14 @@
 import Constants from 'expo-constants';
+import { Platform } from 'react-native';
 
 const getEnvConfig = () => {
-  const { releaseChannel } = Constants.manifest || {};
+  const releaseChannel =
+    Platform.OS === 'web'
+      ? Constants.manifest?.extra?.releaseChannel
+      : Constants.manifest?.releaseChannel;
 
   if (releaseChannel === 'prod') {
-    const server = 'https://nuca.api.craftingsoftware.com';
+    const server = 'https://api.nuca.craftingsoftware.com';
     return {
       server,
       environment: 'prod',
