@@ -24,7 +24,7 @@ import {
   en,
   registerTranslation,
 } from 'react-native-paper-dates';
-import SelectDropdown from 'react-native-select-dropdown';
+// import SelectDropdown from 'react-native-select-dropdown';
 import imagePlaceholder from '../assets/image-placeholder.png';
 import { HotspotContext } from '../context/HotspotDetailContext';
 import { Cat, defaultSterilizedCat } from '../models/Cat';
@@ -322,7 +322,7 @@ export const AddCatCard = ({
   };
 
   const pickImage = async () => {
-    let result: ImagePicker.ImagePickerResult =
+    const result: ImagePicker.ImagePickerResult =
       await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
@@ -330,7 +330,7 @@ export const AddCatCard = ({
         quality: 1,
       });
 
-    if (!result.cancelled) {
+    if (!result.canceled) {
       uploadImageOnS3(result);
     }
   };
@@ -398,7 +398,7 @@ export const AddCatCard = ({
           </View>
         )}
         <Caption style={styles.textInputTitle}>Sex</Caption>
-        <SelectDropdown
+        {/* <SelectDropdown
           data={['M', 'F']}
           defaultValue={localCat.sex}
           buttonStyle={styles.genderButton}
@@ -423,7 +423,7 @@ export const AddCatCard = ({
             capitalize(selectedItem)
           }
           rowTextForSelection={(item: string, _index) => capitalize(item)}
-        />
+        /> */}
         <InputField
           multiline={true}
           label="Observații"
