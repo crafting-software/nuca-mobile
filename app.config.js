@@ -51,6 +51,8 @@ export default {
             'Photo library access is required to share photos of cats.',
         },
       ],
+      "expo-font",
+      "expo-secure-store"
     ],
     extra: {
       releaseChannel: process.env.RELEASE_CHANNEL,

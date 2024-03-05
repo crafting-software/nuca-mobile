@@ -54,7 +54,6 @@ export const InputField = (props: InputFieldProps) => {
       )}
       <TextInput
         placeholder={props.placeholder}
-        autoComplete={false}
         mode="outlined"
         multiline={props.multiline}
         numberOfLines={props.numberOfLines ?? 1}

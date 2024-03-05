@@ -189,7 +189,6 @@ export const AuthenticationScreen = () => {
             placeholder="Utilizator"
             value={username}
             onChangeText={setUsername}
-            autoComplete={false}
             left={
               <TextInput.Icon name="account" color={theme.colors.primary} />
             }
@@ -209,7 +208,6 @@ export const AuthenticationScreen = () => {
             placeholder="Parola"
             value={password}
             onChangeText={setPassword}
-            autoComplete={false}
             left={<TextInput.Icon name="lock" color={theme.colors.primary} />}
             returnKeyType="go"
             onSubmitEditing={signIn}
