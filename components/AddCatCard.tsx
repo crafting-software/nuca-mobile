@@ -321,6 +321,8 @@ export const AddCatCard = ({
     showModal();
   };
 
+  const [inputDate, setInputDate] = useState<Date | undefined>(undefined);
+
   const pickImage = async () => {
     const result: ImagePicker.ImagePickerResult =
       await ImagePicker.launchImageLibraryAsync({
@@ -331,11 +333,11 @@ export const AddCatCard = ({
       });
 
     if (!result.canceled) {
-      uploadImageOnS3(result);
+      result.assets.forEach(uploadImageOnS3);
     }
   };
 
-  const uploadImageOnS3 = (imageInfo: ImagePicker.ImageInfo) => {
+  const uploadImageOnS3 = (imageInfo: ImagePicker.ImagePickerAsset) => {
     //TODO first upload on S3
     setImages(images.concat(imageInfo.uri));
   };

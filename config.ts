@@ -4,8 +4,8 @@ import { Platform } from 'react-native';
 const getEnvConfig = () => {
   const releaseChannel =
     Platform.OS === 'web'
-      ? Constants.manifest?.extra?.releaseChannel
-      : Constants.manifest?.releaseChannel;
+      ? Constants.expoConfig?.extra?.webReleaseChannel
+      : Constants.expoConfig?.extra?.mobileReleaseChannel;
 
   if (releaseChannel === 'prod') {
     const server = 'https://api.nuca.craftingsoftware.com';
