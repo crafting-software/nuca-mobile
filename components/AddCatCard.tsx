@@ -24,7 +24,7 @@ import {
   en,
   registerTranslation,
 } from 'react-native-paper-dates';
-// import SelectDropdown from 'react-native-select-dropdown';
+import SelectDropdown from 'react-native-select-dropdown';
 import imagePlaceholder from '../assets/image-placeholder.png';
 import { HotspotContext } from '../context/HotspotDetailContext';
 import { Cat, defaultSterilizedCat } from '../models/Cat';
@@ -321,6 +321,8 @@ export const AddCatCard = ({
     showModal();
   };
 
+  const [inputDate, setInputDate] = useState<Date | undefined>(undefined);
+
   const pickImage = async () => {
     const result: ImagePicker.ImagePickerResult =
       await ImagePicker.launchImageLibraryAsync({
@@ -331,11 +333,11 @@ export const AddCatCard = ({
       });
 
     if (!result.canceled) {
-      uploadImageOnS3(result);
+      result.assets.forEach(uploadImageOnS3);
     }
   };
 
-  const uploadImageOnS3 = (imageInfo: ImagePicker.ImageInfo) => {
+  const uploadImageOnS3 = (imageInfo: ImagePicker.ImagePickerAsset) => {
     //TODO first upload on S3
     setImages(images.concat(imageInfo.uri));
   };
@@ -398,7 +400,7 @@ export const AddCatCard = ({
           </View>
         )}
         <Caption style={styles.textInputTitle}>Sex</Caption>
-        {/* <SelectDropdown
+        <SelectDropdown
           data={['M', 'F']}
           defaultValue={localCat.sex}
           buttonStyle={styles.genderButton}
@@ -423,7 +425,7 @@ export const AddCatCard = ({
             capitalize(selectedItem)
           }
           rowTextForSelection={(item: string, _index) => capitalize(item)}
-        /> */}
+        />
         <InputField
           multiline={true}
           label="Observații"
@@ -444,7 +446,6 @@ export const AddCatCard = ({
               <View style={styles.datePickerContainer}>
                 <Caption style={styles.textInputTitle}>Dată internare</Caption>
                 <DatePickerInput
-                  autoComplete={false}
                   locale="en"
                   value={new Date(localCat.checkInDate)}
                   onChange={selectedDate => {
@@ -464,7 +465,6 @@ export const AddCatCard = ({
               <View style={styles.datePickerContainer}>
                 <Caption style={styles.textInputTitle}>Dată externare</Caption>
                 <DatePickerInput
-                  autoComplete={false}
                   locale="en"
                   value={new Date(localCat.checkOutDate)}
                   onChange={selectedDate => {

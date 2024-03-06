@@ -128,7 +128,6 @@ export const MapScreen = () => {
             mode="outlined"
             autoCorrect={false}
             placeholder="Caută"
-            autoComplete={false}
             right={
               <TextInput.Icon name="magnify" color={theme.colors.placeholder} />
             }

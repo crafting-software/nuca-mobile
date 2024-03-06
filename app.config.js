@@ -51,9 +51,12 @@ export default {
             'Photo library access is required to share photos of cats.',
         },
       ],
+      'expo-font',
+      'expo-secure-store',
     ],
     extra: {
-      releaseChannel: process.env.RELEASE_CHANNEL,
+      webReleaseChannel: process.env.RELEASE_CHANNEL,
+      mobileReleaseChannel: process.env.MOBILE_RELEASE_CHANNEL,
     },
   },
 };

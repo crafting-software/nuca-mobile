@@ -8,7 +8,7 @@ import { LinkingOptions } from '@react-navigation/native';
 import { RootStackParamList } from '../types';
 
 const linking: LinkingOptions<RootStackParamList> = {
-  prefixes: [Linking.makeUrl('/')],
+  prefixes: ['/'],
   config: {
     screens: {
       Authentication: 'authentication',

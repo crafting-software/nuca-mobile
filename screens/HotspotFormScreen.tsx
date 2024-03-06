@@ -17,7 +17,7 @@ import {
   Title,
   useTheme,
 } from 'react-native-paper';
-// import SelectDropdown from 'react-native-select-dropdown';
+import SelectDropdown from 'react-native-select-dropdown';
 import { useNavigation } from '@react-navigation/native';
 import currentLocationIcon from '../assets/current-location.png';
 import mapPinIcon from '../assets/map-pin.png';
@@ -458,7 +458,7 @@ export const HotspotFormScreen = ({
                 }
               />
               <Caption style={styles.textInputTitle}>STATUS</Caption>
-              {/* <SelectDropdown
+              <SelectDropdown
                 defaultButtonText="Alege status"
                 data={hotspotStatusList}
                 buttonStyle={styles.dropdownButton}
@@ -483,7 +483,7 @@ export const HotspotFormScreen = ({
                   capitalize(item as HotspotStatus)
                 }
                 defaultValue={hotspotDetails.status}
-              /> */}
+              />
               <InputField
                 multiline={true}
                 label="Observații"
