@@ -321,8 +321,6 @@ export const AddCatCard = ({
     showModal();
   };
 
-  const [inputDate, setInputDate] = useState<Date | undefined>(undefined);
-
   const pickImage = async () => {
     const result: ImagePicker.ImagePickerResult =
       await ImagePicker.launchImageLibraryAsync({
