@@ -282,7 +282,7 @@ export const HotspotFormScreen = ({
         ...hotspotDetails,
         city: location.city || '',
         zip: location.postalCode || '',
-        address: location.street + ' ' + location.streetNumber,
+        address: (location.street || ' ') + ' ' + (location.streetNumber || ' '),
         latitude: location.latitude,
         longitude: location.longitude,
       });

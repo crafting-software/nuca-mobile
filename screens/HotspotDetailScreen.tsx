@@ -238,12 +238,12 @@ export const HotspotDetailScreen = ({
       </>
     );
 
-  const address = trim(
-    `${hotspotDetails.address}, ${hotspotDetails.city}, ${hotspotDetails.zip}`,
-    ','
-  )
+  const hotspotDetailsValues = [hotspotDetails.address, hotspotDetails.city, hotspotDetails.zip];
+  const address = hotspotDetailsValues
+    .filter(x => !!x)
+    .join(', ')
     .trim()
-    .replace(' ,', ',');
+    .replace(/^, /g, '');
 
   return (
     <>
