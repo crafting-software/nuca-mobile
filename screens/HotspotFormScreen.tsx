@@ -427,6 +427,14 @@ export const HotspotFormScreen = ({
     }
   };
 
+  const hotspotDetailsValues = [hotspotDetails.address, hotspotDetails.city, hotspotDetails.zip, hotspotDetails.latitude.toString()];
+  const address = hotspotDetailsValues
+    .filter(x => !!x)
+    .map((x) => x.trim())
+    .join(', ')
+    .trim()
+    .replace(/^, /g, '');
+
   return (
     <>
       <Appbar forDetailScreen />
@@ -445,7 +453,7 @@ export const HotspotFormScreen = ({
                 />
               ) : (
                 <Title style={styles.addressTitle}>
-                  {`${hotspotDetails.address} ${hotspotDetails.city}, ${hotspotDetails.zip}, ${hotspotDetails.latitude}`}
+                  {address}
                 </Title>
               )}
               <InputField

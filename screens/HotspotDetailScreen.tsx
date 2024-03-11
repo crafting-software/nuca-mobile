@@ -241,6 +241,7 @@ export const HotspotDetailScreen = ({
   const hotspotDetailsValues = [hotspotDetails.address, hotspotDetails.city, hotspotDetails.zip];
   const address = hotspotDetailsValues
     .filter(x => !!x)
+    .map(x => x.trim())
     .join(', ')
     .trim()
     .replace(/^, /g, '');
