@@ -8,7 +8,7 @@ export type Cat = {
   checkOutDate: number;
   isSterilized: boolean;
   capturedBy?: User;
-  media: Record<string, string>;
+  media: Array<Record<string, string>>;
   isNew?: boolean;
   description?: string;
 };
@@ -23,6 +23,7 @@ export const toCatApiModel = (
   is_sterilized: cat.isSterilized,
   capturer_id: cat.capturedBy?.id,
   hotspot_id: hotspotId,
+  media: cat.media,
 });
 
 export const castToCat = (backendCat: Record<string, any>): Cat => ({
@@ -32,7 +33,7 @@ export const castToCat = (backendCat: Record<string, any>): Cat => ({
   checkInDate: backendCat.check_in_date,
   checkOutDate: backendCat.check_out_date,
   isSterilized: backendCat.is_sterilized,
-  media: backendCat.media,
+  media: backendCat.media || [],
   description: backendCat.description || '',
   capturedBy: backendCat.captured_by
     ? castToUser(backendCat.captured_by)
@@ -70,7 +71,7 @@ export const defaultSterilizedCat: Cat = {
   checkOutDate: Date.parse(new Date().toDateString()),
   isSterilized: true,
   capturedBy: undefined,
-  media: {},
+  media: [],
   isNew: true,
 };
 
@@ -81,6 +82,6 @@ export const defaultUnSterilizedCat: Cat = {
   checkOutDate: Date.parse(new Date().toDateString()),
   isSterilized: false,
   capturedBy: undefined,
-  media: {},
+  media: [],
   isNew: true,
 };

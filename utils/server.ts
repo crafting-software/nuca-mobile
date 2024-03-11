@@ -15,18 +15,43 @@ const getAuthorizationHeader = async () => {
   }
 };
 
+const buildRequestBody = (
+  body: Record<string, any>,
+  sendAsFormData: boolean
+) => {
+  if (sendAsFormData) {
+    const formData = new FormData();
+    for (const [key, value] of Object.entries(body)) {
+      formData.append(key, value);
+    }
+    return formData;
+  }
+  return JSON.stringify(body);
+};
+
 export const makeRequest = async ({
   path,
   method = 'GET',
   body,
+  headers,
+  sendAsFormData,
 }: {
   path: string;
   method: string;
   body?: Record<string, any>;
+  headers?: Record<string, string>;
+  sendAsFormData?: boolean;
 }) => {
   try {
     const requestHeaders: HeadersInit = new Headers();
-    requestHeaders.set('Content-Type', 'application/json');
+
+    for (const [key, value] of Object.entries(
+      headers || { 'Content-Type': 'application/json' }
+    )) {
+      requestHeaders.set(key, value);
+    }
+
+    const requestBody = body && buildRequestBody(body, sendAsFormData || false);
 
     const token = await getAuthorizationHeader();
 
@@ -35,7 +60,7 @@ export const makeRequest = async ({
     const response = await fetch(`${server}/api${path}`, {
       method,
       headers: requestHeaders,
-      body: body ? JSON.stringify(body) : null,
+      body: body ? requestBody : null,
     });
 
     if (!response.ok) {
