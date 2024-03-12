@@ -3,6 +3,7 @@ import {
   castToHotspotDetails,
   Hotspot,
   HotspotDetails,
+  LocationItemProps,
   toApiModel,
 } from '../models/Hotspot';
 import { makeRequest } from './server';
@@ -100,3 +101,38 @@ export const deleteHotspot = async (
 
   return { success: true };
 };
+
+export const searchLocations = async (address: string, proximityPolicy: 'ip' | 'coordinate' | 'none') => {
+  try {
+    const requestHeaders: HeadersInit = new Headers();
+    requestHeaders.set('Content-Type', 'application/json');
+    const server = "https://api.mapbox.com/search/geocode/v6/forward";
+    const search_query = encodeURI(address);
+    const access_token = 'pk.eyJ1IjoiY3JhZnRpbmdtYXBib3hlcyIsImEiOiJjbHRtc2xoZTAxcDd4Mm1wNmtycG4xdGE0In0.jaf4MwDHD_EY4LbZj0fYVw';
+
+    const response = await fetch(`${server}?q=${search_query}&proximity=${proximityPolicy}&access_token=${access_token}`, {
+      method: 'GET',
+      headers: requestHeaders,
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      const isNotSignedIn = response.status === 401;
+
+      return { error: errorText || response, isNotSignedIn };
+    }
+
+    const data = await response.json();
+    const results: LocationItemProps[] = data['features']?.map((x: any) => ({
+      place_name: x.properties.name + ", " + x.properties.place_formatted,
+      coordinates: {
+        latitude: x.properties.coordinates.latitude,
+        longitude: x.properties.coordinates.longitude
+      }
+    }))
+
+    return results;
+  } catch (error) {
+    return { error };
+  }
+}

@@ -11,6 +11,14 @@ export enum HotspotStatus {
   done = 'finalizat',
 }
 
+export type LocationItemProps = {
+  coordinates?: {
+    latitude: number;
+    longitude: number;
+  };
+  place_name: string;
+}
+
 export const hotspotStatusList: HotspotStatus[] = [
   HotspotStatus.toDo,
   HotspotStatus.inProgress,
