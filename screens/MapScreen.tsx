@@ -97,8 +97,8 @@ export const MapScreen = () => {
     mapRef.current?.animateToRegion({
       latitude: locationData!.coordinates!.latitude,
       longitude: locationData!.coordinates!.longitude,
-      latitudeDelta: region.latitudeDelta / 2,
-      longitudeDelta: region.longitudeDelta / 2,
+      latitudeDelta: region.latitudeDelta / 6,
+      longitudeDelta: region.longitudeDelta / 6,
     });
   }
 
