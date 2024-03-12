@@ -7,6 +7,14 @@ export type Location = {
   streetNumber?: string | null;
 };
 
+type LocationItemProps = {
+  coordinates?: {
+    latitude: number;
+    longitude: number;
+  };
+  place_name: string;
+}
+
 export const getFormattedAddress = (location: Location): string => {
   const textOrDefault = (value: string | null | undefined) => value ?? '';
 

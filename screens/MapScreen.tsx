@@ -1,14 +1,21 @@
-import * as LocationProvider from 'expo-location';
-import { useContext, useEffect, useRef, useState } from 'react';
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import {
   Image,
   Platform,
   StyleSheet,
   TouchableOpacity,
   View,
+  Text,
+  Dimensions
 } from 'react-native';
 import MapView from 'react-native-maps';
-import { Caption, FAB, TextInput, Title, useTheme } from 'react-native-paper';
+import { Caption, FAB, Title, useTheme } from 'react-native-paper';
 import { Theme } from 'react-native-paper/lib/typescript/types';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
@@ -18,11 +25,12 @@ import { FullScreenActivityIndicator } from '../components/FullScreenActivityInd
 import { MapContext } from '../context';
 import { findCurrentLocation } from '../context/MapContext';
 import { Marker } from '../maps';
-import { getHotspotMarker, Hotspot } from '../models/Hotspot';
+import { getHotspotMarker, Hotspot, LocationItemProps } from '../models/Hotspot';
 import { Location } from '../models/Location';
 import { EdgeInsets, Region } from '../types';
 import SnackbarManager from '../utils/SnackbarManager';
-import { loadHotspots } from '../utils/hotspots';
+import { loadHotspots, searchLocations } from '../utils/hotspots';
+import { AutocompleteDropdown, TAutocompleteDropdownItem } from 'react-native-autocomplete-dropdown';
 
 export const MapScreen = () => {
   const { hotspots, setHotspots } = useContext(MapContext);
@@ -36,6 +44,14 @@ export const MapScreen = () => {
   const mapRef = useRef<MapView>(null);
   const navigation = useNavigation();
   const [isLoading, setIsLoading] = useState(false);
+  const insets = useSafeAreaInsets();
+  const theme = useTheme();
+  const styles = getStyles(theme, insets);
+  const searchRef = useRef<any>(null);
+  const dropdownController = useRef<any>(null);
+  const [suggestionsList, setSuggestionsList] = useState<TAutocompleteDropdownItem[] | null>(null);
+  const [loading, setLoading] = useState(false)
+  const [selectedItem, setSelectedItem] = useState<string>();
 
   useEffect(() => {
     const load = async () => {
@@ -53,26 +69,50 @@ export const MapScreen = () => {
     load();
   }, []);
 
-  const searchForAddress = async (address: string): Promise<void> => {
+  const searchForAddress = async (address: string) => {
     try {
-      const [{ latitude, longitude }] = await LocationProvider.geocodeAsync(
-        address
-      );
-
-      mapRef.current?.animateToRegion({
-        latitude,
-        longitude,
-        latitudeDelta: 0,
-        longitudeDelta: 0,
-      });
+      const results: any = await searchLocations(address, 'ip');
+      return results;
     } catch (e) {
       alert('Address not found');
+      return [];
     }
   };
 
-  const insets = useSafeAreaInsets();
-  const theme = useTheme();
-  const styles = getStyles(theme, insets);
+  const getSuggestions = useCallback(async (query: string) => {
+    setLoading(true);
+    const locationResults = await searchForAddress(query);
+
+    const suggestions = locationResults
+      .map((item: LocationItemProps) => ({
+        id: `${item.coordinates?.latitude};${item.coordinates?.longitude}`,
+        title: item.place_name,
+      }))
+
+    setSuggestionsList(suggestions);
+    setLoading(false);
+  }, []);
+
+  const animateToSelectedLocation = (locationData: LocationItemProps) => {
+    mapRef.current?.animateToRegion({
+      latitude: locationData!.coordinates!.latitude,
+      longitude: locationData!.coordinates!.longitude,
+      latitudeDelta: region.latitudeDelta / 2,
+      longitudeDelta: region.longitudeDelta / 2,
+    });
+  }
+
+  const onClearPress = useCallback(() => {
+    setSuggestionsList(null);
+  }, []);
+
+  const onOpenSuggestionsList = useCallback((isOpened: any) => {}, []);
+
+  const LocationItem = ({item}: any) => (
+    <View style={styles.locationItem}>
+      <Text style={styles.locationTitle}>{item.title}</Text>
+    </View>
+  );
 
   const onMapRateLimitExceeded = () => {
     SnackbarManager.error(
@@ -130,19 +170,65 @@ export const MapScreen = () => {
           ))}
         </MapView>
         <View style={styles.searchInput}>
-          <TextInput
-            outlineColor={theme.colors.disabled}
-            mode="outlined"
-            autoCorrect={false}
-            placeholder="Caută"
-            right={
-              <TextInput.Icon name="magnify" color={theme.colors.placeholder} />
-            }
-            returnKeyType="search"
-            onSubmitEditing={async ({ nativeEvent: { text } }) =>
-              searchForAddress(text)
-            }
-          />
+        <AutocompleteDropdown
+          ref={searchRef}
+          controller={controller => {
+            dropdownController.current = controller
+          }}
+          direction={Platform.select({ ios: 'down' })}
+          dataSet={suggestionsList}
+          onChangeText={getSuggestions}
+          onSelectItem={item => {
+            if (!item)
+              return;
+            setSelectedItem(item.id)
+            const [latitude, longitude] = item?.id.split(';').map((x: string) => parseFloat(x))
+            animateToSelectedLocation({
+              coordinates: {
+                latitude,
+                longitude
+              },
+              place_name: item.title
+            } as LocationItemProps)
+          }}
+          debounce={1000}
+          suggestionsListMaxHeight={Dimensions.get('window').height * 0.4}
+          onClear={onClearPress}
+          onOpenSuggestionsList={onOpenSuggestionsList}
+          loading={loading}
+          useFilter={false}
+          textInputProps={{
+            placeholder: 'Caută',
+            autoCorrect: false,
+            autoCapitalize: 'none',
+            style: {
+              borderRadius: 25,
+              backgroundColor: '#ffffff',
+              color: '#000',
+              paddingLeft: 18,
+            },
+          }}
+          rightButtonsContainerStyle={{
+            right: 8,
+            height: 30,
+            alignSelf: 'center',
+          }}
+          inputContainerStyle={{
+            backgroundColor: '#ffffff',
+            borderRadius: 25,
+          }}
+          suggestionsListContainerStyle={{
+            backgroundColor: '#ffffff',
+            borderRadius: 25
+          }}
+          containerStyle={{ flexGrow: 1, flexShrink: 1 }}
+          renderItem={(item: any, title: any) => <LocationItem item={item}/> }
+          inputHeight={50}
+          showChevron={false}
+          closeOnBlur={false}
+          clearOnFocus={false}
+          showClear={true}
+        />
         </View>
       </View>
       <TouchableOpacity
@@ -252,8 +338,21 @@ const getStyles = (theme: Theme, insets: EdgeInsets) =>
       shadowRadius: 0.22,
       borderRadius: 30,
     },
+    sheetContainer: {
+      flex: 1,
+      alignItems: 'center',
+      height: 40
+    },
     marker: {
       width: 40,
       height: 40,
     },
+    locationItem: {
+      paddingTop: 10,
+      paddingBottom: 10
+    },
+    locationTitle: {
+      paddingLeft: 25,
+      paddingRight: 25,
+    }
   });

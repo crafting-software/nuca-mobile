@@ -20,6 +20,7 @@ import {
 } from './context';
 import Navigation from './navigation/index';
 import { getTheme } from './theme';
+import { AutocompleteDropdownContextProvider } from 'react-native-autocomplete-dropdown';
 
 export default () => {
   const [fontsLoaded] = useFonts({
@@ -37,6 +38,7 @@ export default () => {
   const theme = getTheme();
 
   return (
+    <AutocompleteDropdownContextProvider>
     <AuthContextProvider>
       <MapContextProvider>
         <PaperProvider theme={theme}>
@@ -50,5 +52,6 @@ export default () => {
         </PaperProvider>
       </MapContextProvider>
     </AuthContextProvider>
+    </AutocompleteDropdownContextProvider>
   );
 };
