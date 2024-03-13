@@ -2,19 +2,19 @@ import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { LocationItemProps } from "../models/Hotspot";
 import { searchLocations } from "../utils/hotspots";
 import { 
-    View, 
-    StyleSheet,
-    Platform,
-    Dimensions,
-    Text
+  View,
+  StyleSheet,
+  Platform,
+  Text
 } from "react-native";
 import MapView from "react-native-maps";
 import { initialLatitudeDelta, initialLongitudeDelta, deltaRatio } from "../constants/location";
 import { EdgeInsets, useSafeAreaInsets } from "react-native-safe-area-context";
 import { Theme, useTheme } from "react-native-paper";
-import { AutocompleteDropdown, TAutocompleteDropdownItem } from 'react-native-autocomplete-dropdown';
+import { AutocompleteDropdown, TAutocompleteDropdownItem, AutocompleteDropdownRef } from 'react-native-autocomplete-dropdown';
 import { MapContext } from "../context";
 import { Location } from "../models/Location";
+import { dropdownDebounceTime, dropdownInputHeight, dropdownListMaxHeight } from "../constants/layout";
 
 export type SearchableLocationDropdownProps = {
   mapRef: React.RefObject<MapView>;
@@ -79,6 +79,24 @@ export const SearchableLocationDropdown = ({ mapRef }: SearchableLocationDropdow
     </View>
   );
 
+  const setController = (controller: AutocompleteDropdownRef) => {
+    dropdownController.current = controller
+  }
+
+  const setSelectedSuggestedLocation = (item: TAutocompleteDropdownItem) => {
+    if (!item)
+      return;
+
+    const [latitude, longitude] = item?.id.split(';').map((x: string) => parseFloat(x));
+    const selectedLocationToBeUpdated: Location = {latitude, longitude};
+    setSelectedLocation(selectedLocationToBeUpdated);
+    dropdownController.current.setInputText(item.title);
+
+    animateToSelectedLocation({coordinates: {latitude, longitude}} as LocationItemProps);
+  }
+
+  const renderLocationItem = (item: any, _title: any) => <LocationItem item={item}/>
+
   useEffect(() => {  
     const addressElements = [
       selectedLocation?.street,
@@ -93,62 +111,29 @@ export const SearchableLocationDropdown = ({ mapRef }: SearchableLocationDropdow
   return (
     <AutocompleteDropdown
         ref={searchRef}
-        controller={controller => {
-          dropdownController.current = controller
-        }}
+        controller={setController}
         direction={Platform.select({ ios: 'down' })}
         dataSet={suggestionsList}
         onChangeText={getSuggestions}
-        onSelectItem={item => {
-            if (!item)
-                return;
-
-            const [latitude, longitude] = item?.id.split(';').map((x: string) => parseFloat(x));
-            const selectedLocationToBeUpdated: Location = {latitude, longitude};
-            setSelectedLocation(selectedLocationToBeUpdated);
-            dropdownController.current.setInputText(item.title);
-
-            animateToSelectedLocation({
-                coordinates: {
-                    latitude,
-                    longitude
-                },
-                place_name: item.title
-            } as LocationItemProps);
-        }}
-        debounce={1000}
-        suggestionsListMaxHeight={Dimensions.get('window').height * 0.4}
+        onSelectItem={setSelectedSuggestedLocation}
+        debounce={dropdownDebounceTime}
+        suggestionsListMaxHeight={dropdownListMaxHeight}
         onClear={onClearPress}
         onOpenSuggestionsList={onOpenSuggestionsList}
         loading={loading}
-        useFilter={false}
         textInputProps={{
           placeholder: 'Caută',
           autoCorrect: false,
           autoCapitalize: 'none',
-          style: {
-            borderRadius: 25,
-            backgroundColor: '#ffffff',
-            color: '#000',
-            paddingLeft: 18,
-          },
+          style: styles.textInputStyle
         }}
-        rightButtonsContainerStyle={{
-            right: 8,
-            height: 30,
-            alignSelf: 'center',
-        }}
-        inputContainerStyle={{
-            backgroundColor: '#ffffff',
-            borderRadius: 25,
-        }}
-        suggestionsListContainerStyle={{
-            backgroundColor: '#ffffff',
-            borderRadius: 25
-        }}
-        containerStyle={{ flexGrow: 1, flexShrink: 1 }}
-        renderItem={(item: any, title: any) => <LocationItem item={item}/> }
-        inputHeight={50}
+        rightButtonsContainerStyle={styles.rightButtonsContainerStyle}
+        inputContainerStyle={styles.inputContainerStyle}
+        suggestionsListContainerStyle={styles.suggestionsListContainerStyle}
+        containerStyle={styles.containerStyle}
+        renderItem={renderLocationItem}
+        inputHeight={dropdownInputHeight}
+        useFilter={false}
         showChevron={false}
         closeOnBlur={false}
         clearOnFocus={false}
@@ -166,5 +151,28 @@ const getStyles = (theme: Theme, insets: EdgeInsets) =>
     locationTitle: {
       paddingLeft: 25,
       paddingRight: 25,
+    },
+    textInputStyle: {
+      borderRadius: 25,
+      backgroundColor: '#ffffff',
+      color: '#000',
+      paddingLeft: 18,
+    },
+    rightButtonsContainerStyle: {
+      right: 8,
+      height: 30,
+      alignSelf: 'center'
+    },
+    inputContainerStyle: {
+      backgroundColor: '#ffffff',
+      borderRadius: 25,
+    },
+    suggestionsListContainerStyle: {
+      backgroundColor: '#ffffff',
+      borderRadius: 25
+    },
+    containerStyle: {
+      flexGrow: 1,
+      flexShrink: 1
     }
   });

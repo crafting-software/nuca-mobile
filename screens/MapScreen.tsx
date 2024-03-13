@@ -11,7 +11,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   View,
-  Dimensions
 } from 'react-native';
 import MapView from 'react-native-maps';
 import { Caption, FAB, Title, useTheme } from 'react-native-paper';
@@ -24,7 +23,7 @@ import { FullScreenActivityIndicator } from '../components/FullScreenActivityInd
 import { MapContext } from '../context';
 import { findCurrentLocation } from '../context/MapContext';
 import { Marker } from '../maps';
-import { getHotspotMarker, Hotspot, LocationItemProps } from '../models/Hotspot';
+import { getHotspotMarker, Hotspot } from '../models/Hotspot';
 import { Location } from '../models/Location';
 import { EdgeInsets, Region } from '../types';
 import SnackbarManager from '../utils/SnackbarManager';

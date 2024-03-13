@@ -3,7 +3,6 @@ import {
   Image,
   Platform,
   StyleSheet,
-  TextInput as BaseTextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
@@ -33,7 +32,6 @@ export const ChooseLocationScreen = ({
     setSelectedLocation, 
     setSelectedAddress,
     selectedLocation,
-    selectedAddress
   } = useContext(MapContext);
   const [region, setRegion] = useState<Region>(route.params.region);
 
