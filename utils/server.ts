@@ -15,16 +15,33 @@ const getAuthorizationHeader = async () => {
   }
 };
 
+const objectToFormData = (
+  obj: Record<string, any>,
+  formData: FormData = new FormData(),
+  parentKey: string = ''
+): FormData =>
+  Object.entries(obj).reduce((fd: FormData, [key, value]: [string, any]) => {
+    const propName: string = parentKey ? `${parentKey}[${key}]` : key;
+
+    if (typeof value === 'object' && !(value instanceof File)) {
+      return objectToFormData(value, fd, propName);
+    } else if (Array.isArray(value)) {
+      value.forEach((item: any, index: number) =>
+        objectToFormData(item, fd, `${propName}[${index}]`)
+      );
+    } else {
+      if (value !== undefined) fd.append(propName, value);
+    }
+
+    return fd;
+  }, formData);
+
 const buildRequestBody = (
   body: Record<string, any>,
   sendAsFormData: boolean
 ) => {
   if (sendAsFormData) {
-    const formData = new FormData();
-    for (const [key, value] of Object.entries(body)) {
-      formData.append(key, value);
-    }
-    return formData;
+    return objectToFormData(body);
   }
   return JSON.stringify(body);
 };
@@ -46,7 +63,7 @@ export const makeRequest = async ({
     const requestHeaders: HeadersInit = new Headers();
 
     for (const [key, value] of Object.entries(
-      headers || { 'Content-Type': 'application/json' }
+      headers || sendAsFormData ? {} : { 'Content-Type': 'application/json' }
     )) {
       requestHeaders.set(key, value);
     }

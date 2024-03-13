@@ -32,7 +32,7 @@ export const updateCat = async (
     path: `/cats/${cat.id}`,
     method: 'PATCH',
     body: toCatApiModel(cat),
-    headers: { 'Content-Type': 'multipart/form-data' },
+    headers: {},
     sendAsFormData: true,
   });
 
