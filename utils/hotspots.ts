@@ -1,3 +1,4 @@
+import { mapboxApiKey, mapboxGeocodingServerAddress } from '../config';
 import {
   castToHotspot,
   castToHotspotDetails,
@@ -106,9 +107,9 @@ export const searchLocations = async (address: string, proximityPolicy: 'ip' | '
   try {
     const requestHeaders: HeadersInit = new Headers();
     requestHeaders.set('Content-Type', 'application/json');
-    const server = "https://api.mapbox.com/search/geocode/v6/forward";
+    const server = mapboxGeocodingServerAddress;
     const search_query = encodeURI(address);
-    const access_token = 'pk.eyJ1IjoiY3JhZnRpbmdtYXBib3hlcyIsImEiOiJjbHRtc2xoZTAxcDd4Mm1wNmtycG4xdGE0In0.jaf4MwDHD_EY4LbZj0fYVw';
+    const access_token = mapboxApiKey;
 
     const response = await fetch(`${server}?q=${search_query}&proximity=${proximityPolicy}&access_token=${access_token}`, {
       method: 'GET',
