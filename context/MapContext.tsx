@@ -6,11 +6,17 @@ import { Location } from '../models/Location';
 interface MapContext {
   hotspots: Hotspot[];
   setHotspots: Dispatch<SetStateAction<Hotspot[]>>;
+  selectedLocation?: Location | null;
+  setSelectedLocation: Dispatch<SetStateAction<Location | undefined | null>>;
+  selectedAddress?: string;
+  setSelectedAddress: Dispatch<SetStateAction<string | undefined>>;
 }
 
 export const MapContext = createContext<MapContext>({
   hotspots: [],
   setHotspots: () => {},
+  setSelectedLocation: () => {},
+  setSelectedAddress: () => {}
 });
 
 export const findCurrentLocation = async (
@@ -47,7 +53,13 @@ export const findPlace = async (
     };
 
     place.find(address => {
-      location = { ...address, ...location };
+      location = { 
+        ...location,
+        street: address.street,
+        streetNumber: address.streetNumber,
+        city: address.city,
+        postalCode: address.postalCode
+      };
     });
 
     return location;

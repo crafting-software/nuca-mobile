@@ -38,20 +38,20 @@ export default () => {
   const theme = getTheme();
 
   return (
-    <AutocompleteDropdownContextProvider>
     <AuthContextProvider>
       <MapContextProvider>
-        <PaperProvider theme={theme}>
-          <SafeAreaProvider>
-            <HotspotContextProvider>
-              <Navigation />
-              <StatusBar />
-              <SnackbarContainer />
-            </HotspotContextProvider>
-          </SafeAreaProvider>
-        </PaperProvider>
+        <AutocompleteDropdownContextProvider>
+          <PaperProvider theme={theme}>
+            <SafeAreaProvider>
+              <HotspotContextProvider>
+                <Navigation />
+                <StatusBar />
+                <SnackbarContainer />
+              </HotspotContextProvider>
+            </SafeAreaProvider>
+          </PaperProvider>
+        </AutocompleteDropdownContextProvider>
       </MapContextProvider>
     </AuthContextProvider>
-    </AutocompleteDropdownContextProvider>
   );
 };

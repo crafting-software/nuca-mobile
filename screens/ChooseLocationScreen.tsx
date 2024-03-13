@@ -1,4 +1,3 @@
-import * as LocationProvider from 'expo-location';
 import { useContext, useEffect, useRef, useState } from 'react';
 import {
   Image,
@@ -22,31 +21,24 @@ import { Marker } from '../maps';
 import { getHotspotMarker } from '../models/Hotspot';
 import { getFormattedAddress, Location } from '../models/Location';
 import { EdgeInsets, Region, RootStackScreenProps } from '../types';
+import { SearchableLocationDropdown } from '../components/SearchableLocationDropdown';
 import SnackbarManager from '../utils/SnackbarManager';
+import { deltaRatio, initialLatitudeDelta, initialLongitudeDelta } from '../constants/location';
 
 export const ChooseLocationScreen = ({
   route,
 }: RootStackScreenProps<'ChooseLocation'>) => {
-  const { hotspots } = useContext(MapContext);
-  const [selectedLocation, setSelectedLocation] = useState<Location | null>();
+  const { 
+    hotspots, 
+    setSelectedLocation, 
+    setSelectedAddress,
+    selectedLocation,
+    selectedAddress
+  } = useContext(MapContext);
   const [region, setRegion] = useState<Region>(route.params.region);
-  const [selectedAddress, setSelectedAddress] = useState('');
 
   const mapRef = useRef<MapView>(null);
-  const searchAddressRef = useRef<BaseTextInput>(null);
   const navigation = useNavigation();
-
-  const searchForAddress = async (address: string): Promise<void> => {
-    try {
-      const [{ latitude, longitude }] = await LocationProvider.geocodeAsync(
-        address
-      );
-
-      animateMapToRegion({ latitude: latitude, longitude: longitude });
-    } catch (e) {
-      alert('Address not found');
-    }
-  };
 
   const insets = useSafeAreaInsets();
   const theme = useTheme();
@@ -56,8 +48,8 @@ export const ChooseLocationScreen = ({
     mapRef.current?.animateToRegion({
       latitude: _location.latitude,
       longitude: _location.longitude,
-      latitudeDelta: 0,
-      longitudeDelta: 0,
+      latitudeDelta: initialLatitudeDelta/ deltaRatio,
+      longitudeDelta: initialLongitudeDelta / deltaRatio,
     });
   };
 
@@ -186,30 +178,7 @@ export const ChooseLocationScreen = ({
           ) : null}
         </MapView>
         <View style={styles.searchInput}>
-          <TextInput
-            ref={searchAddressRef}
-            multiline={false}
-            dense={true}
-            scrollEnabled={true}
-            style={{ height: 60 }}
-            blurOnSubmit={true}
-            outlineColor={theme.colors.disabled}
-            mode="outlined"
-            autoCorrect={false}
-            placeholder="Caută"
-            right={
-              <TextInput.Icon name="magnify" color={theme.colors.placeholder} />
-            }
-            returnKeyType="search"
-            onSubmitEditing={async ({ nativeEvent: { text } }) => {
-              setSelectedAddress(text);
-              searchForAddress(text);
-            }}
-            onChangeText={text => {
-              setSelectedAddress(text);
-            }}
-            value={selectedAddress}
-          />
+          <SearchableLocationDropdown mapRef={mapRef}/>
         </View>
       </View>
 
