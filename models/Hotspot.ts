@@ -17,7 +17,7 @@ export type LocationItemProps = {
     longitude: number;
   };
   place_name: string;
-}
+};
 
 export const hotspotStatusList: HotspotStatus[] = [
   HotspotStatus.toDo,

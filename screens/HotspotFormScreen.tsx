@@ -282,7 +282,8 @@ export const HotspotFormScreen = ({
         ...hotspotDetails,
         city: location.city || '',
         zip: location.postalCode || '',
-        address: (location.street || ' ') + ' ' + (location.streetNumber || ' '),
+        address:
+          (location.street || ' ') + ' ' + (location.streetNumber || ' '),
         latitude: location.latitude,
         longitude: location.longitude,
       });
@@ -427,10 +428,15 @@ export const HotspotFormScreen = ({
     }
   };
 
-  const hotspotDetailsValues = [hotspotDetails.address, hotspotDetails.city, hotspotDetails.zip, hotspotDetails.latitude.toString()];
+  const hotspotDetailsValues = [
+    hotspotDetails.address,
+    hotspotDetails.city,
+    hotspotDetails.zip,
+    hotspotDetails.latitude.toString(),
+  ];
   const address = hotspotDetailsValues
     .filter(x => !!x)
-    .map((x) => x.trim())
+    .map(x => x.trim())
     .join(', ')
     .trim()
     .replace(/^, /g, '');
@@ -452,9 +458,7 @@ export const HotspotFormScreen = ({
                   routeRegion={route.params.region}
                 />
               ) : (
-                <Title style={styles.addressTitle}>
-                  {address}
-                </Title>
+                <Title style={styles.addressTitle}>{address}</Title>
               )}
               <InputField
                 label="Detalii adresă"

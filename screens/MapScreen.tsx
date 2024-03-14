@@ -1,5 +1,4 @@
 import {
-  useCallback,
   useContext,
   useEffect,
   useRef,
@@ -129,7 +128,7 @@ export const MapScreen = () => {
           ))}
         </MapView>
         <View style={styles.searchInput}>
-          <SearchableLocationDropdown mapRef={mapRef}/>
+          <SearchableLocationDropdown mapRef={mapRef} />
         </View>
       </View>
       <TouchableOpacity
@@ -242,7 +241,7 @@ const getStyles = (theme: Theme, insets: EdgeInsets) =>
     sheetContainer: {
       flex: 1,
       alignItems: 'center',
-      height: 40
+      height: 40,
     },
     marker: {
       width: 40,
@@ -250,10 +249,10 @@ const getStyles = (theme: Theme, insets: EdgeInsets) =>
     },
     locationItem: {
       paddingTop: 10,
-      paddingBottom: 10
+      paddingBottom: 10,
     },
     locationTitle: {
       paddingLeft: 25,
       paddingRight: 25,
-    }
+    },
   });

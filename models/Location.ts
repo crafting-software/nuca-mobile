@@ -13,7 +13,7 @@ type LocationItemProps = {
     longitude: number;
   };
   place_name: string;
-}
+};
 
 export const getFormattedAddress = (location: Location): string => {
   const textOrDefault = (value: string | null | undefined) => value ?? '';

@@ -28,9 +28,9 @@ import { findPlaceDetails } from '../utils/hotspots';
 export const ChooseLocationScreen = ({
   route,
 }: RootStackScreenProps<'ChooseLocation'>) => {
-  const { 
-    hotspots, 
-    setSelectedLocation, 
+  const {
+    hotspots,
+    setSelectedLocation,
     setSelectedAddress,
     selectedLocation,
   } = useContext(MapContext);
@@ -47,7 +47,7 @@ export const ChooseLocationScreen = ({
     mapRef.current?.animateToRegion({
       latitude: _location.latitude,
       longitude: _location.longitude,
-      latitudeDelta: initialLatitudeDelta/ deltaRatio,
+      latitudeDelta: initialLatitudeDelta / deltaRatio,
       longitudeDelta: initialLongitudeDelta / deltaRatio,
     });
   };
@@ -174,7 +174,7 @@ export const ChooseLocationScreen = ({
           ) : null}
         </MapView>
         <View style={styles.searchInput}>
-          <SearchableLocationDropdown mapRef={mapRef}/>
+          <SearchableLocationDropdown mapRef={mapRef} />
         </View>
       </View>
 

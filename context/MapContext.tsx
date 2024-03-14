@@ -16,7 +16,7 @@ export const MapContext = createContext<MapContext>({
   hotspots: [],
   setHotspots: () => {},
   setSelectedLocation: () => {},
-  setSelectedAddress: () => {}
+  setSelectedAddress: () => {},
 });
 
 export const findCurrentLocation = async (
@@ -47,9 +47,10 @@ export const findPlace = async (
       latitude: lat,
       longitude: long,
     });
+
     let location: Location = {
       latitude: lat,
-      longitude: long,
+      longitude: long
     };
 
     place.find(address => {

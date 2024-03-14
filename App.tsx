@@ -1,5 +1,6 @@
 import AppLoading from 'expo-app-loading';
 import { StatusBar } from 'expo-status-bar';
+import { AutocompleteDropdownContextProvider } from 'react-native-autocomplete-dropdown';
 import { Provider as PaperProvider } from 'react-native-paper';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import {
@@ -20,7 +21,6 @@ import {
 } from './context';
 import Navigation from './navigation/index';
 import { getTheme } from './theme';
-import { AutocompleteDropdownContextProvider } from 'react-native-autocomplete-dropdown';
 
 export default () => {
   const [fontsLoaded] = useFonts({
