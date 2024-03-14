@@ -22,6 +22,7 @@ import { Marker } from '../maps';
 import { getHotspotMarker } from '../models/Hotspot';
 import { getFormattedAddress, Location } from '../models/Location';
 import { EdgeInsets, Region, RootStackScreenProps } from '../types';
+import SnackbarManager from '../utils/SnackbarManager';
 
 export const ChooseLocationScreen = ({
   route,
@@ -60,6 +61,13 @@ export const ChooseLocationScreen = ({
     });
   };
 
+  const onMapRateLimitExceeded = () => {
+    SnackbarManager.error(
+      'ChooseLocationScreen',
+      'A apărut o problemă, așteptați câteva momente și încercați din nou.'
+    );
+  };
+
   useEffect(() => {
     setSelectedLocation(route.params.location);
     if (route.params.location) {
@@ -93,14 +101,18 @@ export const ChooseLocationScreen = ({
           style={styles.map}
           //am incercat si cu asta, asta merge, dar nu face ceea ce vrem noi
           onRegionChangeComplete={async region => {
-            console.log('Bent1 ', region);
+            console.warn('Bent1 ', region);
             const { latitude, longitude } = region;
             const isSameMarker =
               selectedLocation?.longitude === longitude &&
               selectedLocation?.latitude === latitude;
 
             if (!isSameMarker) {
-              const location = await findPlace(latitude, longitude);
+              const location = await findPlace(
+                latitude,
+                longitude,
+                onMapRateLimitExceeded
+              );
               setSelectedLocation(location);
             }
           }}
@@ -120,7 +132,11 @@ export const ChooseLocationScreen = ({
               selectedLocation?.latitude === latitude;
 
             if (!isSameMarker) {
-              const location = await findPlace(latitude, longitude);
+              const location = await findPlace(
+                latitude,
+                longitude,
+                onMapRateLimitExceeded
+              );
               setSelectedLocation(location);
             }
           }}
@@ -227,8 +243,8 @@ export const ChooseLocationScreen = ({
         icon={currentLocationIcon}
         small
         onPress={async () => {
-          const location = await findCurrentLocation();
-          animateMapToRegion(location);
+          const location = await findCurrentLocation(onMapRateLimitExceeded);
+          if (!!location) animateMapToRegion(location);
         }}
       />
     </>

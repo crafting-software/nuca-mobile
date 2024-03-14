@@ -74,6 +74,13 @@ export const MapScreen = () => {
   const theme = useTheme();
   const styles = getStyles(theme, insets);
 
+  const onMapRateLimitExceeded = () => {
+    SnackbarManager.error(
+      'HotspotFormScreen',
+      'A apărut o problemă, așteptați câteva momente și încercați din nou.'
+    );
+  };
+
   return (
     <>
       <Appbar />
@@ -160,15 +167,17 @@ export const MapScreen = () => {
         icon={currentLocationIcon}
         small
         onPress={async () => {
-          const location = await findCurrentLocation();
-          setLocation(location);
+          const location = await findCurrentLocation(onMapRateLimitExceeded);
+          if (!!location) {
+            setLocation(location);
 
-          mapRef.current?.animateToRegion({
-            latitude: location.latitude,
-            longitude: location.longitude,
-            latitudeDelta: 0,
-            longitudeDelta: 0,
-          });
+            mapRef.current?.animateToRegion({
+              latitude: location.latitude,
+              longitude: location.longitude,
+              latitudeDelta: 0,
+              longitudeDelta: 0,
+            });
+          }
         }}
       />
       {isLoading && <FullScreenActivityIndicator />}
