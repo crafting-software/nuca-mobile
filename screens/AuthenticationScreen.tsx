@@ -114,10 +114,6 @@ export const AuthenticationScreen = () => {
       const authString = await SecureStore.getItemAsync('auth');
       if (!authString) {
         setAuth({ token: '', username: '', inProgress: false });
-        SnackbarManager.error(
-          'AuthenticationScreen - restoreAuth func.',
-          'No values stored under that key.'
-        );
       } else {
         const { token, username } = JSON.parse(authString);
         setAuth({ token, username, inProgress: false });
