@@ -7,6 +7,7 @@ import {
   LocationItemProps,
   toApiModel,
 } from '../models/Hotspot';
+import { Location } from '../models/Location';
 import { makeRequest } from './server';
 
 export const loadHotspots = async (): Promise<{
@@ -111,7 +112,7 @@ export const searchLocations = async (address: string, proximityPolicy: 'ip' | '
     const search_query = encodeURI(address);
     const access_token = mapboxApiKey;
 
-    const response = await fetch(`${server}?q=${search_query}&proximity=${proximityPolicy}&access_token=${access_token}`, {
+    const response = await fetch(`${server}/forward?q=${search_query}&proximity=${proximityPolicy}&access_token=${access_token}`, {
       method: 'GET',
       headers: requestHeaders,
     });
@@ -137,3 +138,42 @@ export const searchLocations = async (address: string, proximityPolicy: 'ip' | '
     return { error };
   }
 }
+
+export const findPlaceDetails = async (
+  lat: number,
+  long: number,
+  onRateLimitExceeded: () => void
+) => {
+  try {
+    const requestHeaders: HeadersInit = new Headers();
+    requestHeaders.set('Content-Type', 'application/json');
+    const server = mapboxGeocodingServerAddress;
+    const access_token = mapboxApiKey;
+
+    const response = await fetch(`${server}/reverse?longitude=${long}&latitude=${lat}&access_token=${access_token}`, {
+      method: 'GET',
+      headers: requestHeaders,
+    });
+
+    const data = await response.json();
+    const streetFeature = data?.features?.find((x: any) => ['street', 'address'].includes(x.properties.feature_type));
+    const postalCodeFeature = data?.features?.find((x: any) => x.properties.feature_type === 'postcode');
+    const placeFeature = data?.features?.find((x: any) => x.properties.feature_type === 'place');
+    const streetName = streetFeature?.properties?.context?.address?.street_name || streetFeature?.properties?.name;
+
+    const location: Location = {
+      latitude: lat,
+      longitude: long,
+      street: streetName,
+      streetNumber: streetFeature?.properties?.context?.address?.address_number,
+      postalCode: postalCodeFeature?.properties?.name,
+      city: placeFeature?.properties?.name
+    };
+
+    return location;
+  } catch (e) {
+    if ((e as Error).message.includes('too many requests')) {
+      onRateLimitExceeded();
+    }
+  }
+};

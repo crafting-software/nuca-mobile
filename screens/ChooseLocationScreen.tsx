@@ -23,6 +23,7 @@ import { EdgeInsets, Region, RootStackScreenProps } from '../types';
 import { SearchableLocationDropdown } from '../components/SearchableLocationDropdown';
 import SnackbarManager from '../utils/SnackbarManager';
 import { deltaRatio, initialLatitudeDelta, initialLongitudeDelta } from '../constants/location';
+import { findPlaceDetails } from '../utils/hotspots';
 
 export const ChooseLocationScreen = ({
   route,
@@ -121,11 +122,8 @@ export const ChooseLocationScreen = ({
               selectedLocation?.latitude === latitude;
 
             if (!isSameMarker) {
-              const location = await findPlace(
-                latitude,
-                longitude,
-                onMapRateLimitExceeded
-              );
+              const identifyLocation = Platform.OS === 'web' ? findPlaceDetails : findPlace;
+              const location = await identifyLocation(latitude, longitude, onMapRateLimitExceeded);
               setSelectedLocation(location);
             }
           }}
