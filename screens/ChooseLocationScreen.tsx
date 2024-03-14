@@ -101,7 +101,6 @@ export const ChooseLocationScreen = ({
           style={styles.map}
           //am incercat si cu asta, asta merge, dar nu face ceea ce vrem noi
           onRegionChangeComplete={async region => {
-            console.warn('Bent1 ', region);
             const { latitude, longitude } = region;
             const isSameMarker =
               selectedLocation?.longitude === longitude &&
