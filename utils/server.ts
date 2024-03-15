@@ -62,11 +62,12 @@ export const makeRequest = async ({
   try {
     const requestHeaders: HeadersInit = new Headers();
 
-    for (const [key, value] of Object.entries(
-      headers || sendAsFormData ? {} : { 'Content-Type': 'application/json' }
-    )) {
-      requestHeaders.set(key, value);
-    }
+    const headersObj =
+      headers || sendAsFormData ? {} : { 'Content-Type': 'application/json' };
+
+    Object.entries(headersObj).forEach(([key, value]) =>
+      requestHeaders.set(key, value)
+    );
 
     const requestBody = body && buildRequestBody(body, sendAsFormData || false);
 
