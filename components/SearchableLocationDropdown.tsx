@@ -1,4 +1,11 @@
-import { useCallback, useContext, useEffect, useRef, useState } from 'react';
+import {
+  forwardRef,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { View, StyleSheet, Platform, Text } from 'react-native';
 import {
   AutocompleteDropdown,
@@ -23,136 +30,135 @@ import { LocationItemProps } from '../models/Hotspot';
 import { Location } from '../models/Location';
 import { searchLocations } from '../utils/hotspots';
 
-export type SearchableLocationDropdownProps = {
-  mapRef: React.RefObject<MapView>;
-};
+export const SearchableLocationDropdown = forwardRef(
+  (_props, ref: React.ForwardedRef<MapView>) => {
+    const [loading, setLoading] = useState(false);
+    const [suggestionsList, setSuggestionsList] = useState<
+      TAutocompleteDropdownItem[] | null
+    >(null);
+    const searchRef = useRef<any>(null);
+    const dropdownController = useRef<any>(null);
+    const { selectedLocation, setSelectedLocation } = useContext(MapContext);
 
-export const SearchableLocationDropdown = ({
-  mapRef,
-}: SearchableLocationDropdownProps) => {
-  const [loading, setLoading] = useState(false);
-  const [suggestionsList, setSuggestionsList] = useState<
-    TAutocompleteDropdownItem[] | null
-  >(null);
-  const searchRef = useRef<any>(null);
-  const dropdownController = useRef<any>(null);
-  const { selectedLocation, setSelectedLocation } = useContext(MapContext);
+    const insets = useSafeAreaInsets();
+    const theme = useTheme();
+    const styles = getStyles(theme, insets);
 
-  const insets = useSafeAreaInsets();
-  const theme = useTheme();
-  const styles = getStyles(theme, insets);
+    const searchForAddress = async (address: string) => {
+      try {
+        const results: any = await searchLocations(address, 'ip');
+        return results;
+      } catch (e) {
+        alert('Address not found');
+        return [];
+      }
+    };
 
-  const searchForAddress = async (address: string) => {
-    try {
-      const results: any = await searchLocations(address, 'ip');
-      return results;
-    } catch (e) {
-      alert('Address not found');
-      return [];
-    }
-  };
+    const getSuggestions = useCallback(async (query: string) => {
+      setLoading(true);
+      const locationResults = await searchForAddress(query);
 
-  const getSuggestions = useCallback(async (query: string) => {
-    setLoading(true);
-    const locationResults = await searchForAddress(query);
+      const suggestions = locationResults.map((item: LocationItemProps) => ({
+        id: `${item.coordinates?.latitude};${item.coordinates?.longitude}`,
+        title: item.placeName,
+      }));
 
-    const suggestions = locationResults.map((item: LocationItemProps) => ({
-      id: `${item.coordinates?.latitude};${item.coordinates?.longitude}`,
-      title: item.place_name,
-    }));
+      setSuggestionsList(suggestions);
+      setLoading(false);
+    }, []);
 
-    setSuggestionsList(suggestions);
-    setLoading(false);
-  }, []);
+    const animateToSelectedLocation = (locationData: LocationItemProps) => {
+      if (!ref || typeof ref === 'function') return;
 
-  const animateToSelectedLocation = (locationData: LocationItemProps) => {
-    mapRef.current?.animateToRegion({
-      latitude: locationData!.coordinates!.latitude,
-      longitude: locationData!.coordinates!.longitude,
-      latitudeDelta: initialLatitudeDelta / deltaRatio,
-      longitudeDelta: initialLongitudeDelta / deltaRatio,
-    });
-  };
+      ref?.current?.animateToRegion({
+        latitude: locationData!.coordinates!.latitude,
+        longitude: locationData!.coordinates!.longitude,
+        latitudeDelta: initialLatitudeDelta / deltaRatio,
+        longitudeDelta: initialLongitudeDelta / deltaRatio,
+      });
+    };
 
-  const onClearPress = useCallback(() => {
-    setSuggestionsList(null);
-  }, []);
+    const onClearPress = useCallback(() => {
+      setSuggestionsList(null);
+    }, []);
 
-  const onOpenSuggestionsList = useCallback((isOpened: any) => {}, []);
+    const onOpenSuggestionsList = useCallback((isOpened: any) => {}, []);
 
-  const LocationItem = ({ item }: any) => (
-    <View style={styles.locationItem}>
-      <Text style={styles.locationTitle}>{item.title}</Text>
-    </View>
-  );
+    const LocationItem = ({ item }: any) => (
+      <View style={styles.locationItem}>
+        <Text style={styles.locationTitle}>{item.title}</Text>
+      </View>
+    );
 
-  const setController = (controller: AutocompleteDropdownRef) => {
-    dropdownController.current = controller;
-  };
+    const setController = (controller: AutocompleteDropdownRef) => {
+      dropdownController.current = controller;
+    };
 
-  const setSelectedSuggestedLocation = (item: TAutocompleteDropdownItem) => {
-    if (!item) return;
+    const setSelectedSuggestedLocation = (item: TAutocompleteDropdownItem) => {
+      if (!item) return;
 
-    const [latitude, longitude] = item?.id
-      .split(';')
-      .map((x: string) => parseFloat(x));
-    const selectedLocationToBeUpdated: Location = { latitude, longitude };
-    setSelectedLocation(selectedLocationToBeUpdated);
-    dropdownController.current.setInputText(item.title);
+      const [latitude, longitude] = item?.id
+        .split(';')
+        .map((x: string) => parseFloat(x));
+      const selectedLocationToBeUpdated: Location = { latitude, longitude };
+      setSelectedLocation(selectedLocationToBeUpdated);
+      dropdownController.current.setInputText(item.title);
 
-    animateToSelectedLocation({
-      coordinates: { latitude, longitude },
-    } as LocationItemProps);
-  };
+      animateToSelectedLocation({
+        coordinates: { latitude, longitude },
+      } as LocationItemProps);
+    };
 
-  const renderLocationItem = (item: any, _title: any) => (
-    <LocationItem item={item} />
-  );
+    const renderLocationItem = (
+      item: TAutocompleteDropdownItem,
+      _title: string
+    ) => <LocationItem item={item} />;
 
-  useEffect(() => {
-    const addressElements = [
-      selectedLocation?.street,
-      selectedLocation?.streetNumber,
-      selectedLocation?.postalCode,
-      selectedLocation?.city,
-    ].filter(x => x);
-    addressElements.length > 0 &&
-      dropdownController.current.setInputText(addressElements.join(', '));
-  }, [selectedLocation]);
+    useEffect(() => {
+      const addressElements = [
+        selectedLocation?.street,
+        selectedLocation?.streetNumber,
+        selectedLocation?.postalCode,
+        selectedLocation?.city,
+      ].filter(x => x);
+      addressElements.length > 0 &&
+        dropdownController.current.setInputText(addressElements.join(', '));
+    }, [selectedLocation]);
 
-  return (
-    <AutocompleteDropdown
-      ref={searchRef}
-      controller={setController}
-      direction={Platform.select({ ios: 'down' })}
-      dataSet={suggestionsList}
-      onChangeText={getSuggestions}
-      onSelectItem={setSelectedSuggestedLocation}
-      debounce={dropdownDebounceTime}
-      suggestionsListMaxHeight={dropdownListMaxHeight}
-      onClear={onClearPress}
-      onOpenSuggestionsList={onOpenSuggestionsList}
-      loading={loading}
-      textInputProps={{
-        placeholder: 'Caută',
-        autoCorrect: false,
-        autoCapitalize: 'none',
-        style: styles.textInputStyle,
-      }}
-      rightButtonsContainerStyle={styles.rightButtonsContainerStyle}
-      inputContainerStyle={styles.inputContainerStyle}
-      suggestionsListContainerStyle={styles.suggestionsListContainerStyle}
-      containerStyle={styles.containerStyle}
-      renderItem={renderLocationItem}
-      inputHeight={dropdownInputHeight}
-      useFilter={false}
-      showChevron={false}
-      closeOnBlur={false}
-      clearOnFocus={false}
-      showClear={true}
-    />
-  );
-};
+    return (
+      <AutocompleteDropdown
+        ref={searchRef}
+        controller={setController}
+        direction={Platform.select({ ios: 'down' })}
+        dataSet={suggestionsList}
+        onChangeText={getSuggestions}
+        onSelectItem={setSelectedSuggestedLocation}
+        debounce={dropdownDebounceTime}
+        suggestionsListMaxHeight={dropdownListMaxHeight}
+        onClear={onClearPress}
+        onOpenSuggestionsList={onOpenSuggestionsList}
+        loading={loading}
+        textInputProps={{
+          placeholder: 'Caută',
+          autoCorrect: false,
+          autoCapitalize: 'none',
+          style: styles.textInputStyle,
+        }}
+        rightButtonsContainerStyle={styles.rightButtonsContainerStyle}
+        inputContainerStyle={styles.inputContainerStyle}
+        suggestionsListContainerStyle={styles.suggestionsListContainerStyle}
+        containerStyle={styles.containerStyle}
+        renderItem={renderLocationItem}
+        inputHeight={dropdownInputHeight}
+        useFilter={false}
+        showChevron={false}
+        closeOnBlur={false}
+        clearOnFocus={false}
+        showClear={true}
+      />
+    );
+  }
+);
 
 const getStyles = (theme: Theme, insets: EdgeInsets) =>
   StyleSheet.create({

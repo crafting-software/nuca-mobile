@@ -7,7 +7,12 @@ import {
   LocationItemProps,
   toApiModel,
 } from '../models/Hotspot';
-import { Location } from '../models/Location';
+import {
+  Location,
+  MapboxLocationFeature,
+  MapboxLocationFeatureProperties,
+  convertRawMapboxResponseToEntity,
+} from '../models/Location';
 import { makeRequest } from './server';
 
 export const loadHotspots = async (): Promise<{
@@ -131,13 +136,16 @@ export const searchLocations = async (
     }
 
     const data = await response.json();
-    const results: LocationItemProps[] = data['features']?.map((x: any) => ({
-      place_name: x.properties.name + ', ' + x.properties.place_formatted,
-      coordinates: {
-        latitude: x.properties.coordinates.latitude,
-        longitude: x.properties.coordinates.longitude,
-      },
-    }));
+    const mapboxFeatures = convertRawMapboxResponseToEntity(data?.features);
+    const results: LocationItemProps[] = mapboxFeatures
+      ?.map((x: MapboxLocationFeature) => x.properties)
+      .map((x: MapboxLocationFeatureProperties) => ({
+        placeName: x.name + ', ' + x.placeFormatted,
+        coordinates: {
+          latitude: x.coordinates.latitude,
+          longitude: x.coordinates.longitude,
+        },
+      }));
 
     return results;
   } catch (error) {
@@ -165,24 +173,25 @@ export const findPlaceDetails = async (
     );
 
     const data = await response.json();
-    const streetFeature = data?.features?.find((x: any) =>
-      ['street', 'address'].includes(x.properties.feature_type)
+    const mapboxFeatures = convertRawMapboxResponseToEntity(data?.features);
+    const streetFeature = mapboxFeatures?.find((x: MapboxLocationFeature) =>
+      ['street', 'address'].includes(x.properties.featureType)
     );
     const postalCodeFeature = data?.features?.find(
-      (x: any) => x.properties.feature_type === 'postcode'
+      (x: MapboxLocationFeature) => x.properties.featureType === 'postcode'
     );
     const placeFeature = data?.features?.find(
-      (x: any) => x.properties.feature_type === 'place'
+      (x: MapboxLocationFeature) => x.properties.featureType === 'place'
     );
     const streetName =
-      streetFeature?.properties?.context?.address?.street_name ||
+      streetFeature?.properties?.context?.address?.streetName ||
       streetFeature?.properties?.name;
 
     const location: Location = {
       latitude: lat,
       longitude: long,
       street: streetName,
-      streetNumber: streetFeature?.properties?.context?.address?.address_number,
+      streetNumber: streetFeature?.properties?.context?.address?.addressNumber,
       postalCode: postalCodeFeature?.properties?.name,
       city: placeFeature?.properties?.name,
     };

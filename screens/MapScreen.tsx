@@ -128,7 +128,7 @@ export const MapScreen = () => {
           ))}
         </MapView>
         <View style={styles.searchInput}>
-          <SearchableLocationDropdown mapRef={mapRef} />
+          <SearchableLocationDropdown ref={mapRef} />
         </View>
       </View>
       <TouchableOpacity

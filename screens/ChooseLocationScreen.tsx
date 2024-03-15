@@ -174,7 +174,7 @@ export const ChooseLocationScreen = ({
           ) : null}
         </MapView>
         <View style={styles.searchInput}>
-          <SearchableLocationDropdown mapRef={mapRef} />
+          <SearchableLocationDropdown ref={mapRef} />
         </View>
       </View>
 
