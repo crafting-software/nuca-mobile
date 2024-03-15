@@ -15,18 +15,61 @@ const getAuthorizationHeader = async () => {
   }
 };
 
+const objectToFormData = (
+  obj: Record<string, any>,
+  formData: FormData = new FormData(),
+  parentKey: string = ''
+): FormData =>
+  Object.entries(obj).reduce((fd: FormData, [key, value]: [string, any]) => {
+    const propName: string = parentKey ? `${parentKey}[${key}]` : key;
+
+    if (typeof value === 'object' && !(value instanceof File)) {
+      return objectToFormData(value, fd, propName);
+    } else if (Array.isArray(value)) {
+      value.forEach((item: any, index: number) =>
+        objectToFormData(item, fd, `${propName}[${index}]`)
+      );
+    } else {
+      if (value !== undefined) fd.append(propName, value);
+    }
+
+    return fd;
+  }, formData);
+
+const buildRequestBody = (
+  body: Record<string, any>,
+  sendAsFormData: boolean
+) => {
+  if (sendAsFormData) {
+    return objectToFormData(body);
+  }
+  return JSON.stringify(body);
+};
+
 export const makeRequest = async ({
   path,
   method = 'GET',
   body,
+  headers,
+  sendAsFormData,
 }: {
   path: string;
   method: string;
   body?: Record<string, any>;
+  headers?: Record<string, string>;
+  sendAsFormData?: boolean;
 }) => {
   try {
     const requestHeaders: HeadersInit = new Headers();
-    requestHeaders.set('Content-Type', 'application/json');
+
+    const headersObj =
+      headers || sendAsFormData ? {} : { 'Content-Type': 'application/json' };
+
+    Object.entries(headersObj).forEach(([key, value]) =>
+      requestHeaders.set(key, value)
+    );
+
+    const requestBody = body && buildRequestBody(body, sendAsFormData || false);
 
     const token = await getAuthorizationHeader();
 
@@ -35,7 +78,7 @@ export const makeRequest = async ({
     const response = await fetch(`${server}/api${path}`, {
       method,
       headers: requestHeaders,
-      body: body ? JSON.stringify(body) : null,
+      body: body ? requestBody : null,
     });
 
     if (!response.ok) {

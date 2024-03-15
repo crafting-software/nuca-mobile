@@ -26,6 +26,7 @@ import {
 } from 'react-native-paper-dates';
 import SelectDropdown from 'react-native-select-dropdown';
 import imagePlaceholder from '../assets/image-placeholder.png';
+import { isDevelopment, server } from '../config';
 import { HotspotContext } from '../context/HotspotDetailContext';
 import { Cat, defaultSterilizedCat } from '../models/Cat';
 import { User } from '../models/User';
@@ -250,7 +251,7 @@ export const AddCatCard = ({
   const [localCat, setCat] = useState<Cat>(cat || defaultSterilizedCat);
   const { hotspotDetails, setHotspotDetails } = useContext(HotspotContext);
   const [checked, setChecked] = React.useState(false);
-  const [images, setImages] = useState<string[]>([]);
+  // const [images, setImages] = useState<ImagePicker.ImagePickerAsset[]>([]);
 
   useEffect(() => {
     const load = async () => {
@@ -329,19 +330,28 @@ export const AddCatCard = ({
         aspect: [4, 3],
         quality: 1,
       });
-
     if (!result.canceled) {
-      result.assets.forEach(uploadImageOnS3);
+      result.assets.forEach(prepareMedia);
     }
   };
 
-  const uploadImageOnS3 = (imageInfo: ImagePicker.ImagePickerAsset) => {
-    //TODO first upload on S3
-    setImages(images.concat(imageInfo.uri));
+  const prepareMedia = (imageInfo: ImagePicker.ImagePickerAsset) => {
+    const formattedFile = {
+      file: imageInfo.uri,
+      type: imageInfo.mimeType,
+      name: imageInfo.fileName,
+    };
+    setCat(prev => ({
+      ...prev,
+      media: prev.media.concat(formattedFile as Record<string, string>),
+    }));
   };
 
   const removeImage = (uri: string) => {
-    setImages(images.filter(item => item !== uri));
+    setCat(prev => ({
+      ...prev,
+      media: prev.media.filter(item => ![item.file, item.url].includes(uri)),
+    }));
   };
 
   return (
@@ -521,18 +531,23 @@ export const AddCatCard = ({
           <View style={styles.imageContainer}>
             <FlatList
               horizontal
-              data={images /*cat.media*/}
-              keyExtractor={(item, index) => index.toString()}
-              renderItem={({ item }) => (
-                <View>
-                  <Image style={styles.media} source={{ uri: item }} />
-                  <IconButton
-                    icon="close-circle"
-                    style={styles.deleteImageIcon}
-                    onPress={() => removeImage(item)}
-                  />
-                </View>
-              )}
+              data={localCat.media}
+              keyExtractor={(_item, index) => index.toString()}
+              renderItem={({ item }) => {
+                const imageUri =
+                  item?.file ||
+                  (isDevelopment ? `${server}${item.url}` : item.url);
+                return (
+                  <View>
+                    <Image style={styles.media} source={{ uri: imageUri }} />
+                    <IconButton
+                      icon="close-circle"
+                      style={styles.deleteImageIcon}
+                      onPress={() => removeImage(item.file || item.url)}
+                    />
+                  </View>
+                );
+              }}
             />
           </View>
           <TouchableOpacity onPress={pickImage}>

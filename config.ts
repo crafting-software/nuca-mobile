@@ -25,6 +25,6 @@ const getEnvConfig = () => {
 
 const { server, environment } = getEnvConfig();
 
-const isDevelopment = environment === 'development';
+const isDevelopment = environment === 'dev';
 
 export { server, environment, isDevelopment };
