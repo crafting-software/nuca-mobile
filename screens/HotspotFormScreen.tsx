@@ -666,6 +666,13 @@ const AddLocation = ({
   const navigation = useNavigation();
   const [location, setLocation] = useState<Location>();
 
+  const onMapRateLimitExceeded = () => {
+    SnackbarManager.error(
+      'HotspotFormScreen',
+      'A apărut o problemă, așteptați câteva momente și încercați din nou.'
+    );
+  };
+
   useEffect(() => {
     setLocation(routeLocation);
   }, [routeLocation]);
@@ -707,8 +714,10 @@ const AddLocation = ({
           <TouchableOpacity
             style={styles.locationButton}
             onPress={async () => {
-              const currentLocation = await findCurrentLocation();
-              setLocation(currentLocation);
+              const currentLocation = await findCurrentLocation(
+                onMapRateLimitExceeded
+              );
+              if (currentLocation) setLocation(currentLocation);
             }}
           >
             <Image

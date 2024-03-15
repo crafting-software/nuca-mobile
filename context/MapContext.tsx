@@ -13,7 +13,9 @@ export const MapContext = createContext<MapContext>({
   setHotspots: () => {},
 });
 
-export const findCurrentLocation = async (): Promise<Location> => {
+export const findCurrentLocation = async (
+  onRateLimitExceeded: () => void
+): Promise<Location | undefined> => {
   const { status } = await LocationProvider.requestForegroundPermissionsAsync();
   if (status !== 'granted') {
     alert('Permission to access location was denied.');
@@ -21,27 +23,37 @@ export const findCurrentLocation = async (): Promise<Location> => {
 
   const position = await LocationProvider.getCurrentPositionAsync();
 
-  return findPlace(position.coords.latitude, position.coords.longitude);
+  return findPlace(
+    position.coords.latitude,
+    position.coords.longitude,
+    onRateLimitExceeded
+  );
 };
 
 export const findPlace = async (
   lat: number,
-  long: number
-): Promise<Location> => {
-  LocationProvider.setGoogleApiKey('AIzaSyDgAde1GooxomdvTUlNtsfH16NWlkdKMpg');
-  const place = await LocationProvider.reverseGeocodeAsync({
-    latitude: lat,
-    longitude: long,
-  });
+  long: number,
+  onRateLimitExceeded: () => void
+): Promise<Location | undefined> => {
+  try {
+    LocationProvider.setGoogleApiKey('AIzaSyDgAde1GooxomdvTUlNtsfH16NWlkdKMpg');
+    const place = await LocationProvider.reverseGeocodeAsync({
+      latitude: lat,
+      longitude: long,
+    });
+    let location: Location = {
+      latitude: lat,
+      longitude: long,
+    };
 
-  let location: Location = {
-    latitude: lat,
-    longitude: long,
-  };
+    place.find(address => {
+      location = { ...address, ...location };
+    });
 
-  place.find(address => {
-    location = { ...address, ...location };
-  });
-
-  return location;
+    return location;
+  } catch (e) {
+    if ((e as Error).message.includes('too many requests')) {
+      onRateLimitExceeded();
+    }
+  }
 };
