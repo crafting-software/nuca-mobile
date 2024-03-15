@@ -50,16 +50,16 @@ export const findPlace = async (
 
     let location: Location = {
       latitude: lat,
-      longitude: long
+      longitude: long,
     };
 
     place.find(address => {
-      location = { 
+      location = {
         ...location,
         street: address.street,
         streetNumber: address.streetNumber,
         city: address.city,
-        postalCode: address.postalCode
+        postalCode: address.postalCode,
       };
     });
 

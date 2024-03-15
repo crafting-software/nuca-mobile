@@ -1,9 +1,4 @@
-import {
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import {
   Image,
   Platform,
@@ -19,6 +14,13 @@ import { useNavigation } from '@react-navigation/native';
 import currentLocationIcon from '../assets/current-location.png';
 import { Appbar } from '../components/Appbar';
 import { FullScreenActivityIndicator } from '../components/FullScreenActivityIndicator';
+import { SearchableLocationDropdown } from '../components/SearchableLocationDropdown';
+import {
+  initialLatitude,
+  initialLatitudeDelta,
+  initialLongitude,
+  initialLongitudeDelta,
+} from '../constants/location';
 import { MapContext } from '../context';
 import { findCurrentLocation } from '../context/MapContext';
 import { Marker } from '../maps';
@@ -27,8 +29,6 @@ import { Location } from '../models/Location';
 import { EdgeInsets, Region } from '../types';
 import SnackbarManager from '../utils/SnackbarManager';
 import { loadHotspots, searchLocations } from '../utils/hotspots';
-import { initialLatitude, initialLatitudeDelta, initialLongitude, initialLongitudeDelta } from '../constants/location';
-import { SearchableLocationDropdown } from '../components/SearchableLocationDropdown';
 
 export const MapScreen = () => {
   const { hotspots, setHotspots } = useContext(MapContext);

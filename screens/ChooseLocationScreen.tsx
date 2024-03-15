@@ -14,15 +14,19 @@ import { useNavigation } from '@react-navigation/native';
 import currentLocationIcon from '../assets/current-location.png';
 import markerNewImage from '../assets/marker-new.png';
 import { Appbar } from '../components/Appbar';
+import { SearchableLocationDropdown } from '../components/SearchableLocationDropdown';
+import {
+  deltaRatio,
+  initialLatitudeDelta,
+  initialLongitudeDelta,
+} from '../constants/location';
 import { MapContext } from '../context';
 import { findCurrentLocation, findPlace } from '../context/MapContext';
 import { Marker } from '../maps';
 import { getHotspotMarker } from '../models/Hotspot';
 import { getFormattedAddress, Location } from '../models/Location';
 import { EdgeInsets, Region, RootStackScreenProps } from '../types';
-import { SearchableLocationDropdown } from '../components/SearchableLocationDropdown';
 import SnackbarManager from '../utils/SnackbarManager';
-import { deltaRatio, initialLatitudeDelta, initialLongitudeDelta } from '../constants/location';
 import { findPlaceDetails } from '../utils/hotspots';
 
 export const ChooseLocationScreen = ({
@@ -122,8 +126,13 @@ export const ChooseLocationScreen = ({
               selectedLocation?.latitude === latitude;
 
             if (!isSameMarker) {
-              const identifyLocation = Platform.OS === 'web' ? findPlaceDetails : findPlace;
-              const location = await identifyLocation(latitude, longitude, onMapRateLimitExceeded);
+              const identifyLocation =
+                Platform.OS === 'web' ? findPlaceDetails : findPlace;
+              const location = await identifyLocation(
+                latitude,
+                longitude,
+                onMapRateLimitExceeded
+              );
               setSelectedLocation(location);
             }
           }}
