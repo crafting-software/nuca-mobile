@@ -28,8 +28,8 @@ import {
 import { MapContext } from '../context';
 import { LocationItemProps } from '../models/Hotspot';
 import { Location } from '../models/Location';
-import { searchLocations } from '../utils/hotspots';
 import SnackbarManager from '../utils/SnackbarManager';
+import { searchLocations } from '../utils/hotspots';
 
 export const SearchableLocationDropdown = forwardRef(
   (_props, ref: React.ForwardedRef<MapView>) => {
@@ -60,15 +60,18 @@ export const SearchableLocationDropdown = forwardRef(
 
       if (!Array.isArray(locationResults)) {
         SnackbarManager.error(
-          "SearchableLocationDropdown.tsx",
-          "A failure occured while obtaining the location search results.");
+          'SearchableLocationDropdown.tsx',
+          'A failure occured while obtaining the location search results.'
+        );
         return;
       }
 
-      setSuggestionsList(locationResults.map((item: LocationItemProps) => ({
-        id: `${item.coordinates?.latitude};${item.coordinates?.longitude}`,
-        title: item.placeName,
-      })));
+      setSuggestionsList(
+        locationResults.map((item: LocationItemProps) => ({
+          id: `${item.coordinates?.latitude};${item.coordinates?.longitude}`,
+          title: item.placeName,
+        }))
+      );
       setLoading(false);
     }, []);
 
@@ -89,7 +92,7 @@ export const SearchableLocationDropdown = forwardRef(
 
     const onOpenSuggestionsList = useCallback((isOpened: boolean) => {}, []);
 
-    const LocationItem = ({title}: TAutocompleteDropdownItem) => (
+    const LocationItem = ({ title }: TAutocompleteDropdownItem) => (
       <View style={styles.locationItem}>
         <Text style={styles.locationTitle}>{title}</Text>
       </View>

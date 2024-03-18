@@ -1,8 +1,8 @@
 import Constants from 'expo-constants';
 import { Platform } from 'react-native';
 
-export const mapboxApiKey =
-  'pk.eyJ1IjoiY3JhZnRpbmdtYXBib3hlcyIsImEiOiJjbHRtc2xoZTAxcDd4Mm1wNmtycG4xdGE0In0.jaf4MwDHD_EY4LbZj0fYVw';
+export const googleMapsApiKey = Constants.expoConfig?.extra?.googleMapsApiKey;
+export const mapboxApiKey = Constants.expoConfig?.extra?.mapboxApiKey;
 export const mapboxGeocodingServerAddress =
   'https://api.mapbox.com/search/geocode/v6';
 

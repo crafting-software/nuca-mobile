@@ -1,5 +1,6 @@
 import * as LocationProvider from 'expo-location';
 import { createContext, Dispatch, SetStateAction } from 'react';
+import { googleMapsApiKey } from '../config';
 import { Hotspot } from '../models/Hotspot';
 import { Location } from '../models/Location';
 
@@ -42,7 +43,7 @@ export const findPlace = async (
   onRateLimitExceeded: () => void
 ): Promise<Location | undefined> => {
   try {
-    LocationProvider.setGoogleApiKey('AIzaSyDgAde1GooxomdvTUlNtsfH16NWlkdKMpg');
+    LocationProvider.setGoogleApiKey(googleMapsApiKey);
     const place = await LocationProvider.reverseGeocodeAsync({
       latitude: lat,
       longitude: long,

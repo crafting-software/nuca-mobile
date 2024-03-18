@@ -237,7 +237,7 @@ export const HotspotDetailScreen = ({
         </View>
       </>
     );
- 
+
   const address = formatHotspotAddress(hotspotDetails, false);
 
   return (

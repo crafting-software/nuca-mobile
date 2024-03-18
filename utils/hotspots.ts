@@ -204,14 +204,22 @@ export const findPlaceDetails = async (
   }
 };
 
-export const formatHotspotAddress = (hotspotDetails: HotspotDetails, shouldIncludeCoordinates: boolean) => {
+export const formatHotspotAddress = (
+  hotspotDetails: HotspotDetails,
+  shouldIncludeCoordinates: boolean
+) => {
   const hotspotDetailsValues = [
     hotspotDetails.address,
     hotspotDetails.city,
     hotspotDetails.zip,
-  ].concat(shouldIncludeCoordinates
-    ? [hotspotDetails.latitude.toString(), hotspotDetails.longitude.toString()]
-    : []);
+  ].concat(
+    shouldIncludeCoordinates
+      ? [
+          hotspotDetails.latitude.toString(),
+          hotspotDetails.longitude.toString(),
+        ]
+      : []
+  );
 
   return hotspotDetailsValues
     .filter(x => !!x)
@@ -219,4 +227,4 @@ export const formatHotspotAddress = (hotspotDetails: HotspotDetails, shouldInclu
     .join(', ')
     .trim()
     .replace(/^, /g, '');
-}
+};

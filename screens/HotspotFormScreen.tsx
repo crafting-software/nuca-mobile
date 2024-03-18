@@ -45,7 +45,12 @@ import { Region, RootStackScreenProps } from '../types';
 import SnackbarManager from '../utils/SnackbarManager';
 import { addCat, deleteCatRequest } from '../utils/cats';
 import { isSmallScreen } from '../utils/helperFunc';
-import { addHotspot, deleteHotspot, formatHotspotAddress, updateHotspot } from '../utils/hotspots';
+import {
+  addHotspot,
+  deleteHotspot,
+  formatHotspotAddress,
+  updateHotspot,
+} from '../utils/hotspots';
 import { loadUsers } from '../utils/users';
 import { CatsView } from './HotspotDetailScreen';
 
