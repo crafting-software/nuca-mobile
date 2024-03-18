@@ -203,3 +203,20 @@ export const findPlaceDetails = async (
     }
   }
 };
+
+export const formatHotspotAddress = (hotspotDetails: HotspotDetails, shouldIncludeCoordinates: boolean) => {
+  const hotspotDetailsValues = [
+    hotspotDetails.address,
+    hotspotDetails.city,
+    hotspotDetails.zip,
+  ].concat(shouldIncludeCoordinates
+    ? [hotspotDetails.latitude.toString(), hotspotDetails.longitude.toString()]
+    : []);
+
+  return hotspotDetailsValues
+    .filter(x => !!x)
+    .map(x => x.trim())
+    .join(', ')
+    .trim()
+    .replace(/^, /g, '');
+}

@@ -45,7 +45,7 @@ import { Region, RootStackScreenProps } from '../types';
 import SnackbarManager from '../utils/SnackbarManager';
 import { addCat, deleteCatRequest } from '../utils/cats';
 import { isSmallScreen } from '../utils/helperFunc';
-import { addHotspot, deleteHotspot, updateHotspot } from '../utils/hotspots';
+import { addHotspot, deleteHotspot, formatHotspotAddress, updateHotspot } from '../utils/hotspots';
 import { loadUsers } from '../utils/users';
 import { CatsView } from './HotspotDetailScreen';
 
@@ -428,18 +428,7 @@ export const HotspotFormScreen = ({
     }
   };
 
-  const hotspotDetailsValues = [
-    hotspotDetails.address,
-    hotspotDetails.city,
-    hotspotDetails.zip,
-    hotspotDetails.latitude.toString(),
-  ];
-  const address = hotspotDetailsValues
-    .filter(x => !!x)
-    .map(x => x.trim())
-    .join(', ')
-    .trim()
-    .replace(/^, /g, '');
+  const address = formatHotspotAddress(hotspotDetails, true);
 
   return (
     <>

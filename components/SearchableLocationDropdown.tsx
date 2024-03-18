@@ -6,7 +6,7 @@ import {
   useRef,
   useState,
 } from 'react';
-import { View, StyleSheet, Platform, Text } from 'react-native';
+import { View, StyleSheet, Platform, Text, TextInput } from 'react-native';
 import {
   AutocompleteDropdown,
   TAutocompleteDropdownItem,
@@ -29,6 +29,7 @@ import { MapContext } from '../context';
 import { LocationItemProps } from '../models/Hotspot';
 import { Location } from '../models/Location';
 import { searchLocations } from '../utils/hotspots';
+import SnackbarManager from '../utils/SnackbarManager';
 
 export const SearchableLocationDropdown = forwardRef(
   (_props, ref: React.ForwardedRef<MapView>) => {
@@ -36,8 +37,8 @@ export const SearchableLocationDropdown = forwardRef(
     const [suggestionsList, setSuggestionsList] = useState<
       TAutocompleteDropdownItem[] | null
     >(null);
-    const searchRef = useRef<any>(null);
-    const dropdownController = useRef<any>(null);
+    const searchRef = useRef<TextInput>(null);
+    const dropdownController = useRef<AutocompleteDropdownRef | null>(null);
     const { selectedLocation, setSelectedLocation } = useContext(MapContext);
 
     const insets = useSafeAreaInsets();
@@ -46,8 +47,7 @@ export const SearchableLocationDropdown = forwardRef(
 
     const searchForAddress = async (address: string) => {
       try {
-        const results: any = await searchLocations(address, 'ip');
-        return results;
+        return await searchLocations(address, 'ip');
       } catch (e) {
         alert('Address not found');
         return [];
@@ -58,12 +58,17 @@ export const SearchableLocationDropdown = forwardRef(
       setLoading(true);
       const locationResults = await searchForAddress(query);
 
-      const suggestions = locationResults.map((item: LocationItemProps) => ({
+      if (!Array.isArray(locationResults)) {
+        SnackbarManager.error(
+          "SearchableLocationDropdown.tsx",
+          "A failure occured while obtaining the location search results.");
+        return;
+      }
+
+      setSuggestionsList(locationResults.map((item: LocationItemProps) => ({
         id: `${item.coordinates?.latitude};${item.coordinates?.longitude}`,
         title: item.placeName,
-      }));
-
-      setSuggestionsList(suggestions);
+      })));
       setLoading(false);
     }, []);
 
@@ -82,11 +87,11 @@ export const SearchableLocationDropdown = forwardRef(
       setSuggestionsList(null);
     }, []);
 
-    const onOpenSuggestionsList = useCallback((isOpened: any) => {}, []);
+    const onOpenSuggestionsList = useCallback((isOpened: boolean) => {}, []);
 
-    const LocationItem = ({ item }: any) => (
+    const LocationItem = ({title}: TAutocompleteDropdownItem) => (
       <View style={styles.locationItem}>
-        <Text style={styles.locationTitle}>{item.title}</Text>
+        <Text style={styles.locationTitle}>{title}</Text>
       </View>
     );
 
@@ -102,7 +107,7 @@ export const SearchableLocationDropdown = forwardRef(
         .map((x: string) => parseFloat(x));
       const selectedLocationToBeUpdated: Location = { latitude, longitude };
       setSelectedLocation(selectedLocationToBeUpdated);
-      dropdownController.current.setInputText(item.title);
+      dropdownController.current?.setInputText(item.title!);
 
       animateToSelectedLocation({
         coordinates: { latitude, longitude },
@@ -112,7 +117,7 @@ export const SearchableLocationDropdown = forwardRef(
     const renderLocationItem = (
       item: TAutocompleteDropdownItem,
       _title: string
-    ) => <LocationItem item={item} />;
+    ) => <LocationItem {...item} />;
 
     useEffect(() => {
       const addressElements = [
@@ -122,7 +127,7 @@ export const SearchableLocationDropdown = forwardRef(
         selectedLocation?.city,
       ].filter(x => x);
       addressElements.length > 0 &&
-        dropdownController.current.setInputText(addressElements.join(', '));
+        dropdownController?.current?.setInputText(addressElements.join(', '));
     }, [selectedLocation]);
 
     return (
