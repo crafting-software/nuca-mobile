@@ -25,14 +25,12 @@ import { findCurrentLocation } from '../context/MapContext';
 import { useNucaTheme as useTheme } from '../hooks/useNucaTheme';
 import { Marker } from '../maps';
 import { getHotspotMarker, Hotspot } from '../models/Hotspot';
-import { Location } from '../models/Location';
 import { EdgeInsets, Region } from '../types';
 import SnackbarManager from '../utils/SnackbarManager';
 import { loadHotspots } from '../utils/hotspots';
 
 export const MapScreen = () => {
-  const { hotspots, setHotspots } = useContext(MapContext);
-  const [location, setLocation] = useState<Location>();
+  const { hotspots, setHotspots, selectedLocation, setSelectedLocation } = useContext(MapContext);
   const [region, setRegion] = useState<Region>({
     latitude: initialLatitude,
     longitude: initialLongitude,
@@ -127,7 +125,7 @@ export const MapScreen = () => {
         activeOpacity={0.9}
         onPress={() => {
           navigation.navigate('AddHotspot', {
-            location: location,
+            location: selectedLocation,
             region: region,
           });
         }}
@@ -145,16 +143,14 @@ export const MapScreen = () => {
         small
         onPress={async () => {
           const location = await findCurrentLocation(onMapRateLimitExceeded);
-          if (!!location) {
-            setLocation(location);
+          setSelectedLocation(location);
 
-            mapRef.current?.animateToRegion({
-              latitude: location.latitude,
-              longitude: location.longitude,
-              latitudeDelta: 0,
-              longitudeDelta: 0,
-            });
-          }
+          mapRef.current?.animateToRegion({
+            latitude: location?.latitude || initialLatitude,
+            longitude: location?.longitude || initialLongitude,
+            latitudeDelta: 0,
+            longitudeDelta: 0,
+          });
         }}
       />
       {isLoading && <FullScreenActivityIndicator />}

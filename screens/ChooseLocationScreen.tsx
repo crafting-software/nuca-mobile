@@ -172,7 +172,7 @@ export const ChooseLocationScreen = ({
                 longitude: selectedLocation.longitude,
               }}
               onPress={() => {
-                setSelectedLocation(null);
+                setSelectedLocation(undefined);
               }}
             >
               <Image

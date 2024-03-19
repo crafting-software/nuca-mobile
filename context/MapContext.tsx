@@ -7,8 +7,8 @@ import { Location } from '../models/Location';
 interface MapContext {
   hotspots: Hotspot[];
   setHotspots: Dispatch<SetStateAction<Hotspot[]>>;
-  selectedLocation?: Location | null;
-  setSelectedLocation: Dispatch<SetStateAction<Location | undefined | null>>;
+  selectedLocation?: Location;
+  setSelectedLocation: Dispatch<SetStateAction<Location | undefined>>;
   selectedAddress?: string;
   setSelectedAddress: Dispatch<SetStateAction<string | undefined>>;
 }
