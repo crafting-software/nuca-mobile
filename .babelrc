@@ -1,0 +1,12 @@
+{
+  "plugins": [
+    [
+      "module:react-native-dotenv",
+      {
+        "envName": "NUCA_DEV_ENV",
+        "moduleName": "@dev",
+        "path": ".env.development.local"
+      }
+    ]
+  ]
+}

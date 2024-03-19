@@ -45,7 +45,12 @@ import { Region, RootStackScreenProps } from '../types';
 import SnackbarManager from '../utils/SnackbarManager';
 import { addCat, deleteCatRequest } from '../utils/cats';
 import { isSmallScreen } from '../utils/helperFunc';
-import { addHotspot, deleteHotspot, updateHotspot } from '../utils/hotspots';
+import {
+  addHotspot,
+  deleteHotspot,
+  formatHotspotAddress,
+  updateHotspot,
+} from '../utils/hotspots';
 import { loadUsers } from '../utils/users';
 import { CatsView } from './HotspotDetailScreen';
 
@@ -282,7 +287,8 @@ export const HotspotFormScreen = ({
         ...hotspotDetails,
         city: location.city || '',
         zip: location.postalCode || '',
-        address: location.street + ' ' + location.streetNumber,
+        address:
+          (location.street || ' ') + ' ' + (location.streetNumber || ' '),
         latitude: location.latitude,
         longitude: location.longitude,
       });
@@ -427,6 +433,8 @@ export const HotspotFormScreen = ({
     }
   };
 
+  const address = formatHotspotAddress(hotspotDetails, true);
+
   return (
     <>
       <Appbar forDetailScreen />
@@ -444,9 +452,7 @@ export const HotspotFormScreen = ({
                   routeRegion={route.params.region}
                 />
               ) : (
-                <Title style={styles.addressTitle}>
-                  {`${hotspotDetails.address} ${hotspotDetails.city}, ${hotspotDetails.zip}, ${hotspotDetails.latitude}`}
-                </Title>
+                <Title style={styles.addressTitle}>{address}</Title>
               )}
               <InputField
                 label="Detalii adresă"

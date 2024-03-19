@@ -1,4 +1,3 @@
-import * as LocationProvider from 'expo-location';
 import { useContext, useEffect, useRef, useState } from 'react';
 import {
   Image,
@@ -8,13 +7,20 @@ import {
   View,
 } from 'react-native';
 import MapView from 'react-native-maps';
-import { Caption, FAB, TextInput, Title, useTheme } from 'react-native-paper';
+import { Caption, FAB, Title, useTheme } from 'react-native-paper';
 import { Theme } from 'react-native-paper/lib/typescript/types';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import currentLocationIcon from '../assets/current-location.png';
 import { Appbar } from '../components/Appbar';
 import { FullScreenActivityIndicator } from '../components/FullScreenActivityIndicator';
+import { SearchableLocationDropdown } from '../components/SearchableLocationDropdown';
+import {
+  initialLatitude,
+  initialLatitudeDelta,
+  initialLongitude,
+  initialLongitudeDelta,
+} from '../constants/location';
 import { MapContext } from '../context';
 import { findCurrentLocation } from '../context/MapContext';
 import { Marker } from '../maps';
@@ -22,20 +28,23 @@ import { getHotspotMarker, Hotspot } from '../models/Hotspot';
 import { Location } from '../models/Location';
 import { EdgeInsets, Region } from '../types';
 import SnackbarManager from '../utils/SnackbarManager';
-import { loadHotspots } from '../utils/hotspots';
+import { loadHotspots, searchLocations } from '../utils/hotspots';
 
 export const MapScreen = () => {
   const { hotspots, setHotspots } = useContext(MapContext);
   const [location, setLocation] = useState<Location>();
   const [region, setRegion] = useState<Region>({
-    latitude: 46.77293258116839,
-    longitude: 23.587688864363546,
-    latitudeDelta: 0.0922,
-    longitudeDelta: 0.0421,
+    latitude: initialLatitude,
+    longitude: initialLongitude,
+    latitudeDelta: initialLatitudeDelta,
+    longitudeDelta: initialLongitudeDelta,
   });
   const mapRef = useRef<MapView>(null);
   const navigation = useNavigation();
   const [isLoading, setIsLoading] = useState(false);
+  const insets = useSafeAreaInsets();
+  const theme = useTheme();
+  const styles = getStyles(theme, insets);
 
   useEffect(() => {
     const load = async () => {
@@ -53,26 +62,15 @@ export const MapScreen = () => {
     load();
   }, []);
 
-  const searchForAddress = async (address: string): Promise<void> => {
+  const searchForAddress = async (address: string) => {
     try {
-      const [{ latitude, longitude }] = await LocationProvider.geocodeAsync(
-        address
-      );
-
-      mapRef.current?.animateToRegion({
-        latitude,
-        longitude,
-        latitudeDelta: 0,
-        longitudeDelta: 0,
-      });
+      const results: any = await searchLocations(address, 'ip');
+      return results;
     } catch (e) {
       alert('Address not found');
+      return [];
     }
   };
-
-  const insets = useSafeAreaInsets();
-  const theme = useTheme();
-  const styles = getStyles(theme, insets);
 
   const onMapRateLimitExceeded = () => {
     SnackbarManager.error(
@@ -130,19 +128,7 @@ export const MapScreen = () => {
           ))}
         </MapView>
         <View style={styles.searchInput}>
-          <TextInput
-            outlineColor={theme.colors.disabled}
-            mode="outlined"
-            autoCorrect={false}
-            placeholder="Caută"
-            right={
-              <TextInput.Icon name="magnify" color={theme.colors.placeholder} />
-            }
-            returnKeyType="search"
-            onSubmitEditing={async ({ nativeEvent: { text } }) =>
-              searchForAddress(text)
-            }
-          />
+          <SearchableLocationDropdown ref={mapRef} />
         </View>
       </View>
       <TouchableOpacity
@@ -252,8 +238,21 @@ const getStyles = (theme: Theme, insets: EdgeInsets) =>
       shadowRadius: 0.22,
       borderRadius: 30,
     },
+    sheetContainer: {
+      flex: 1,
+      alignItems: 'center',
+      height: 40,
+    },
     marker: {
       width: 40,
       height: 40,
+    },
+    locationItem: {
+      paddingTop: 10,
+      paddingBottom: 10,
+    },
+    locationTitle: {
+      paddingLeft: 25,
+      paddingRight: 25,
     },
   });

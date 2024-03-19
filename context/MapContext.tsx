@@ -1,16 +1,23 @@
 import * as LocationProvider from 'expo-location';
 import { createContext, Dispatch, SetStateAction } from 'react';
+import { googleMapsApiKey } from '../config';
 import { Hotspot } from '../models/Hotspot';
 import { Location } from '../models/Location';
 
 interface MapContext {
   hotspots: Hotspot[];
   setHotspots: Dispatch<SetStateAction<Hotspot[]>>;
+  selectedLocation?: Location | null;
+  setSelectedLocation: Dispatch<SetStateAction<Location | undefined | null>>;
+  selectedAddress?: string;
+  setSelectedAddress: Dispatch<SetStateAction<string | undefined>>;
 }
 
 export const MapContext = createContext<MapContext>({
   hotspots: [],
   setHotspots: () => {},
+  setSelectedLocation: () => {},
+  setSelectedAddress: () => {},
 });
 
 export const findCurrentLocation = async (
@@ -36,18 +43,25 @@ export const findPlace = async (
   onRateLimitExceeded: () => void
 ): Promise<Location | undefined> => {
   try {
-    LocationProvider.setGoogleApiKey('AIzaSyDgAde1GooxomdvTUlNtsfH16NWlkdKMpg');
+    LocationProvider.setGoogleApiKey(googleMapsApiKey);
     const place = await LocationProvider.reverseGeocodeAsync({
       latitude: lat,
       longitude: long,
     });
+
     let location: Location = {
       latitude: lat,
       longitude: long,
     };
 
     place.find(address => {
-      location = { ...address, ...location };
+      location = {
+        ...location,
+        street: address.street,
+        streetNumber: address.streetNumber,
+        city: address.city,
+        postalCode: address.postalCode,
+      };
     });
 
     return location;

@@ -26,7 +26,7 @@ import { Cat } from '../models/Cat';
 import { HotspotDetails, HotspotStatus } from '../models/Hotspot';
 import { Region, RootStackParamList } from '../types';
 import { isSmallScreen } from '../utils/helperFunc';
-import { loadHotspotDetails } from '../utils/hotspots';
+import { formatHotspotAddress, loadHotspotDetails } from '../utils/hotspots';
 
 const getStyles = (theme: ReactNativePaper.Theme) =>
   StyleSheet.create({
@@ -238,12 +238,7 @@ export const HotspotDetailScreen = ({
       </>
     );
 
-  const address = trim(
-    `${hotspotDetails.address}, ${hotspotDetails.city}, ${hotspotDetails.zip}`,
-    ','
-  )
-    .trim()
-    .replace(' ,', ',');
+  const address = formatHotspotAddress(hotspotDetails, false);
 
   return (
     <>

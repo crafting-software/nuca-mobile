@@ -1,5 +1,6 @@
 import AppLoading from 'expo-app-loading';
 import { StatusBar } from 'expo-status-bar';
+import { AutocompleteDropdownContextProvider } from 'react-native-autocomplete-dropdown';
 import { Provider as PaperProvider } from 'react-native-paper';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import {
@@ -39,15 +40,17 @@ export default () => {
   return (
     <AuthContextProvider>
       <MapContextProvider>
-        <PaperProvider theme={theme}>
-          <SafeAreaProvider>
-            <HotspotContextProvider>
-              <Navigation />
-              <StatusBar />
-              <SnackbarContainer />
-            </HotspotContextProvider>
-          </SafeAreaProvider>
-        </PaperProvider>
+        <AutocompleteDropdownContextProvider>
+          <PaperProvider theme={theme}>
+            <SafeAreaProvider>
+              <HotspotContextProvider>
+                <Navigation />
+                <StatusBar />
+                <SnackbarContainer />
+              </HotspotContextProvider>
+            </SafeAreaProvider>
+          </PaperProvider>
+        </AutocompleteDropdownContextProvider>
       </MapContextProvider>
     </AuthContextProvider>
   );

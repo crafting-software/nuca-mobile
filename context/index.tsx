@@ -4,6 +4,7 @@ import {
   Hotspot,
   HotspotDetails,
 } from '../models/Hotspot';
+import { Location } from '../models/Location';
 import { Auth, AuthContext } from './AuthContext';
 import { HotspotContext } from './HotspotDetailContext';
 import { MapContext } from './MapContext';
@@ -24,12 +25,24 @@ export const AuthContextProvider = ({ children }: { children: ReactNode }) => {
 
 export const MapContextProvider = ({ children }: { children: ReactNode }) => {
   const [hotspots, setHotspots] = useState<Hotspot[]>([]);
+  const [selectedLocation, setSelectedLocation] = useState<
+    Location | null | undefined
+  >();
+  const [selectedAddress, setSelectedAddress] = useState<string | undefined>();
 
-  const hotspotsValue = useMemo(() => ({ hotspots, setHotspots }), [hotspots]);
-
-  return (
-    <MapContext.Provider value={hotspotsValue}>{children}</MapContext.Provider>
+  const value = useMemo(
+    () => ({
+      hotspots,
+      setHotspots,
+      selectedLocation,
+      setSelectedLocation,
+      selectedAddress,
+      setSelectedAddress,
+    }),
+    [hotspots, selectedLocation, selectedAddress]
   );
+
+  return <MapContext.Provider value={value}>{children}</MapContext.Provider>;
 };
 
 export const HotspotContextProvider = ({
