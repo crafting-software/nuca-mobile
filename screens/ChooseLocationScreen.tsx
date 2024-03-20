@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import MapView from 'react-native-maps';
+import MapView, { MapPressEvent } from 'react-native-maps';
 import { Caption, FAB, TextInput, useTheme } from 'react-native-paper';
 import { Theme } from 'react-native-paper/lib/typescript/types';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -76,6 +76,33 @@ export const ChooseLocationScreen = ({
     );
   }, [selectedLocation]);
 
+  const onPressCallback = async (e: MapPressEvent) => {
+    const getCoords = () => {
+      if (Platform.OS === 'web') {
+        const coords = e.nativeEvent.coordinate;
+        return { latitude: coords.latitude, longitude: coords.longitude };
+      }
+      return e.nativeEvent.coordinate;
+    };
+
+    const { latitude, longitude } = getCoords();
+
+    const isSameMarker =
+      selectedLocation?.longitude === longitude &&
+      selectedLocation?.latitude === latitude;
+
+    if (!isSameMarker) {
+      const identifyLocation =
+        Platform.OS === 'web' ? findPlaceDetails : findPlace;
+      const location = await identifyLocation(
+        latitude,
+        longitude,
+        onMapRateLimitExceeded
+      );
+      setSelectedLocation(location);
+    }
+  };
+
   return (
     <>
       <Appbar forDetailScreen />
@@ -89,53 +116,9 @@ export const ChooseLocationScreen = ({
           // use intial region + animateToRegion instead of region as react state because
           // gestures don't work well https://github.com/react-native-maps/react-native-maps/issues/3639
           initialRegion={region}
-          onRegionChange={() => {
-            setRegion;
-          }}
           showsUserLocation
           style={styles.map}
-          //am incercat si cu asta, asta merge, dar nu face ceea ce vrem noi
-          onRegionChangeComplete={async region => {
-            const { latitude, longitude } = region;
-            const isSameMarker =
-              selectedLocation?.longitude === longitude &&
-              selectedLocation?.latitude === latitude;
-
-            if (!isSameMarker) {
-              const location = await findPlace(
-                latitude,
-                longitude,
-                onMapRateLimitExceeded
-              );
-              setSelectedLocation(location);
-            }
-          }}
-          onPress={async e => {
-            const getCoords = () => {
-              if (Platform.OS === 'web') {
-                const coords = (e as any).latLng;
-                return { latitude: coords.lat(), longitude: coords.lng() };
-              }
-              return e.nativeEvent.coordinate;
-            };
-
-            const { latitude, longitude } = getCoords();
-
-            const isSameMarker =
-              selectedLocation?.longitude === longitude &&
-              selectedLocation?.latitude === latitude;
-
-            if (!isSameMarker) {
-              const identifyLocation =
-                Platform.OS === 'web' ? findPlaceDetails : findPlace;
-              const location = await identifyLocation(
-                latitude,
-                longitude,
-                onMapRateLimitExceeded
-              );
-              setSelectedLocation(location);
-            }
-          }}
+          onPress={onPressCallback}
         >
           {hotspots.map(h => (
             <Marker
