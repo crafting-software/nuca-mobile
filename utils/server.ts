@@ -19,8 +19,8 @@ const objectToFormData = (
   obj: Record<string, any>,
   formData: FormData = new FormData(),
   parentKey: string = ''
-): FormData =>
-  Object.entries(obj).reduce((fd: FormData, [key, value]: [string, any]) => {
+): FormData => {
+  return obj ? Object.entries(obj).reduce((fd: FormData, [key, value]: [string, any]) => {
     const propName: string = parentKey ? `${parentKey}[${key}]` : key;
 
     if (typeof value === 'object' && !(value instanceof File)) {
@@ -34,7 +34,8 @@ const objectToFormData = (
     }
 
     return fd;
-  }, formData);
+  }, formData) : formData;
+}
 
 const buildRequestBody = (
   body: Record<string, any>,
