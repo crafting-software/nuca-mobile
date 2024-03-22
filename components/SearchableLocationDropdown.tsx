@@ -13,7 +13,6 @@ import {
   AutocompleteDropdownRef,
 } from 'react-native-autocomplete-dropdown';
 import MapView from 'react-native-maps';
-import { Theme, useTheme } from 'react-native-paper';
 import { EdgeInsets, useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   dropdownDebounceTime,
@@ -26,6 +25,7 @@ import {
   deltaRatio,
 } from '../constants/location';
 import { MapContext } from '../context';
+import { useNucaTheme as useTheme } from '../hooks/useNucaTheme';
 import { LocationItemProps } from '../models/Hotspot';
 import { Location } from '../models/Location';
 import SnackbarManager from '../utils/SnackbarManager';
@@ -90,7 +90,7 @@ export const SearchableLocationDropdown = forwardRef(
       setSuggestionsList(null);
     }, []);
 
-    const onOpenSuggestionsList = useCallback((isOpened: boolean) => {}, []);
+    const onOpenSuggestionsList = useCallback((_isOpened: boolean) => {}, []);
 
     const LocationItem = ({ title }: TAutocompleteDropdownItem) => (
       <View style={styles.locationItem}>
@@ -168,7 +168,7 @@ export const SearchableLocationDropdown = forwardRef(
   }
 );
 
-const getStyles = (theme: Theme, insets: EdgeInsets) =>
+const getStyles = (_theme: NucaCustomTheme, _insets: EdgeInsets) =>
   StyleSheet.create({
     locationItem: {
       paddingTop: 10,
