@@ -21,6 +21,7 @@ import { HotspotDetails, HotspotStatus } from '../models/Hotspot';
 import { Region, RootStackParamList } from '../types';
 import { isSmallScreen } from '../utils/helperFunc';
 import { formatHotspotAddress, loadHotspotDetails } from '../utils/hotspots';
+import { initialLatitudeDelta, initialLongitudeDelta } from '../constants/location';
 
 const getStyles = (theme: NucaCustomTheme) =>
   StyleSheet.create({
@@ -215,8 +216,8 @@ export const HotspotDetailScreen = ({
       setRegion({
         latitude: hd?.latitude!,
         longitude: hd?.longitude!,
-        latitudeDelta: 0.0922,
-        longitudeDelta: 0.0421,
+        latitudeDelta: initialLatitudeDelta,
+        longitudeDelta: initialLongitudeDelta,
       });
     };
     load();
@@ -283,7 +284,7 @@ export const HotspotDetailScreen = ({
                   Pisici nesterilizate
                 </Title>
               </View>
-              <CatsView cats={hotspotDetails.unsterilizedCats} />
+              <CatsView areCatsSterilized={false}/>
               <View style={styles.separator} />
               <View style={styles.catCategoryContainer}>
                 <IconButton
@@ -296,7 +297,7 @@ export const HotspotDetailScreen = ({
                   Pisici sterilizate
                 </Title>
               </View>
-              <CatsView cats={hotspotDetails.sterilizedCats} />
+              <CatsView areCatsSterilized={true}/>
             </View>
           </View>
           <FooterView screen={FooterScreens.HotspotDetailScreen} />
@@ -427,12 +428,14 @@ const SummaryView = ({
 export type CatsViewTypes = 'create' | 'detail';
 
 export const CatsView = ({
-  cats = [],
+  // cats = [],
+  areCatsSterilized,
   isEditMode,
   deleteFunction,
   addNewCat,
 }: {
-  cats: Cat[];
+  // cats: Cat[];
+  areCatsSterilized: boolean;
   isEditMode?: boolean;
   deleteFunction?: (cat: Cat) => void;
   addNewCat?: (cat: Cat) => void;
@@ -440,29 +443,62 @@ export const CatsView = ({
   const theme = useTheme();
   const styles = getStyles(theme);
   const maxVisibleCat = 2;
+  const [cats, setCats] = useState<Cat[]>([]);
   const [visibleCat, setVisible] = useState<number>(maxVisibleCat);
+  const {
+    hotspotDetails,
+    newSterilizedCats, 
+    newUnsterilizedCats,
+    // setNewSterilizedCats,
+    // setNewUnsterilizedCats,
+  } = useContext(HotspotContext);
+
+  useEffect(() => {
+    if (!hotspotDetails)
+      return;
+
+    console.log("CatsView --> newSterilizedCats: ", newSterilizedCats);
+    console.log("CatsView --> newUnsterilizedCats: ", newUnsterilizedCats);
+    console.log("CatsView --> hotspotDetails: ", hotspotDetails);
+    setCats(
+      areCatsSterilized 
+        ? hotspotDetails.sterilizedCats
+        : hotspotDetails.unsterilizedCats)  
+  }, [hotspotDetails]);
+
+  // useEffect(() => {
+  //   console.log("HotspotDetailScreen.tsx --> cats: ", cats);  
+  //   console.log("HotspotDetailScreen.tsx --> newSterilizedCats: ", newSterilizedCats);
+  //   console.log("HotspotDetailScreen.tsx --> newUnsterilizedCats: ", newUnsterilizedCats);
+  //   console.log("HotspotDetailScreen.tsx --> hotspotDetails: ", hotspotDetails);
+  // }, []);
 
   return isSmallScreen() ? (
     <View>
       {cats
         .slice(0, visibleCat)
-        .map((cat, index) =>
-          cat.isNew ? (
+        .map((cat, index) => {
+          console.log(`HotspotDetailScreen --> cat no. ${index}: `, cat);
+          return cat.isNew ? (
             <AddCatCard
               key={index}
-              cat={cat}
+              index={index}
+              // cat={cat}
+              isCatSterilized={areCatsSterilized}
               addCat={addNewCat}
               deleteCat={deleteFunction}
             />
           ) : (
             <CatCard
               key={cat.id}
-              cat={cat}
-              index={index + 1}
+              // cat={cat}
+              isCatSterilized={areCatsSterilized}
+              index={index}
               isEditingMode={isEditMode}
               deleteFunction={deleteFunction}
             />
-          )
+          );
+        }
         )}
       {cats.length > maxVisibleCat && visibleCat === maxVisibleCat && (
         <View style={{ alignItems: 'center' }}>
@@ -488,15 +524,18 @@ export const CatsView = ({
             {cats[index].isNew ? (
               <AddCatCard
                 key={index}
-                cat={cats[index]}
+                index={index}
+                isCatSterilized={areCatsSterilized}
+                // cat={cats[index]}
                 addCat={addNewCat}
                 deleteCat={deleteFunction}
               />
             ) : (
               <CatCard
                 key={cats[index].id}
-                cat={cats[index]}
-                index={index + 1}
+                // cat={cats[index]}
+                index={index}//+ 1}
+                isCatSterilized={areCatsSterilized}
                 isEditingMode={isEditMode}
                 deleteFunction={deleteFunction}
               />

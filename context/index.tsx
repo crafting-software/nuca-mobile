@@ -15,6 +15,7 @@ import { Location } from '../models/Location';
 import { Auth, AuthContext } from './AuthContext';
 import { HotspotContext } from './HotspotDetailContext';
 import { MapContext } from './MapContext';
+import { Cat } from '../models/Cat';
 
 export * from './AuthContext';
 export * from './MapContext';
@@ -68,9 +69,18 @@ export const HotspotContextProvider = ({
   const [hotspotDetails, setHotspotDetails] = useState<HotspotDetails>(
     defaultHotspotDetails
   );
+  const [newSterilizedCats, setNewSterilizedCats] = useState<Cat[]>([]);
+  const [newUnsterilizedCats, setNewUnsterilizedCats] = useState<Cat[]>([]);
 
   const hotspotDetailsValue = useMemo(
-    () => ({ hotspotDetails, setHotspotDetails }),
+    () => ({ 
+      hotspotDetails, 
+      newSterilizedCats,
+      newUnsterilizedCats,
+      setHotspotDetails,
+      setNewSterilizedCats,
+      setNewUnsterilizedCats
+    }),
     [hotspotDetails]
   );
 

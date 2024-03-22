@@ -235,24 +235,41 @@ const getStyles = (theme: NucaCustomTheme) =>
 
 export const AddCatCard = ({
   isEditingMode = false,
-  cat,
+  // cat,
+  index,
   addCat,
   deleteCat,
   saveChanges,
+  isCatSterilized
 }: {
   isEditingMode?: boolean;
-  cat?: Cat;
+  // cat?: Cat;
+  index: number;
   addCat?: (cat: Cat) => void;
   deleteCat?: (cat: Cat) => void;
   saveChanges?: () => void;
+  isCatSterilized: boolean;
 }) => {
   const theme = useTheme();
   const styles = getStyles(theme);
-  const [users, setUsers] = useState<User[]>([]);
-  const [localCat, setCat] = useState<Cat>(cat || defaultSterilizedCat);
+
   const { hotspotDetails, setHotspotDetails } = useContext(HotspotContext);
+  const [users, setUsers] = useState<User[]>([]);
+
+  // the localCat variable might represent a problem, because we shouldn't keep a local state of the cat
+  // if we would like to display the updated contents in both the CatCard and AddCatCard
+  // (the card used to display the existing cat information and the one used to update information),
+  // otherwise we will have stale information displayed in the CatCard (used to display existing cat info)
+  const [localCat, setCat] = useState<Cat>(defaultSterilizedCat); 
   const [checked, setChecked] = React.useState(false);
   // const [images, setImages] = useState<ImagePicker.ImagePickerAsset[]>([]);
+
+  useEffect(() => {
+    const catToSet = isCatSterilized
+      ? hotspotDetails.sterilizedCats.at(index)
+      : hotspotDetails.unsterilizedCats.at(index) || defaultSterilizedCat;
+    setCat(catToSet!); // be careful...
+  }, [hotspotDetails]);
 
   useEffect(() => {
     const load = async () => {
@@ -263,48 +280,55 @@ export const AddCatCard = ({
     load();
   }, []);
 
+  // this function is used to actually edit the cat
   const saveCat = async () => {
-    if (saveChanges) saveChanges();
-    if (isEditingMode) {
-      const { success, cat } = await updateCat(
-        checked
-          ? {
-              ...localCat,
-              isSterilized: checked,
-            }
-          : localCat
-      );
+    console.log("AddCatCard --> saveCat");
+    saveChanges && saveChanges();
 
-      if (success && cat) {
-        SnackbarManager.success('Cat updated!');
-        if (checked) {
-          setHotspotDetails(prev => ({
-            ...prev,
-            sterilizedCats: [cat, ...hotspotDetails.sterilizedCats],
-            unsterilizedCats: hotspotDetails.unsterilizedCats.filter(
-              (c: Cat) => c.id !== cat.id
-            ),
-          }));
-        } else {
-          const catList = cat.isSterilized
-            ? hotspotDetails.sterilizedCats
-            : hotspotDetails.unsterilizedCats;
-          const catIndex = catList.findIndex((c: Cat) => c.id === cat.id);
-          catList[catIndex] = cat;
-          cat.isSterilized
-            ? setHotspotDetails(prev => ({
-                ...prev,
-                sterilizedCats: catList,
-              }))
-            : setHotspotDetails(prev => ({
-                ...prev,
-                unsterilizedCats: catList,
-              }));
-        }
-      }
-    } else {
-      if (addCat) addCat(localCat);
+    if (!isEditingMode) {
+      addCat && addCat(localCat);
+      return;
     }
+    
+    const { success, cat } = await updateCat(
+      checked
+        ? {
+            ...localCat,
+            isSterilized: checked,
+          }
+        : localCat
+    );
+
+    if (!success || !cat)
+      return;
+
+    SnackbarManager.success('Cat updated!');
+
+    if (checked) {
+      setHotspotDetails(prev => ({
+        ...prev,
+        sterilizedCats: [cat, ...hotspotDetails.sterilizedCats],
+        unsterilizedCats: hotspotDetails.unsterilizedCats.filter(
+          (c: Cat) => c.id !== cat.id
+        ),
+      }));
+      return;
+    }
+
+    const catList = cat.isSterilized
+      ? hotspotDetails.sterilizedCats
+      : hotspotDetails.unsterilizedCats;
+    const catIndex = catList.findIndex((c: Cat) => c.id === cat.id);
+    catList[catIndex] = cat;
+    cat.isSterilized
+      ? setHotspotDetails(prev => ({
+          ...prev,
+          sterilizedCats: catList,
+        }))
+      : setHotspotDetails(prev => ({
+          ...prev,
+          unsterilizedCats: catList,
+        }));
   };
 
   const [visible, setVisible] = useState(false);
@@ -384,7 +408,7 @@ export const AddCatCard = ({
             </>
           )}
         </View>
-        {isEditingMode && !localCat.isSterilized && (
+        {isEditingMode && !localCat?.isSterilized && (
           <View style={styles.checkboxView}>
             <Caption style={styles.textInputTitle}>
               am sterilizat pisica
@@ -403,7 +427,7 @@ export const AddCatCard = ({
         <Caption style={styles.textInputTitle}>Sex</Caption>
         <SelectDropdown
           data={['M', 'F']}
-          defaultValue={localCat.sex}
+          defaultValue={localCat?.sex}
           buttonStyle={styles.genderButton}
           buttonTextStyle={styles.genderButtonText}
           dropdownStyle={styles.genderDropdown}
@@ -433,7 +457,7 @@ export const AddCatCard = ({
           placeholder="Scrie aici"
           inputFieldStyle={styles.inputField}
           textInputStyle={{ height: 100 }}
-          value={localCat.notes}
+          value={localCat?.notes}
           onTextInputChangeText={text => {
             setCat((prev: Cat) => ({
               ...prev,
@@ -441,14 +465,14 @@ export const AddCatCard = ({
             }));
           }}
         />
-        {(localCat.isSterilized || checked) && (
+        {(localCat?.isSterilized || checked) && (
           <>
             <View style={styles.pickerContainer}>
               <View style={styles.datePickerContainer}>
                 <Caption style={styles.textInputTitle}>Dată internare</Caption>
                 <DatePickerInput
                   locale="en"
-                  value={new Date(localCat.checkInDate)}
+                  value={new Date(localCat?.checkInDate)}
                   onChange={selectedDate => {
                     if (selectedDate) {
                       setCat((prev: Cat) => ({
@@ -467,11 +491,11 @@ export const AddCatCard = ({
                 <Caption style={styles.textInputTitle}>Dată externare</Caption>
                 <DatePickerInput
                   locale="en"
-                  value={new Date(localCat.checkOutDate)}
+                  value={new Date(localCat?.checkOutDate)}
                   onChange={selectedDate => {
                     if (selectedDate) {
                       if (
-                        new Date(selectedDate) < new Date(localCat.checkInDate)
+                        new Date(selectedDate) < new Date(localCat?.checkInDate)
                       ) {
                         SnackbarManager.error(
                           'AddCatCard - checkout date less than checkin',
@@ -494,7 +518,7 @@ export const AddCatCard = ({
             </View>
             <Caption style={styles.volunteerTitle}>VOLUNTAR</Caption>
             <SelectDropdown
-              defaultButtonText={localCat.capturedBy?.name || 'Alege voluntar'}
+              defaultButtonText={localCat?.capturedBy?.name || 'Alege voluntar'}
               data={users}
               buttonStyle={styles.dropdownButton}
               buttonTextStyle={styles.dropdownText}
@@ -513,7 +537,7 @@ export const AddCatCard = ({
               }
               rowTextForSelection={(user: User) => user.name}
               buttonTextAfterSelection={(user: User) => user.name}
-              defaultValue={localCat.capturedBy?.name}
+              defaultValue={localCat?.capturedBy?.name}
             />
           </>
         )}
@@ -524,7 +548,7 @@ export const AddCatCard = ({
           <View style={styles.imageContainer}>
             <FlatList
               horizontal
-              data={localCat.media}
+              data={localCat?.media}
               keyExtractor={(_item, index) => index.toString()}
               renderItem={({ item }) => {
                 const imageUri =

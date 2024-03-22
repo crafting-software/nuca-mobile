@@ -1,5 +1,5 @@
 import { isEmpty } from 'lodash';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { FlatList, Image, StyleSheet, View } from 'react-native';
 import {
   Button,
@@ -13,6 +13,7 @@ import { useNucaTheme as useTheme } from '../hooks/useNucaTheme';
 import { Cat, getDateText } from '../models/Cat';
 import { AddCatCard } from './AddCatCard';
 import { DeleteModal } from './DeleteModal';
+import { HotspotContext } from '../context/HotspotDetailContext';
 
 const getStyles = (theme: NucaCustomTheme) =>
   StyleSheet.create({
@@ -136,22 +137,31 @@ const getStyles = (theme: NucaCustomTheme) =>
     },
   });
 interface CatCardProps {
-  cat: Cat;
+  // cat: Cat;
   index: number;
   isEditingMode?: boolean;
   deleteFunction?: (cat: Cat) => void;
+  isCatSterilized: boolean;
 }
 
 export const CatCard = ({
-  cat,
+  // cat,
   index,
   isEditingMode = false,
   deleteFunction,
+  isCatSterilized
 }: CatCardProps) => {
   const theme = useTheme();
   const styles = getStyles(theme);
   const [visible, setVisible] = useState(false);
   const [shouldEdit, setShouldEdit] = useState(false);
+  const {
+    hotspotDetails
+  } = useContext(HotspotContext);
+
+  const cat = isCatSterilized 
+    ? hotspotDetails.sterilizedCats.at(index)
+    : hotspotDetails.unsterilizedCats.at(index);
 
   const showModal = () => setVisible(true);
   const hideModal = () => setVisible(false);
@@ -167,7 +177,7 @@ export const CatCard = ({
           <Portal>
             <Modal visible={visible} onDismiss={hideModal}>
               <DeleteModal
-                cat={cat}
+                cat={cat!} // the bang operator might cause issues later on...
                 hideModal={hideModal}
                 deleteCat={deleteFunction}
               />
@@ -175,16 +185,17 @@ export const CatCard = ({
           </Portal>
           <View style={styles.container}>
             <View style={styles.titleRow}>
-              <Caption style={styles.index}>{index}.</Caption>
+              <Caption style={styles.index}>{index+1}.</Caption>
               <Caption style={styles.title}>Sex</Caption>
-              <Caption style={styles.genderText}>{cat.sex}</Caption>
+              <Caption style={styles.genderText}>{cat?.sex}</Caption>
+              {/* // the bang operator might cause issues later on... */}
             </View>
-            {!!cat.notes && (
+            {!!cat?.notes && (
               <Caption style={styles.notes}>
-                Observatii: {cat.notes + ' ' + cat.description}
+                Observatii: {cat?.notes + ' ' + cat?.description}
               </Caption>
             )}
-            {!!cat.isSterilized && (
+            {!!cat?.isSterilized && (
               <View style={{ paddingTop: 8 }}>
                 <View style={styles.informationLine}>
                   <View style={styles.iconAndText}>
@@ -197,7 +208,7 @@ export const CatCard = ({
                     <Caption style={styles.baseText}>Dată internare:</Caption>
                   </View>
                   <Caption style={styles.infoText}>
-                    {getDateText(cat.checkInDate)}
+                    {getDateText(cat!.checkInDate)}
                   </Caption>
                 </View>
                 <View style={styles.informationLine}>
@@ -211,7 +222,7 @@ export const CatCard = ({
                     <Caption style={styles.baseText}>Dată externare:</Caption>
                   </View>
                   <Caption style={styles.infoText}>
-                    {getDateText(cat.checkOutDate)}
+                    {getDateText(cat!.checkOutDate)}
                   </Caption>
                 </View>
                 <View style={styles.informationLine}>
@@ -225,12 +236,12 @@ export const CatCard = ({
                     <Caption style={styles.baseText}>Voluntar:</Caption>
                   </View>
                   <Caption style={styles.infoText}>
-                    {cat.capturedBy?.name || ''}
+                    {cat?.capturedBy?.name || ''}
                   </Caption>
                 </View>
               </View>
             )}
-            {!isEmpty(cat.media) && (
+            {!isEmpty(cat?.media) && (
               <FlatList
                 style={{ marginTop: 20 }}
                 horizontal
@@ -273,8 +284,9 @@ export const CatCard = ({
         </Card>
       ) : (
         <AddCatCard
+          index={index+1}
           isEditingMode={isEditingMode}
-          cat={cat}
+          isCatSterilized={isCatSterilized}
           saveChanges={updateChanges}
           deleteCat={deleteFunction}
         />
