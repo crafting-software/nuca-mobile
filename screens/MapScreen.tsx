@@ -96,6 +96,7 @@ export const MapScreen = () => {
             setRegion;
           }}
           showsUserLocation
+          showsMyLocationButton={false}
           style={styles.map}
         >
           {hotspots.map((h: Hotspot) => (
