@@ -8,13 +8,13 @@ import {
   IconButton,
   Modal,
   Portal,
-  useTheme,
 } from 'react-native-paper';
+import { useNucaTheme as useTheme } from '../hooks/useNucaTheme';
 import { Cat, getDateText } from '../models/Cat';
 import { AddCatCard } from './AddCatCard';
 import { DeleteModal } from './DeleteModal';
 
-const getStyles = (theme: ReactNativePaper.Theme) =>
+const getStyles = (theme: NucaCustomTheme) =>
   StyleSheet.create({
     mainContainer: {
       minWidth: 250,
@@ -191,7 +191,7 @@ export const CatCard = ({
                     <IconButton
                       icon="calendar-arrow-left"
                       size={16}
-                      color={theme.colors.placeholder}
+                      iconColor={theme.colors.placeholder}
                       style={styles.icon}
                     />
                     <Caption style={styles.baseText}>Dată internare:</Caption>
@@ -205,7 +205,7 @@ export const CatCard = ({
                     <IconButton
                       icon="calendar-arrow-right"
                       size={16}
-                      color={theme.colors.placeholder}
+                      iconColor={theme.colors.placeholder}
                       style={styles.icon}
                     />
                     <Caption style={styles.baseText}>Dată externare:</Caption>
@@ -219,7 +219,7 @@ export const CatCard = ({
                     <IconButton
                       icon="account"
                       size={16}
-                      color={theme.colors.placeholder}
+                      iconColor={theme.colors.placeholder}
                       style={styles.icon}
                     />
                     <Caption style={styles.baseText}>Voluntar:</Caption>

@@ -7,8 +7,7 @@ import {
   View,
 } from 'react-native';
 import MapView from 'react-native-maps';
-import { Caption, FAB, Title, useTheme } from 'react-native-paper';
-import { Theme } from 'react-native-paper/lib/typescript/types';
+import { Caption, FAB, TextInput, Title } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import currentLocationIcon from '../assets/current-location.png';
@@ -23,6 +22,7 @@ import {
 } from '../constants/location';
 import { MapContext } from '../context';
 import { findCurrentLocation } from '../context/MapContext';
+import { useNucaTheme as useTheme } from '../hooks/useNucaTheme';
 import { Marker } from '../maps';
 import { getHotspotMarker, Hotspot } from '../models/Hotspot';
 import { Location } from '../models/Location';
@@ -171,7 +171,7 @@ export const MapScreen = () => {
   );
 };
 
-const getStyles = (theme: Theme, insets: EdgeInsets) =>
+const getStyles = (theme: NucaCustomTheme, insets: EdgeInsets) =>
   StyleSheet.create({
     container: {
       flex: 1,

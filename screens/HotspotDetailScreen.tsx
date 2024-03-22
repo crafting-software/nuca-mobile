@@ -8,13 +8,7 @@ import {
   StyleSheet,
   View,
 } from 'react-native';
-import {
-  Button,
-  Caption,
-  IconButton,
-  Title,
-  useTheme,
-} from 'react-native-paper';
+import { Button, Caption, IconButton, Title } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AddCatCard } from '../components/AddCatCard';
@@ -22,13 +16,14 @@ import { Appbar } from '../components/Appbar';
 import { CatCard } from '../components/CatCard';
 import { FooterScreens, FooterView } from '../components/Footer';
 import { HotspotContext } from '../context/HotspotDetailContext';
+import { useNucaTheme as useTheme } from '../hooks/useNucaTheme';
 import { Cat } from '../models/Cat';
 import { HotspotDetails, HotspotStatus } from '../models/Hotspot';
 import { Region, RootStackParamList } from '../types';
 import { isSmallScreen } from '../utils/helperFunc';
 import { formatHotspotAddress, loadHotspotDetails } from '../utils/hotspots';
 
-const getStyles = (theme: ReactNativePaper.Theme) =>
+const getStyles = (theme: NucaCustomTheme) =>
   StyleSheet.create({
     loadingContainer: {
       flex: 1,
@@ -282,7 +277,7 @@ export const HotspotDetailScreen = ({
                 <IconButton
                   size={24}
                   icon="close-circle"
-                  color={theme.colors.text}
+                  iconColor={theme.colors.text}
                   style={styles.catCategoryIcon}
                 />
                 <Title style={styles.catCategoryTitleLabel}>
@@ -295,7 +290,7 @@ export const HotspotDetailScreen = ({
                 <IconButton
                   size={24}
                   icon="check-circle"
-                  color={theme.colors.text}
+                  iconColor={theme.colors.text}
                   style={styles.catCategoryIcon}
                 />
                 <Title style={styles.catCategoryTitleLabel}>

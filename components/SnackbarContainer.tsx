@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Caption, Snackbar, useTheme } from 'react-native-paper';
+import { Caption, Snackbar } from 'react-native-paper';
+import { useNucaTheme as useTheme } from '../hooks/useNucaTheme';
 import SnackbarManager from '../utils/SnackbarManager';
 
-const getStyles = (theme: ReactNativePaper.Theme) =>
+const getStyles = (theme: NucaCustomTheme) =>
   StyleSheet.create({
     snackLabel: {
       justifyContent: 'center',

@@ -9,21 +9,16 @@ import {
   TextInput as NativeTextInput,
   View,
 } from 'react-native';
-import {
-  Button,
-  Snackbar,
-  TextInput,
-  Title,
-  useTheme,
-} from 'react-native-paper';
+import { Button, Snackbar, TextInput, Title } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import catLady from '../assets/cat-lady.png';
 import { AuthContext } from '../context';
+import { useNucaTheme as useTheme } from '../hooks/useNucaTheme';
 import SnackbarManager from '../utils/SnackbarManager';
 import { isSmallScreen } from '../utils/helperFunc';
 import { signIn2 } from '../utils/sign-in';
 
-const getStyles = (theme: ReactNativePaper.Theme) =>
+const getStyles = (theme: NucaCustomTheme) =>
   StyleSheet.create({
     container: {
       margin: 20,
@@ -186,7 +181,7 @@ export const AuthenticationScreen = () => {
             value={username}
             onChangeText={setUsername}
             left={
-              <TextInput.Icon name="account" color={theme.colors.primary} />
+              <TextInput.Icon icon="account" color={theme.colors.primary} />
             }
             returnKeyType="next"
             error={isInvalidUserName}
@@ -204,7 +199,7 @@ export const AuthenticationScreen = () => {
             placeholder="Parola"
             value={password}
             onChangeText={setPassword}
-            left={<TextInput.Icon name="lock" color={theme.colors.primary} />}
+            left={<TextInput.Icon icon="lock" color={theme.colors.primary} />}
             returnKeyType="go"
             onSubmitEditing={signIn}
             error={isInvalidPassword}

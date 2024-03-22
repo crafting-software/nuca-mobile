@@ -15,7 +15,6 @@ import {
   Headline,
   TextInput,
   Title,
-  useTheme,
 } from 'react-native-paper';
 import SelectDropdown from 'react-native-select-dropdown';
 import { useNavigation } from '@react-navigation/native';
@@ -27,6 +26,7 @@ import { FullScreenActivityIndicator } from '../components/FullScreenActivityInd
 import { InputField } from '../components/InputField';
 import { findCurrentLocation, MapContext } from '../context';
 import { HotspotContext } from '../context/HotspotDetailContext';
+import { useNucaTheme as useTheme } from '../hooks/useNucaTheme';
 import {
   Cat,
   defaultSterilizedCat,
@@ -54,7 +54,7 @@ import {
 import { loadUsers } from '../utils/users';
 import { CatsView } from './HotspotDetailScreen';
 
-const getStyles = (theme: ReactNativePaper.Theme) =>
+const getStyles = (theme: NucaCustomTheme) =>
   StyleSheet.create({
     container: {
       backgroundColor: theme.colors.background,
@@ -474,7 +474,7 @@ export const HotspotFormScreen = ({
                 dropdownIconPosition="right"
                 renderDropdownIcon={(_selectedItem, _index) => (
                   <TextInput.Icon
-                    name="chevron-down"
+                    icon="chevron-down"
                     color={theme.colors.text}
                     style={{ marginRight: 40 }}
                   />
@@ -545,7 +545,7 @@ export const HotspotFormScreen = ({
                 dropdownIconPosition="right"
                 renderDropdownIcon={() => (
                   <TextInput.Icon
-                    name="chevron-down"
+                    icon="chevron-down"
                     color={theme.colors.text}
                     style={{ marginRight: 40 }}
                   />

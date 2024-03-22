@@ -17,7 +17,6 @@ import {
   Modal,
   Portal,
   TextInput,
-  useTheme,
 } from 'react-native-paper';
 import {
   DatePickerInput,
@@ -28,6 +27,7 @@ import SelectDropdown from 'react-native-select-dropdown';
 import imagePlaceholder from '../assets/image-placeholder.png';
 import { isDevelopment, server } from '../config';
 import { HotspotContext } from '../context/HotspotDetailContext';
+import { useNucaTheme as useTheme } from '../hooks/useNucaTheme';
 import { Cat, defaultSterilizedCat } from '../models/Cat';
 import { User } from '../models/User';
 import SnackbarManager from '../utils/SnackbarManager';
@@ -38,7 +38,7 @@ import { InputField } from './InputField';
 
 registerTranslation('en', en);
 
-const getStyles = (theme: ReactNativePaper.Theme) =>
+const getStyles = (theme: NucaCustomTheme) =>
   StyleSheet.create({
     mainContainer: {
       width: '100%',
@@ -418,7 +418,7 @@ export const AddCatCard = ({
           dropdownIconPosition="right"
           renderDropdownIcon={(_selectedItem, _index) => (
             <TextInput.Icon
-              name="chevron-down"
+              icon="chevron-down"
               color={theme.colors.text}
               style={{ marginRight: 40 }}
             />
@@ -510,7 +510,7 @@ export const AddCatCard = ({
               dropdownIconPosition="right"
               renderDropdownIcon={() => (
                 <TextInput.Icon
-                  name="chevron-down"
+                  icon="chevron-down"
                   color={theme.colors.text}
                   style={{ marginRight: 40 }}
                 />
