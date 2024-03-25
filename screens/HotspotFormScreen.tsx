@@ -287,13 +287,13 @@ export const HotspotFormScreen = ({
     load();
   }, []);
 
-  // useEffect(() => {
-  //   console.log("HotspotFormScreen.tsx --> newSterilizedCats: ", newSterilizedCats); 
-  // }, [newSterilizedCats]);
+  useEffect(() => {
+    console.log("HotspotFormScreen.tsx --> newSterilizedCats - useEffect: ", newSterilizedCats); 
+  }, [newSterilizedCats]);
 
-  // useEffect(() => {
-  //   console.log("HotspotFormScreen.tsx --> newUnsterilizedCats: ", newUnsterilizedCats); 
-  // }, [newUnsterilizedCats]);
+  useEffect(() => {
+    console.log("HotspotFormScreen.tsx --> newUnsterilizedCats - useEffect: ", newUnsterilizedCats); 
+  }, [newUnsterilizedCats]);
 
   useEffect(() => {
     if (location)
@@ -412,32 +412,38 @@ export const HotspotFormScreen = ({
 
   const addNewCat = async (newCat: Cat) => {
     console.log("HotspotFormScreen.tsx --> addNewCat - newCat: ", newCat);
-    if (hotspotDetails.id === undefined || hotspotDetails.id === '') {
+    if ([undefined, ''].includes(hotspotDetails.id)) {
+      console.log("HotspotFormScreen.tsx --> addNewCat - new hotspot: ", newCat);
       const hotspot = await save();
       if (hotspot.hotspot) {
         saveNewCat(newCat, hotspot.hotspot.id);
+        console.log("HotspotFormScreen.tsx --> addNewCat - new hotspot - saved the cat. ");
       }
     } else {
       saveNewCat(newCat, hotspotDetails.id);
+      console.log("HotspotFormScreen.tsx --> addNewCat - old hotspot - saved the cat.");
       setIsInProgress(true);
     }
   };
 
   const saveNewCat = async (newCat: Cat, hotspotId: string) => {
+    console.log("HotspotFormScreen.tsx --> saveNewCat - sending newCat to the server... - newCat: ", newCat);
     const { success, cat } = await addCat(newCat, hotspotId);
-
     if (success) {
       setIsInProgress(false);
 
       SnackbarManager.success('Adăugare reuşită');
+      console.log("HotspotFormScreen.tsx --> saveNewCat - cat response received successfully.");
 
       if (cat?.isSterilized) {
+        console.log("HotspotFormScreen.tsx --> saveNewCat - setting sterilized cat details...");
         setNewSterilizedCats([]);
         setHotspotDetails({
           ...hotspotDetails,
           sterilizedCats: [cat!, ...hotspotDetails.sterilizedCats],
         });
       } else {
+        console.log("HotspotFormScreen.tsx --> saveNewCat - setting unsterilized cat details...");
         setNewUnsterilizedCats([]);
         setHotspotDetails({
           ...hotspotDetails,
@@ -445,6 +451,7 @@ export const HotspotFormScreen = ({
         });
       }
     } else {
+      console.log("HotspotFormScreen.tsx --> saveNewCat - receiving the cat response failed...");
       setIsInProgress(false);
       SnackbarManager.error(
         'HotspotFormScreen - addNewCat func.',
@@ -593,6 +600,7 @@ export const HotspotFormScreen = ({
                   style={styles.catCategoryAddButton}
                   size="small"
                   onPress={() => {
+                    console.log("HotspotFormScreen.tsx --> FAB - setNewUnsterilizatedCats: ", defaultUnSterilizedCat);
                     setNewUnsterilizedCats([defaultUnSterilizedCat]);
                   }}
                 />
@@ -623,10 +631,8 @@ export const HotspotFormScreen = ({
                   style={styles.catCategoryAddButton}
                   size="small"
                   onPress={() => {
-                    console.log("HotspotFormScreen --> setNewSterilizedCats: ", setNewSterilizedCats);
-                    console.log("HotspotFormScreen --> setNewSterilizedCats - defaultSterilizedCat: ", defaultSterilizedCat);
-                    console.log("HotspotFormScreen --> newSterilizedCats: ", newSterilizedCats);
                     setNewSterilizedCats([defaultSterilizedCat]);
+                    console.log("HotspotFormScreen.tsx --> FAB - setNewUnsterilizatedCats: ", defaultUnSterilizedCat);
                   }}
                 />
               </View>

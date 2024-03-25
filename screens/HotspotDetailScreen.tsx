@@ -443,28 +443,31 @@ export const CatsView = ({
   const theme = useTheme();
   const styles = getStyles(theme);
   const maxVisibleCat = 2;
-  const [cats, setCats] = useState<Cat[]>([]);
   const [visibleCat, setVisible] = useState<number>(maxVisibleCat);
   const {
     hotspotDetails,
     newSterilizedCats, 
     newUnsterilizedCats,
-    // setNewSterilizedCats,
-    // setNewUnsterilizedCats,
+    setNewSterilizedCats,
+    setNewUnsterilizedCats,
   } = useContext(HotspotContext);
 
-  useEffect(() => {
-    if (!hotspotDetails)
-      return;
+  const cats = (areCatsSterilized
+        ? newSterilizedCats.concat(hotspotDetails.sterilizedCats)
+        : newUnsterilizedCats.concat(hotspotDetails.unsterilizedCats));
 
-    console.log("CatsView --> newSterilizedCats: ", newSterilizedCats);
-    console.log("CatsView --> newUnsterilizedCats: ", newUnsterilizedCats);
-    console.log("CatsView --> hotspotDetails: ", hotspotDetails);
-    setCats(
-      areCatsSterilized 
-        ? hotspotDetails.sterilizedCats
-        : hotspotDetails.unsterilizedCats)  
-  }, [hotspotDetails]);
+  // useEffect(() => {
+  //   if (!hotspotDetails)
+  //     return;
+
+  //   // console.log("CatsView --> newSterilizedCats: ", newSterilizedCats);
+  //   // console.log("CatsView --> newUnsterilizedCats: ", newUnsterilizedCats);
+  //   // console.log("CatsView --> hotspotDetails: ", hotspotDetails);
+  //   setCats(
+  //     areCatsSterilized 
+  //       ? hotspotDetails.sterilizedCats
+  //       : hotspotDetails.unsterilizedCats)
+  // }, [hotspotDetails]);
 
   // useEffect(() => {
   //   console.log("HotspotDetailScreen.tsx --> cats: ", cats);  
@@ -473,33 +476,47 @@ export const CatsView = ({
   //   console.log("HotspotDetailScreen.tsx --> hotspotDetails: ", hotspotDetails);
   // }, []);
 
+  const renderCat = ({ cat, index }: {cat: Cat, index: number}) => (
+    cat.isNew ? (
+      <AddCatCard
+        key={index}
+        index={index}
+        isCatSterilized={areCatsSterilized}
+        // cat={cats[index]}
+        addCat={() => {
+          if (!addNewCat)
+            return;
+          // // add a default new cat to the shared context cat array
+          // areCatsSterilized
+          //   ? setNewSterilizedCats([...newSterilizedCats])
+          //   : ;
+          addNewCat(cat);
+        }}
+        deleteCat={deleteFunction}
+      />
+    ) : (
+      <CatCard
+        key={cats[index].id}
+        // cat={cats[index]}
+        index={index}//+ 1}
+        isCatSterilized={areCatsSterilized}
+        isEditingMode={isEditMode}
+        deleteFunction={deleteFunction}
+      />
+    )
+  );
+
+  const renderCatWeb = ({ cat, index }: {cat: Cat, index: number}) => (
+    <View style={styles.catsWebView}>
+      {renderCat({cat, index})}
+    </View>
+  )
+
   return isSmallScreen() ? (
     <View>
       {cats
         .slice(0, visibleCat)
-        .map((cat, index) => {
-          console.log(`HotspotDetailScreen --> cat no. ${index}: `, cat);
-          return cat.isNew ? (
-            <AddCatCard
-              key={index}
-              index={index}
-              // cat={cat}
-              isCatSterilized={areCatsSterilized}
-              addCat={addNewCat}
-              deleteCat={deleteFunction}
-            />
-          ) : (
-            <CatCard
-              key={cat.id}
-              // cat={cat}
-              isCatSterilized={areCatsSterilized}
-              index={index}
-              isEditingMode={isEditMode}
-              deleteFunction={deleteFunction}
-            />
-          );
-        }
-        )}
+        .map((cat, index) => renderCat({cat, index}))}
       {cats.length > maxVisibleCat && visibleCat === maxVisibleCat && (
         <View style={{ alignItems: 'center' }}>
           <Button
@@ -519,29 +536,7 @@ export const CatsView = ({
     <View style={styles.catsWebViewContainer}>
       <FlatList
         data={cats}
-        renderItem={({ index }) => (
-          <View style={styles.catsWebView}>
-            {cats[index].isNew ? (
-              <AddCatCard
-                key={index}
-                index={index}
-                isCatSterilized={areCatsSterilized}
-                // cat={cats[index]}
-                addCat={addNewCat}
-                deleteCat={deleteFunction}
-              />
-            ) : (
-              <CatCard
-                key={cats[index].id}
-                // cat={cats[index]}
-                index={index}//+ 1}
-                isCatSterilized={areCatsSterilized}
-                isEditingMode={isEditMode}
-                deleteFunction={deleteFunction}
-              />
-            )}
-          </View>
-        )}
+        renderItem={({item, index}) => renderCatWeb({cat: item, index})}
         columnWrapperStyle={{ flexWrap: 'wrap', flex: 1, marginTop: 5 }}
         //Setting the number of column
         numColumns={3}

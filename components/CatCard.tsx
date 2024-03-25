@@ -10,7 +10,7 @@ import {
   Portal,
 } from 'react-native-paper';
 import { useNucaTheme as useTheme } from '../hooks/useNucaTheme';
-import { Cat, getDateText } from '../models/Cat';
+import { Cat, defaultSterilizedCat, defaultUnSterilizedCat, getDateText } from '../models/Cat';
 import { AddCatCard } from './AddCatCard';
 import { DeleteModal } from './DeleteModal';
 import { HotspotContext } from '../context/HotspotDetailContext';
@@ -159,15 +159,18 @@ export const CatCard = ({
     hotspotDetails
   } = useContext(HotspotContext);
 
-  const cat = isCatSterilized 
-    ? hotspotDetails.sterilizedCats.at(index)
-    : hotspotDetails.unsterilizedCats.at(index);
+  const [cat, setCat] = useState<Cat>(isCatSterilized 
+    ? hotspotDetails.sterilizedCats.at(index) || defaultSterilizedCat
+    : hotspotDetails.unsterilizedCats.at(index) || defaultUnSterilizedCat);
 
   const showModal = () => setVisible(true);
   const hideModal = () => setVisible(false);
 
   const updateChanges = () => {
     setShouldEdit(false);
+    setCat(isCatSterilized 
+    ? hotspotDetails.sterilizedCats.at(index) || defaultSterilizedCat
+    : hotspotDetails.unsterilizedCats.at(index) || defaultUnSterilizedCat);
   };
 
   return (
@@ -177,7 +180,7 @@ export const CatCard = ({
           <Portal>
             <Modal visible={visible} onDismiss={hideModal}>
               <DeleteModal
-                cat={cat!} // the bang operator might cause issues later on...
+                cat={cat} 
                 hideModal={hideModal}
                 deleteCat={deleteFunction}
               />
@@ -187,15 +190,14 @@ export const CatCard = ({
             <View style={styles.titleRow}>
               <Caption style={styles.index}>{index+1}.</Caption>
               <Caption style={styles.title}>Sex</Caption>
-              <Caption style={styles.genderText}>{cat?.sex}</Caption>
-              {/* // the bang operator might cause issues later on... */}
+              <Caption style={styles.genderText}>{cat.sex}</Caption>
             </View>
-            {!!cat?.notes && (
+            {!!cat.notes && (
               <Caption style={styles.notes}>
-                Observatii: {cat?.notes + ' ' + cat?.description}
+                Observatii: {cat.notes + ' ' + cat.description}
               </Caption>
             )}
-            {!!cat?.isSterilized && (
+            {!!cat.isSterilized && (
               <View style={{ paddingTop: 8 }}>
                 <View style={styles.informationLine}>
                   <View style={styles.iconAndText}>
@@ -208,7 +210,7 @@ export const CatCard = ({
                     <Caption style={styles.baseText}>Dată internare:</Caption>
                   </View>
                   <Caption style={styles.infoText}>
-                    {getDateText(cat!.checkInDate)}
+                    {getDateText(cat.checkInDate)}
                   </Caption>
                 </View>
                 <View style={styles.informationLine}>
@@ -222,7 +224,7 @@ export const CatCard = ({
                     <Caption style={styles.baseText}>Dată externare:</Caption>
                   </View>
                   <Caption style={styles.infoText}>
-                    {getDateText(cat!.checkOutDate)}
+                    {getDateText(cat.checkOutDate)}
                   </Caption>
                 </View>
                 <View style={styles.informationLine}>
@@ -236,12 +238,12 @@ export const CatCard = ({
                     <Caption style={styles.baseText}>Voluntar:</Caption>
                   </View>
                   <Caption style={styles.infoText}>
-                    {cat?.capturedBy?.name || ''}
+                    {cat.capturedBy?.name || ''}
                   </Caption>
                 </View>
               </View>
             )}
-            {!isEmpty(cat?.media) && (
+            {!isEmpty(cat.media) && (
               <FlatList
                 style={{ marginTop: 20 }}
                 horizontal
@@ -284,7 +286,7 @@ export const CatCard = ({
         </Card>
       ) : (
         <AddCatCard
-          index={index+1}
+          index={index}
           isEditingMode={isEditingMode}
           isCatSterilized={isCatSterilized}
           saveChanges={updateChanges}

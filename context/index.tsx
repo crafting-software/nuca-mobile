@@ -1,4 +1,3 @@
-import { ReactNode, useMemo, useState } from 'react';
 import { Region } from 'react-native-maps';
 import {
   initialLatitude,
@@ -6,6 +5,7 @@ import {
   initialLongitude,
   initialLongitudeDelta,
 } from '../constants/location';
+import { ReactNode, useEffect, useMemo, useState } from 'react';
 import {
   defaultHotspotDetails,
   Hotspot,
@@ -81,8 +81,16 @@ export const HotspotContextProvider = ({
       setNewSterilizedCats,
       setNewUnsterilizedCats
     }),
-    [hotspotDetails]
+    [hotspotDetails, newSterilizedCats, newUnsterilizedCats]
   );
+
+  useEffect(() => {
+    console.log("HotspotContextProvider --> newSterilizedCats: ", newSterilizedCats);
+  }, [newSterilizedCats]);
+
+  useEffect(() => {
+    console.log("HotspotContextProvider --> newUnsterilizedCats: ", newUnsterilizedCats);
+  }, [newUnsterilizedCats]);
 
   return (
     <HotspotContext.Provider value={hotspotDetailsValue}>
