@@ -381,6 +381,25 @@ export const AddCatCard = ({
     }
   };
 
+  const modifyCat = (newCat: Cat) => {
+    const setContext = !cat.isSterilized ? setNewUnsterilizedCats : setNewSterilizedCats; 
+    const newCats = !cat.isSterilized ? newUnsterilizedCats : newSterilizedCats;
+
+    if (cat.isNew) {
+      // This could cause an issue in the future, in case we would like to 
+      // add multiple new cards (because it does not take into account the 
+      // potentially fixed ordering of the new cat cards)
+      setContext([newCat, ...newCats]);
+      return;
+    }
+ 
+    setContext(
+      newCats.map((cat: Cat, catIndex: number) => 
+        catIndex === index ? newCat : cat
+      )
+    )
+  }
+
   const prepareMedia = (imageInfo: ImagePicker.ImagePickerAsset) => {
     const formattedFile = {
       file: imageInfo.uri,
@@ -388,65 +407,17 @@ export const AddCatCard = ({
       name: imageInfo.fileName,
     };
 
-    // set the cat into the shared context
-    const setContext = !cat.isSterilized ? setNewUnsterilizedCats : setNewSterilizedCats; 
-    const newCats = !cat.isSterilized ? newUnsterilizedCats : newSterilizedCats;
-
-    if (cat.isNew) {
-      // This could cause an issue in the future, in case we would like to 
-      // add multiple new cards (because it does not take into account the 
-      // potentially fixed ordering of the new cat cards)
-      setContext([{
-        ...cat, 
-        media: cat.media.concat(formattedFile as Record<string, string>),
-      }, ...newCats]);
-
-      return;
-    }
- 
-    setContext(
-      newCats.map((cat: Cat, catIndex: number) => 
-        catIndex === index 
-          ? {
-              ...cat, 
-              media: cat.media.concat(formattedFile as Record<string, string>),
-            } 
-          : cat
-      )
-    )
+    modifyCat({
+      ...cat, 
+      media: cat.media.concat(formattedFile as Record<string, string>),
+    });
   };
 
   const removeImage = (uri: string) => {
-    // setCat(prev => ({
-    //   ...prev,
-    //   media: prev.media.filter(item => ![item.file, item.url].includes(uri)),
-    // }));
-
-    const setContext = !cat.isSterilized ? setNewUnsterilizedCats : setNewSterilizedCats; 
-    const newCats = !cat.isSterilized ? newUnsterilizedCats : newSterilizedCats;
-
-    if (cat.isNew) {
-      // This could cause an issue in the future, in case we would like to 
-      // add multiple new cards (because it does not take into account the 
-      // potentially fixed ordering of the new cat cards)
-      setContext([{
-        ...cat, 
-        media: cat.media.filter(item => ![item.file, item.url].includes(uri))
-      }, ...newCats]);
-
-      return;
-    }
- 
-    setContext(
-      newCats.map((cat: Cat, catIndex: number) => 
-        catIndex === index 
-          ? {
-              ...cat, 
-              media: cat.media.filter(item => ![item.file, item.url].includes(uri))
-            } 
-          : cat
-      )
-    )
+    modifyCat({
+      ...cat, 
+      media: cat.media.filter(item => ![item.file, item.url].includes(uri))
+    });
   };
 
   return (
@@ -512,10 +483,10 @@ export const AddCatCard = ({
             />
           )}
           onSelect={selectedValue => {
-            setCat(prev => ({
-              ...prev,
+            modifyCat({
+              ...cat,
               sex: selectedValue,
-            }));
+            });
           }}
           buttonTextAfterSelection={(selectedItem: string, _index) =>
             capitalize(selectedItem)
@@ -530,10 +501,10 @@ export const AddCatCard = ({
           textInputStyle={{ height: 100 }}
           value={cat?.notes}
           onTextInputChangeText={text => {
-            setCat((prev: Cat) => ({
-              ...prev,
+            modifyCat({
+              ...cat,
               notes: text,
-            }));
+            });
           }}
         />
         {(cat?.isSterilized || checked) && (
@@ -546,10 +517,10 @@ export const AddCatCard = ({
                   value={new Date(cat!.checkInDate)} // might fail
                   onChange={selectedDate => {
                     if (selectedDate) {
-                      setCat((prev: Cat) => ({
-                        ...prev,
+                      modifyCat({
+                        ...cat,
                         checkInDate: Date.parse(selectedDate.toDateString()),
-                      }));
+                      });
                     }
                   }}
                   mode="outlined"
@@ -573,10 +544,10 @@ export const AddCatCard = ({
                           "Checkout date can't be earlier than checkin date"
                         );
                       } else {
-                        setCat((prev: Cat) => ({
-                          ...prev,
+                        modifyCat({
+                          ...cat,
                           checkOutDate: Date.parse(selectedDate.toDateString()),
-                        }));
+                        });
                       }
                     }
                   }}
@@ -604,7 +575,7 @@ export const AddCatCard = ({
                 />
               )}
               onSelect={selectedVolunteer =>
-                setCat(prev => ({ ...prev, capturedBy: selectedVolunteer }))
+                modifyCat({ ...cat, capturedBy: selectedVolunteer })
               }
               rowTextForSelection={(user: User) => user.name}
               buttonTextAfterSelection={(user: User) => user.name}
