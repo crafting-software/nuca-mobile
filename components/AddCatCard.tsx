@@ -235,7 +235,6 @@ const getStyles = (theme: NucaCustomTheme) =>
 
 export const AddCatCard = ({
   isEditingMode = false,
-  // cat,
   index,
   addCat,
   deleteCat,
@@ -243,7 +242,6 @@ export const AddCatCard = ({
   isCatSterilized
 }: {
   isEditingMode?: boolean;
-  // cat?: Cat;
   index: number;
   addCat?: () => void;
   deleteCat?: (cat: Cat) => void;
@@ -262,12 +260,6 @@ export const AddCatCard = ({
     setNewUnsterilizedCats
   } = useContext(HotspotContext);
   const [users, setUsers] = useState<User[]>([]);
-
-  // // the localCat variable might represent a problem, because we shouldn't keep a local state of the cat
-  // // if we would like to display the updated contents in both the CatCard and AddCatCard
-  // // (the card used to display the existing cat information and the one used to update information),
-  // // otherwise we will have stale information displayed in the CatCard (used to display existing cat info)
-  // const [localCat, setCat] = useState<Cat>(defaultSterilizedCat); 
   const [checked, setChecked] = React.useState(false);
   // const [images, setImages] = useState<ImagePicker.ImagePickerAsset[]>([]);
 
@@ -275,13 +267,13 @@ export const AddCatCard = ({
     ? hotspotDetails.sterilizedCats.at(index) || defaultSterilizedCat
     : hotspotDetails.unsterilizedCats.at(index) || defaultUnSterilizedCat;
 
-  useEffect(() => {
-    console.log("AddCatCard.tsx --> newSterilizedCats: ", newSterilizedCats);
-  }, [newSterilizedCats]);
+  // useEffect(() => {
+  //   console.log("AddCatCard.tsx --> newSterilizedCats: ", newSterilizedCats);
+  // }, [newSterilizedCats]);
 
-  useEffect(() => {
-    console.log("AddCatCard.tsx --> newUnsterilizedCats: ", newUnsterilizedCats);
-  }, [newUnsterilizedCats]);
+  // useEffect(() => {
+  //   console.log("AddCatCard.tsx --> newUnsterilizedCats: ", newUnsterilizedCats);
+  // }, [newUnsterilizedCats]);
 
   useEffect(() => {
     const load = async () => {
@@ -290,19 +282,10 @@ export const AddCatCard = ({
       setUsers(users);
     };
     load();
-
-    // if (!hotspotDetails)
-    //   return;
-
-    // const catToSet = isCatSterilized
-    //   ? hotspotDetails.sterilizedCats.at(index) || defaultSterilizedCat
-    //   : hotspotDetails.unsterilizedCats.at(index) || defaultUnSterilizedCat;
-    // setCat(catToSet);
   }, []); 
 
   // this function is used to actually edit the cat
   const saveCat = async () => {
-    // console.log("AddCatCard --> saveCat");
     saveChanges && saveChanges();
 
     if (!isEditingMode) {
@@ -313,10 +296,10 @@ export const AddCatCard = ({
     const { success, cat: updatedCat } = await updateCat(
       checked
         ? {
-            ...cat!, // might fail
+            ...cat!,
             isSterilized: checked,
           }
-        : cat! // might fail
+        : cat!
     );
 
     if (!success || !updatedCat)
@@ -338,7 +321,7 @@ export const AddCatCard = ({
     const catList = updatedCat.isSterilized
       ? hotspotDetails.sterilizedCats
       : hotspotDetails.unsterilizedCats;
-    const catIndex = index; // catList.findIndex((c: Cat) => c.id === updatedCat.id);
+    const catIndex = index;
     catList[catIndex] = updatedCat;
     updatedCat.isSterilized
       ? setHotspotDetails(prev => ({
@@ -382,22 +365,28 @@ export const AddCatCard = ({
   };
 
   const modifyCat = (newCat: Cat) => {
-    const setContext = !cat.isSterilized ? setNewUnsterilizedCats : setNewSterilizedCats; 
-    const newCats = !cat.isSterilized ? newUnsterilizedCats : newSterilizedCats;
+    const setNewContext = !cat.isSterilized ? setNewUnsterilizedCats : setNewSterilizedCats; 
 
     if (cat.isNew) {
       // This could cause an issue in the future, in case we would like to 
       // add multiple new cards (because it does not take into account the 
       // potentially fixed ordering of the new cat cards)
-      setContext([newCat, ...newCats]);
+      // const newCats = !cat.isSterilized ? newUnsterilizedCats : newSterilizedCats;
+      setNewContext([newCat]);
       return;
     }
- 
-    setContext(
-      newCats.map((cat: Cat, catIndex: number) => 
+
+    const oldCats = !cat.isSterilized ? hotspotDetails.unsterilizedCats : hotspotDetails.sterilizedCats;
+    const updatedCats = 
+      oldCats.map((cat: Cat, catIndex: number) => 
         catIndex === index ? newCat : cat
-      )
-    )
+      );
+
+    setHotspotDetails(
+      cat.isSterilized
+        ? {...hotspotDetails, ...{sterilizedCats: updatedCats}}
+        : {...hotspotDetails, ...{unsterilizedCats: updatedCats}}
+    );
   }
 
   const prepareMedia = (imageInfo: ImagePicker.ImagePickerAsset) => {
@@ -425,7 +414,7 @@ export const AddCatCard = ({
       <Portal>
         <Modal visible={visible} onDismiss={hideModal}>
           <DeleteModal
-            cat={cat!} // might fail
+            cat={cat!}
             hideModal={hideModal}
             deleteCat={deleteCat}
           />
@@ -458,10 +447,7 @@ export const AddCatCard = ({
               <Checkbox
                 color={theme.colors.text}
                 status={checked ? 'checked' : 'unchecked'}
-                onPress={() => {
-                  // console.log("AddCatCard --> checked: ", checked);
-                  setChecked(!checked);
-                }}
+                onPress={() => setChecked(!checked)}
               />
             </View>
           </View>
@@ -514,7 +500,7 @@ export const AddCatCard = ({
                 <Caption style={styles.textInputTitle}>Dată internare</Caption>
                 <DatePickerInput
                   locale="en"
-                  value={new Date(cat!.checkInDate)} // might fail
+                  value={new Date(cat!.checkInDate)}
                   onChange={selectedDate => {
                     if (selectedDate) {
                       modifyCat({
@@ -533,11 +519,11 @@ export const AddCatCard = ({
                 <Caption style={styles.textInputTitle}>Dată externare</Caption>
                 <DatePickerInput
                   locale="en"
-                  value={new Date(cat!.checkOutDate)} //might fail
+                  value={new Date(cat!.checkOutDate)}
                   onChange={selectedDate => {
                     if (selectedDate) {
                       if (
-                        new Date(selectedDate) < new Date(cat!.checkInDate) // might fail
+                        new Date(selectedDate) < new Date(cat!.checkInDate)
                       ) {
                         SnackbarManager.error(
                           'AddCatCard - checkout date less than checkin',
@@ -560,7 +546,7 @@ export const AddCatCard = ({
             </View>
             <Caption style={styles.volunteerTitle}>VOLUNTAR</Caption>
             <SelectDropdown
-              defaultButtonText={cat!.capturedBy?.name || 'Alege voluntar'} // might fail
+              defaultButtonText={cat!.capturedBy?.name || 'Alege voluntar'}
               data={users}
               buttonStyle={styles.dropdownButton}
               buttonTextStyle={styles.dropdownText}
@@ -579,7 +565,7 @@ export const AddCatCard = ({
               }
               rowTextForSelection={(user: User) => user.name}
               buttonTextAfterSelection={(user: User) => user.name}
-              defaultValue={cat!.capturedBy?.name} // might fail
+              defaultValue={cat!.capturedBy?.name}
             />
           </>
         )}
@@ -590,7 +576,7 @@ export const AddCatCard = ({
           <View style={styles.imageContainer}>
             <FlatList
               horizontal
-              data={cat!.media} // might fail
+              data={cat!.media}
               keyExtractor={(_item, index) => index.toString()}
               renderItem={({ item }) => {
                 const imageUri =

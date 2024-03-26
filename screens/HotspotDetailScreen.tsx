@@ -428,13 +428,11 @@ const SummaryView = ({
 export type CatsViewTypes = 'create' | 'detail';
 
 export const CatsView = ({
-  // cats = [],
   areCatsSterilized,
   isEditMode,
   deleteFunction,
   addNewCat,
 }: {
-  // cats: Cat[];
   areCatsSterilized: boolean;
   isEditMode?: boolean;
   deleteFunction?: (cat: Cat) => void;
@@ -456,49 +454,19 @@ export const CatsView = ({
         ? newSterilizedCats.concat(hotspotDetails.sterilizedCats)
         : newUnsterilizedCats.concat(hotspotDetails.unsterilizedCats));
 
-  // useEffect(() => {
-  //   if (!hotspotDetails)
-  //     return;
-
-  //   // console.log("CatsView --> newSterilizedCats: ", newSterilizedCats);
-  //   // console.log("CatsView --> newUnsterilizedCats: ", newUnsterilizedCats);
-  //   // console.log("CatsView --> hotspotDetails: ", hotspotDetails);
-  //   setCats(
-  //     areCatsSterilized 
-  //       ? hotspotDetails.sterilizedCats
-  //       : hotspotDetails.unsterilizedCats)
-  // }, [hotspotDetails]);
-
-  // useEffect(() => {
-  //   console.log("HotspotDetailScreen.tsx --> cats: ", cats);  
-  //   console.log("HotspotDetailScreen.tsx --> newSterilizedCats: ", newSterilizedCats);
-  //   console.log("HotspotDetailScreen.tsx --> newUnsterilizedCats: ", newUnsterilizedCats);
-  //   console.log("HotspotDetailScreen.tsx --> hotspotDetails: ", hotspotDetails);
-  // }, []);
-
   const renderCat = ({ cat, index }: {cat: Cat, index: number}) => (
     cat.isNew ? (
       <AddCatCard
         key={index}
         index={index}
         isCatSterilized={areCatsSterilized}
-        // cat={cats[index]}
-        addCat={() => {
-          if (!addNewCat)
-            return;
-          // // add a default new cat to the shared context cat array
-          // areCatsSterilized
-          //   ? setNewSterilizedCats([...newSterilizedCats])
-          //   : ;
-          addNewCat(cat);
-        }}
+        addCat={() => addNewCat && addNewCat(cat)}
         deleteCat={deleteFunction}
       />
     ) : (
       <CatCard
         key={cats[index].id}
-        // cat={cats[index]}
-        index={index}//+ 1}
+        index={index}
         isCatSterilized={areCatsSterilized}
         isEditingMode={isEditMode}
         deleteFunction={deleteFunction}
