@@ -264,8 +264,8 @@ export const AddCatCard = ({
   // const [images, setImages] = useState<ImagePicker.ImagePickerAsset[]>([]);
 
   const cat = isCatSterilized
-    ? hotspotDetails.sterilizedCats.at(index) || defaultSterilizedCat
-    : hotspotDetails.unsterilizedCats.at(index) || defaultUnSterilizedCat;
+    ? !addCat && hotspotDetails.sterilizedCats.at(index) || defaultSterilizedCat
+    : !addCat && hotspotDetails.unsterilizedCats.at(index) || defaultUnSterilizedCat;
 
   // useEffect(() => {
   //   console.log("AddCatCard.tsx --> newSterilizedCats: ", newSterilizedCats);

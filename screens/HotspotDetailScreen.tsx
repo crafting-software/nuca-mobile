@@ -450,9 +450,13 @@ export const CatsView = ({
     setNewUnsterilizedCats,
   } = useContext(HotspotContext);
 
-  const cats = (areCatsSterilized
-        ? newSterilizedCats.concat(hotspotDetails.sterilizedCats)
-        : newUnsterilizedCats.concat(hotspotDetails.unsterilizedCats));
+  const cats = areCatsSterilized
+    ? [...newSterilizedCats, ...hotspotDetails.sterilizedCats]
+    : [...newUnsterilizedCats, ...hotspotDetails.unsterilizedCats];
+
+  useEffect(() => {
+    console.log(`${areCatsSterilized ? 'sterilized cats' : 'unsterilized cats'}: `, cats);
+  }, [cats]);
 
   const renderCat = ({ cat, index }: {cat: Cat, index: number}) => (
     cat.isNew ? (

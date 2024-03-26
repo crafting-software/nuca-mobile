@@ -600,15 +600,12 @@ export const HotspotFormScreen = ({
                   style={styles.catCategoryAddButton}
                   size="small"
                   onPress={() => {
-                    // console.log("HotspotFormScreen.tsx --> FAB - setNewUnsterilizatedCats: ", defaultUnSterilizedCat);
                     setNewUnsterilizedCats([defaultUnSterilizedCat]);
+                    console.log("HotspotFormScreen.tsx --> FAB - setNewUnsterilizatedCats: ", defaultUnSterilizedCat);
                   }}
                 />
               </View>
               <CatsView
-                // cats={newUnsterilizedCats.concat(
-                //   hotspotDetails.unsterilizedCats
-                // )}
                 isEditMode={true}
                 deleteFunction={deleteCat}
                 addNewCat={addNewCat}
@@ -632,12 +629,11 @@ export const HotspotFormScreen = ({
                   size="small"
                   onPress={() => {
                     setNewSterilizedCats([defaultSterilizedCat]);
-                    // console.log("HotspotFormScreen.tsx --> FAB - setNewUnsterilizatedCats: ", defaultUnSterilizedCat);
+                    console.log("HotspotFormScreen.tsx --> FAB - setNewSterilizatedCats: ", defaultSterilizedCat);
                   }}
                 />
               </View>
               <CatsView
-                // cats={newSterilizedCats.concat(hotspotDetails.sterilizedCats)}
                 areCatsSterilized={true}
                 isEditMode={true}
                 deleteFunction={deleteCat}
