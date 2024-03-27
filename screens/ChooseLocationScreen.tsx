@@ -93,6 +93,7 @@ export const ChooseLocationScreen = ({
             setRegion;
           }}
           showsUserLocation
+          showsMyLocationButton={false}
           style={styles.map}
           //am incercat si cu asta, asta merge, dar nu face ceea ce vrem noi
           onRegionChangeComplete={async region => {
