@@ -88,6 +88,7 @@ export const SearchableLocationDropdown = forwardRef(
 
     const onClearPress = useCallback(() => {
       setSuggestionsList(null);
+      setSelectedLocation(undefined);
     }, []);
 
     const onOpenSuggestionsList = useCallback((_isOpened: boolean) => {}, []);

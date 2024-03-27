@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useRef } from 'react';
 import {
   Image,
   Platform,
@@ -25,7 +25,7 @@ import { useNucaTheme as useTheme } from '../hooks/useNucaTheme';
 import { Marker } from '../maps';
 import { getHotspotMarker } from '../models/Hotspot';
 import { getFormattedAddress, Location } from '../models/Location';
-import { EdgeInsets, Region, RootStackScreenProps } from '../types';
+import { EdgeInsets, RootStackScreenProps } from '../types';
 import SnackbarManager from '../utils/SnackbarManager';
 import { findPlaceDetails } from '../utils/hotspots';
 
@@ -37,8 +37,8 @@ export const ChooseLocationScreen = ({
     setSelectedLocation,
     setSelectedAddress,
     selectedLocation,
+    region,
   } = useContext(MapContext);
-  const [region, setRegion] = useState<Region>(route.params.region);
 
   const mapRef = useRef<MapView>(null);
   const navigation = useNavigation();
@@ -89,9 +89,6 @@ export const ChooseLocationScreen = ({
           // use intial region + animateToRegion instead of region as react state because
           // gestures don't work well https://github.com/react-native-maps/react-native-maps/issues/3639
           initialRegion={region}
-          onRegionChange={() => {
-            setRegion;
-          }}
           showsUserLocation
           showsMyLocationButton={false}
           style={styles.map}
