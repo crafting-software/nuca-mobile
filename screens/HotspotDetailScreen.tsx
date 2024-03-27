@@ -1,4 +1,3 @@
-import { trim } from 'lodash';
 import { useContext, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
@@ -484,7 +483,7 @@ export const CatsView = ({
     <View style={styles.catsWebViewContainer}>
       <FlatList
         data={cats}
-        renderItem={({ item, index }) => (
+        renderItem={({ index }) => (
           <View style={styles.catsWebView}>
             {cats[index].isNew ? (
               <AddCatCard
@@ -507,7 +506,7 @@ export const CatsView = ({
         columnWrapperStyle={{ flexWrap: 'wrap', flex: 1, marginTop: 5 }}
         //Setting the number of column
         numColumns={3}
-        keyExtractor={(item, index) => index.toString()}
+        keyExtractor={(_item, index) => index.toString()}
       />
     </View>
   );

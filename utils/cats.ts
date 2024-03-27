@@ -48,7 +48,7 @@ export const deleteCatRequest = async (
 ): Promise<{
   success: boolean;
 }> => {
-  const { error, data } = await makeRequest({
+  const { error } = await makeRequest({
     path: `/cats/${catId}`,
     method: 'DELETE',
   });

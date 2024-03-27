@@ -235,7 +235,7 @@ export const CatCard = ({
                 style={{ marginTop: 20 }}
                 horizontal
                 data={[] /*cat.media*/}
-                keyExtractor={(item, index) => index.toString()}
+                keyExtractor={(_item, index) => index.toString()}
                 renderItem={({ item }) => (
                   <View>
                     <Image style={styles.media} source={{ uri: item }} />

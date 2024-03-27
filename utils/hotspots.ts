@@ -96,7 +96,7 @@ export const deleteHotspot = async (
 ): Promise<{
   success: boolean;
 }> => {
-  const { error, data } = await makeRequest({
+  const { error } = await makeRequest({
     path: `/hotspots/${hotspotId}`,
     method: 'DELETE',
   });
