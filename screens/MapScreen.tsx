@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import MapView from 'react-native-maps';
+import MapView, { Details } from 'react-native-maps';
 import { Caption, FAB, Title } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
@@ -14,31 +14,25 @@ import currentLocationIcon from '../assets/current-location.png';
 import { Appbar } from '../components/Appbar';
 import { FullScreenActivityIndicator } from '../components/FullScreenActivityIndicator';
 import { SearchableLocationDropdown } from '../components/SearchableLocationDropdown';
-import {
-  initialLatitude,
-  initialLatitudeDelta,
-  initialLongitude,
-  initialLongitudeDelta,
-} from '../constants/location';
+import { initialLatitude, initialLongitude } from '../constants/location';
 import { MapContext } from '../context';
 import { findCurrentLocation } from '../context/MapContext';
 import { useNucaTheme as useTheme } from '../hooks/useNucaTheme';
 import { Marker } from '../maps';
 import { getHotspotMarker, Hotspot } from '../models/Hotspot';
-import { Location } from '../models/Location';
 import { EdgeInsets, Region } from '../types';
 import SnackbarManager from '../utils/SnackbarManager';
 import { loadHotspots } from '../utils/hotspots';
 
 export const MapScreen = () => {
-  const { hotspots, setHotspots } = useContext(MapContext);
-  const [location, setLocation] = useState<Location>();
-  const [region, setRegion] = useState<Region>({
-    latitude: initialLatitude,
-    longitude: initialLongitude,
-    latitudeDelta: initialLatitudeDelta,
-    longitudeDelta: initialLongitudeDelta,
-  });
+  const {
+    hotspots,
+    setHotspots,
+    selectedLocation,
+    setSelectedLocation,
+    region,
+    setRegion,
+  } = useContext(MapContext);
   const mapRef = useRef<MapView>(null);
   const navigation = useNavigation();
   const [isLoading, setIsLoading] = useState(false);
@@ -69,6 +63,9 @@ export const MapScreen = () => {
     );
   };
 
+  const onRegionChange = (region: Region, _details: Details) =>
+    setRegion(region);
+
   return (
     <>
       <Appbar />
@@ -82,11 +79,9 @@ export const MapScreen = () => {
           // use intial region + animateToRegion instead of region as react state because
           // gestures don't work well https://github.com/react-native-maps/react-native-maps/issues/3639
           initialRegion={region}
-          onRegionChange={() => {
-            setRegion;
-          }}
           showsUserLocation
           showsMyLocationButton={false}
+          onRegionChangeComplete={onRegionChange}
           style={styles.map}
         >
           {hotspots.map((h: Hotspot) => (
@@ -127,7 +122,7 @@ export const MapScreen = () => {
         activeOpacity={0.9}
         onPress={() => {
           navigation.navigate('AddHotspot', {
-            location: location,
+            location: selectedLocation,
             region: region,
           });
         }}
@@ -145,16 +140,14 @@ export const MapScreen = () => {
         small
         onPress={async () => {
           const location = await findCurrentLocation(onMapRateLimitExceeded);
-          if (!!location) {
-            setLocation(location);
+          setSelectedLocation(location);
 
-            mapRef.current?.animateToRegion({
-              latitude: location.latitude,
-              longitude: location.longitude,
-              latitudeDelta: 0,
-              longitudeDelta: 0,
-            });
-          }
+          mapRef.current?.animateToRegion({
+            latitude: location?.latitude || initialLatitude,
+            longitude: location?.longitude || initialLongitude,
+            latitudeDelta: 0,
+            longitudeDelta: 0,
+          });
         }}
       />
       {isLoading && <FullScreenActivityIndicator />}

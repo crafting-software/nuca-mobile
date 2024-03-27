@@ -1,4 +1,11 @@
 import { ReactNode, useMemo, useState } from 'react';
+import { Region } from 'react-native-maps';
+import {
+  initialLatitude,
+  initialLatitudeDelta,
+  initialLongitude,
+  initialLongitudeDelta,
+} from '../constants/location';
 import {
   defaultHotspotDetails,
   Hotspot,
@@ -26,20 +33,28 @@ export const AuthContextProvider = ({ children }: { children: ReactNode }) => {
 export const MapContextProvider = ({ children }: { children: ReactNode }) => {
   const [hotspots, setHotspots] = useState<Hotspot[]>([]);
   const [selectedLocation, setSelectedLocation] = useState<
-    Location | null | undefined
+    Location | undefined
   >();
   const [selectedAddress, setSelectedAddress] = useState<string | undefined>();
+  const [region, setRegion] = useState<Region>({
+    latitude: initialLatitude,
+    longitude: initialLongitude,
+    latitudeDelta: initialLatitudeDelta,
+    longitudeDelta: initialLongitudeDelta,
+  });
 
   const value = useMemo(
     () => ({
       hotspots,
-      setHotspots,
       selectedLocation,
-      setSelectedLocation,
       selectedAddress,
+      region,
+      setHotspots,
+      setSelectedLocation,
       setSelectedAddress,
+      setRegion,
     }),
-    [hotspots, selectedLocation, selectedAddress]
+    [hotspots, selectedLocation, selectedAddress, region]
   );
 
   return <MapContext.Provider value={value}>{children}</MapContext.Provider>;

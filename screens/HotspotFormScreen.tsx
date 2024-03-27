@@ -254,7 +254,7 @@ const getStyles = (theme: NucaCustomTheme) =>
 export const HotspotFormScreen = ({
   route,
 }: RootStackScreenProps<'AddHotspot'>) => {
-  const { hotspots, setHotspots } = useContext(MapContext);
+  const { hotspots, setHotspots, setSelectedLocation } = useContext(MapContext);
   const [isInProgress, setIsInProgress] = useState(false);
   const navigation = useNavigation();
 
@@ -323,6 +323,7 @@ export const HotspotFormScreen = ({
         isUpdate ? 'Editare reuşită' : 'Adăugare reuşită'
       );
       navigation.goBack();
+      setSelectedLocation(undefined);
       return { hotspot: newHotspot };
     } else {
       setIsInProgress(false);

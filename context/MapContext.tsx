@@ -1,23 +1,39 @@
 import * as LocationProvider from 'expo-location';
 import { createContext, Dispatch, SetStateAction } from 'react';
+import { Region } from 'react-native-maps';
 import { googleMapsApiKey } from '../config';
+import {
+  initialLatitude,
+  initialLatitudeDelta,
+  initialLongitude,
+  initialLongitudeDelta,
+} from '../constants/location';
 import { Hotspot } from '../models/Hotspot';
 import { Location } from '../models/Location';
 
 interface MapContext {
   hotspots: Hotspot[];
   setHotspots: Dispatch<SetStateAction<Hotspot[]>>;
-  selectedLocation?: Location | null;
-  setSelectedLocation: Dispatch<SetStateAction<Location | undefined | null>>;
+  selectedLocation?: Location;
+  setSelectedLocation: Dispatch<SetStateAction<Location | undefined>>;
   selectedAddress?: string;
   setSelectedAddress: Dispatch<SetStateAction<string | undefined>>;
+  region: Region;
+  setRegion: Dispatch<SetStateAction<Region>>;
 }
 
 export const MapContext = createContext<MapContext>({
   hotspots: [],
+  region: {
+    latitude: initialLatitude,
+    longitude: initialLongitude,
+    latitudeDelta: initialLatitudeDelta,
+    longitudeDelta: initialLongitudeDelta,
+  },
   setHotspots: () => {},
   setSelectedLocation: () => {},
   setSelectedAddress: () => {},
+  setRegion: () => {},
 });
 
 export const findCurrentLocation = async (
