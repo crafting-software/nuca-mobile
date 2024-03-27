@@ -13,6 +13,7 @@ import {
   Caption,
   Card,
   Checkbox,
+  Icon,
   IconButton,
   Modal,
   Portal,
@@ -100,7 +101,7 @@ const getStyles = (theme: NucaCustomTheme) =>
       width: '60%',
       borderRadius: theme.roundness,
       height: 60,
-      backgroundColor: theme.colors.background,
+      backgroundColor: 'transparent',
       borderWidth: 1,
       borderColor: theme.colors.disabled,
       marginTop: 5,
@@ -144,7 +145,7 @@ const getStyles = (theme: NucaCustomTheme) =>
       width: '100%',
       borderRadius: theme.roundness,
       height: 60,
-      backgroundColor: theme.colors.background,
+      backgroundColor: 'transparent',
       borderWidth: 1,
       borderColor: theme.colors.disabled,
       marginTop: 5,
@@ -370,24 +371,16 @@ export const AddCatCard = ({
           {isEditingMode ? (
             <>
               <Caption style={styles.title}>Editează</Caption>
-              <Button
-                icon="pencil"
-                disabled
-                labelStyle={{ color: theme.colors.text }}
-              >
-                <></>
-              </Button>
+              <View style={{ marginHorizontal: 16 }}>
+                <Icon source={'pencil'} size={16} />
+              </View>
             </>
           ) : (
             <>
               <Caption style={styles.title}>Adaugă</Caption>
-              <Button
-                icon="plus"
-                disabled
-                labelStyle={{ color: theme.colors.text }}
-              >
-                <></>
-              </Button>
+              <View style={{ marginHorizontal: 16 }}>
+                <Icon source={'plus'} size={16} />
+              </View>
             </>
           )}
         </View>

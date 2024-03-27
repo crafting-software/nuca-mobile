@@ -185,7 +185,7 @@ const getStyles = (_theme: NucaCustomTheme, _insets: EdgeInsets) =>
       paddingLeft: 18,
     },
     rightButtonsContainerStyle: {
-      right: 8,
+      right: 20,
       height: 30,
       alignSelf: 'center',
     },

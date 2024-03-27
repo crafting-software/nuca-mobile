@@ -154,8 +154,7 @@ const getStyles = (theme: NucaCustomTheme) =>
     },
     catCategoryAddButton: {
       backgroundColor: theme.colors.primary,
-      width: 40,
-      height: 40,
+      alignItems: 'center',
       position: 'absolute',
       margin: 1,
       right: 0,
@@ -475,8 +474,7 @@ export const HotspotFormScreen = ({
                 renderDropdownIcon={(_selectedItem, _index) => (
                   <TextInput.Icon
                     icon="chevron-down"
-                    color={theme.colors.text}
-                    style={{ marginRight: 40 }}
+                    style={{ marginRight: 40, backgroundColor: 'transparent' }}
                   />
                 )}
                 onSelect={(selectedItem: HotspotStatus) =>
@@ -547,7 +545,7 @@ export const HotspotFormScreen = ({
                   <TextInput.Icon
                     icon="chevron-down"
                     color={theme.colors.text}
-                    style={{ marginRight: 40 }}
+                    style={{ marginRight: 40, backgroundColor: 'transparent' }}
                   />
                 )}
                 onSelect={(user: User) =>
@@ -572,7 +570,7 @@ export const HotspotFormScreen = ({
                   color={theme.colors.background}
                   icon="plus"
                   style={styles.catCategoryAddButton}
-                  small
+                  size="small"
                   onPress={() => {
                     setNewUnsterilizedCat([defaultUnSterilizedCat]);
                   }}
@@ -601,7 +599,7 @@ export const HotspotFormScreen = ({
                   color={theme.colors.background}
                   icon="plus"
                   style={styles.catCategoryAddButton}
-                  small
+                  size="small"
                   onPress={() => {
                     setNewSterilizedCats([defaultSterilizedCat]);
                   }}
