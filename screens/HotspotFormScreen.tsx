@@ -601,7 +601,7 @@ export const HotspotFormScreen = ({
                   size="small"
                   onPress={() => {
                     setNewUnsterilizedCats([defaultUnSterilizedCat]);
-                    console.log("HotspotFormScreen.tsx --> FAB - setNewUnsterilizatedCats: ", defaultUnSterilizedCat);
+                    // console.log("HotspotFormScreen.tsx --> FAB - setNewUnsterilizatedCats: ", defaultUnSterilizedCat);
                   }}
                 />
               </View>
@@ -629,7 +629,7 @@ export const HotspotFormScreen = ({
                   size="small"
                   onPress={() => {
                     setNewSterilizedCats([defaultSterilizedCat]);
-                    console.log("HotspotFormScreen.tsx --> FAB - setNewSterilizatedCats: ", defaultSterilizedCat);
+                    // console.log("HotspotFormScreen.tsx --> FAB - setNewSterilizatedCats: ", defaultSterilizedCat);
                   }}
                 />
               </View>

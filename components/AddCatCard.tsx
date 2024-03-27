@@ -260,20 +260,16 @@ export const AddCatCard = ({
     setNewUnsterilizedCats
   } = useContext(HotspotContext);
   const [users, setUsers] = useState<User[]>([]);
-  const [checked, setChecked] = React.useState(false);
+  const [checked, setChecked] = React.useState(isCatSterilized);
   // const [images, setImages] = useState<ImagePicker.ImagePickerAsset[]>([]);
 
   const cat = isCatSterilized
     ? !addCat && hotspotDetails.sterilizedCats.at(index) || defaultSterilizedCat
     : !addCat && hotspotDetails.unsterilizedCats.at(index) || defaultUnSterilizedCat;
 
-  // useEffect(() => {
-  //   console.log("AddCatCard.tsx --> newSterilizedCats: ", newSterilizedCats);
-  // }, [newSterilizedCats]);
-
-  // useEffect(() => {
-  //   console.log("AddCatCard.tsx --> newUnsterilizedCats: ", newUnsterilizedCats);
-  // }, [newUnsterilizedCats]);
+  useEffect(() => {
+    console.log(`AddCatCard.tsx --> cat index: ${index}; cat: `, cat);
+  }, [cat])
 
   useEffect(() => {
     const load = async () => {
@@ -287,12 +283,13 @@ export const AddCatCard = ({
   // this function is used to actually edit the cat
   const saveCat = async () => {
     saveChanges && saveChanges();
+    console.log(`AddCatCard.tsx --> cat index: ${index}; cat: `, cat);
 
     if (!isEditingMode) {
       addCat && addCat();
       return;
     }
- 
+
     const { success, cat: updatedCat } = await updateCat(
       checked
         ? {
@@ -307,9 +304,14 @@ export const AddCatCard = ({
 
     SnackbarManager.success('Cat updated!');
 
+    console.log("AddCatCard.tsx --> isEditingMode");
+
     if (checked) {
       setHotspotDetails(prev => ({
         ...prev,
+        // sterilizedCats: hotspotDetails.sterilizedCats.map( 
+        //   (x, catIndex) => catIndex === index ? updatedCat : x 
+        // ),
         sterilizedCats: [updatedCat, ...hotspotDetails.sterilizedCats],
         unsterilizedCats: hotspotDetails.unsterilizedCats.filter(
           (c: Cat) => c.id !== updatedCat.id
@@ -323,15 +325,15 @@ export const AddCatCard = ({
       : hotspotDetails.unsterilizedCats;
     const catIndex = index;
     catList[catIndex] = updatedCat;
-    updatedCat.isSterilized
-      ? setHotspotDetails(prev => ({
-          ...prev,
-          sterilizedCats: catList,
-        }))
-      : setHotspotDetails(prev => ({
-          ...prev,
-          unsterilizedCats: catList,
-        }));
+    
+    setHotspotDetails(prev => ({
+      ...prev,
+      ...(
+        updatedCat.isSterilized
+          ? {sterilizedCats: catList}
+          : {unsterilizedCats: catList}
+      )
+    }));
   };
 
   const [visible, setVisible] = useState(false);

@@ -1,5 +1,5 @@
 import { isEmpty } from 'lodash';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { FlatList, Image, StyleSheet, View } from 'react-native';
 import {
   Button,
@@ -137,7 +137,6 @@ const getStyles = (theme: NucaCustomTheme) =>
     },
   });
 interface CatCardProps {
-  // cat: Cat;
   index: number;
   isEditingMode?: boolean;
   deleteFunction?: (cat: Cat) => void;
@@ -157,6 +156,7 @@ export const CatCard = ({
   const {
     hotspotDetails
   } = useContext(HotspotContext);
+  const [ content, setContent ] = useState(<></>);
 
   const cat = isCatSterilized
     ? hotspotDetails.sterilizedCats.at(index)
@@ -169,126 +169,145 @@ export const CatCard = ({
     setShouldEdit(false);
   };
 
+  useEffect(() => {
+    console.log('CatCard --> shouldEdit: ', shouldEdit);
+  }, [shouldEdit]);
+
+  useEffect(() => {
+    console.log(`CatCard --> cat index: ${index}; editing mode: ${isEditingMode}; cat: `, cat);
+  }, [cat]);
+
+  const displayCard = () => ((
+    <Card style={styles.mainContainer}>
+      <Portal>
+        <Modal visible={visible} onDismiss={hideModal}>
+          <DeleteModal
+            cat={cat || (isCatSterilized ? defaultSterilizedCat : defaultUnSterilizedCat)}
+            hideModal={hideModal}
+            deleteCat={deleteFunction}
+          />
+        </Modal>
+      </Portal>
+      <View style={styles.container}>
+        <View style={styles.titleRow}>
+          <Caption style={styles.index}>{index+1}.</Caption>
+          <Caption style={styles.title}>Sex</Caption>
+          <Caption style={styles.genderText}>{cat?.sex}</Caption>
+        </View>
+        {!!cat?.notes && (
+          <Caption style={styles.notes}>
+            Observatii: {cat.notes + ' ' + cat.description}
+          </Caption>
+        )}
+        {!!cat?.isSterilized && (
+          <View style={{ paddingTop: 8 }}>
+            <View style={styles.informationLine}>
+              <View style={styles.iconAndText}>
+                <IconButton
+                  icon="calendar-arrow-left"
+                  size={16}
+                  iconColor={theme.colors.placeholder}
+                  style={styles.icon}
+                />
+                <Caption style={styles.baseText}>Dată internare:</Caption>
+              </View>
+              <Caption style={styles.infoText}>
+                {getDateText(cat.checkInDate)}
+              </Caption>
+            </View>
+            <View style={styles.informationLine}>
+              <View style={styles.iconAndText}>
+                <IconButton
+                  icon="calendar-arrow-right"
+                  size={16}
+                  iconColor={theme.colors.placeholder}
+                  style={styles.icon}
+                />
+                <Caption style={styles.baseText}>Dată externare:</Caption>
+              </View>
+              <Caption style={styles.infoText}>
+                {getDateText(cat.checkOutDate)}
+              </Caption>
+            </View>
+            <View style={styles.informationLine}>
+              <View style={styles.iconAndText}>
+                <IconButton
+                  icon="account"
+                  size={16}
+                  iconColor={theme.colors.placeholder}
+                  style={styles.icon}
+                />
+                <Caption style={styles.baseText}>Voluntar:</Caption>
+              </View>
+              <Caption style={styles.infoText}>
+                {cat.capturedBy?.name || ''}
+              </Caption>
+            </View>
+          </View>
+        )}
+        {!isEmpty(cat?.media) && (
+          <FlatList
+            style={{ marginTop: 20 }}
+            horizontal
+            data={[] /*cat.media*/}
+            keyExtractor={(_item, index) => index.toString()}
+            renderItem={({ item }) => (
+              <View>
+                <Image style={styles.media} source={{ uri: item }} />
+              </View>
+            )}
+          />
+        )}
+      </View>
+      {isEditingMode && (
+        <View style={{ flexDirection: 'row', paddingTop: 8 }}>
+          <View style={styles.buttonView}>
+            <Button
+              style={styles.editButton}
+              contentStyle={styles.buttonContent}
+              labelStyle={styles.buttonLabel}
+              icon="pencil"
+              onPress={() => setShouldEdit(true)}
+            >
+              Editează
+            </Button>
+          </View>
+          <View style={styles.buttonView}>
+            <Button
+              style={styles.deleteButton}
+              contentStyle={styles.buttonContent}
+              labelStyle={styles.buttonLabel}
+              icon="close"
+              onPress={showModal}
+            >
+              Șterge
+            </Button>
+          </View>
+        </View>
+      )}
+    </Card>
+  ));
+
+  const displayCatAdditionCard = () => (
+    <AddCatCard
+      key={`add-cat-card-${index}`}
+      index={index}
+      isEditingMode={isEditingMode}
+      isCatSterilized={isCatSterilized}
+      saveChanges={updateChanges}
+      deleteCat={deleteFunction}
+    />
+  );
+
+  useEffect(() => {
+    setContent(
+      !shouldEdit ? displayCard() : displayCatAdditionCard()
+    );
+  }, [shouldEdit]);
+
   return (
     <>
-      {!shouldEdit ? (
-        <Card style={styles.mainContainer}>
-          <Portal>
-            <Modal visible={visible} onDismiss={hideModal}>
-              <DeleteModal
-                cat={cat || (isCatSterilized ? defaultSterilizedCat : defaultUnSterilizedCat)}
-                hideModal={hideModal}
-                deleteCat={deleteFunction}
-              />
-            </Modal>
-          </Portal>
-          <View style={styles.container}>
-            <View style={styles.titleRow}>
-              <Caption style={styles.index}>{index+1}.</Caption>
-              <Caption style={styles.title}>Sex</Caption>
-              <Caption style={styles.genderText}>{cat?.sex}</Caption>
-            </View>
-            {!!cat?.notes && (
-              <Caption style={styles.notes}>
-                Observatii: {cat.notes + ' ' + cat.description}
-              </Caption>
-            )}
-            {!!cat?.isSterilized && (
-              <View style={{ paddingTop: 8 }}>
-                <View style={styles.informationLine}>
-                  <View style={styles.iconAndText}>
-                    <IconButton
-                      icon="calendar-arrow-left"
-                      size={16}
-                      iconColor={theme.colors.placeholder}
-                      style={styles.icon}
-                    />
-                    <Caption style={styles.baseText}>Dată internare:</Caption>
-                  </View>
-                  <Caption style={styles.infoText}>
-                    {getDateText(cat.checkInDate)}
-                  </Caption>
-                </View>
-                <View style={styles.informationLine}>
-                  <View style={styles.iconAndText}>
-                    <IconButton
-                      icon="calendar-arrow-right"
-                      size={16}
-                      iconColor={theme.colors.placeholder}
-                      style={styles.icon}
-                    />
-                    <Caption style={styles.baseText}>Dată externare:</Caption>
-                  </View>
-                  <Caption style={styles.infoText}>
-                    {getDateText(cat.checkOutDate)}
-                  </Caption>
-                </View>
-                <View style={styles.informationLine}>
-                  <View style={styles.iconAndText}>
-                    <IconButton
-                      icon="account"
-                      size={16}
-                      iconColor={theme.colors.placeholder}
-                      style={styles.icon}
-                    />
-                    <Caption style={styles.baseText}>Voluntar:</Caption>
-                  </View>
-                  <Caption style={styles.infoText}>
-                    {cat.capturedBy?.name || ''}
-                  </Caption>
-                </View>
-              </View>
-            )}
-            {!isEmpty(cat?.media) && (
-              <FlatList
-                style={{ marginTop: 20 }}
-                horizontal
-                data={[] /*cat.media*/}
-                keyExtractor={(_item, index) => index.toString()}
-                renderItem={({ item }) => (
-                  <View>
-                    <Image style={styles.media} source={{ uri: item }} />
-                  </View>
-                )}
-              />
-            )}
-          </View>
-          {isEditingMode && (
-            <View style={{ flexDirection: 'row', paddingTop: 8 }}>
-              <View style={styles.buttonView}>
-                <Button
-                  style={styles.editButton}
-                  contentStyle={styles.buttonContent}
-                  labelStyle={styles.buttonLabel}
-                  icon="pencil"
-                  onPress={() => setShouldEdit(true)}
-                >
-                  Editează
-                </Button>
-              </View>
-              <View style={styles.buttonView}>
-                <Button
-                  style={styles.deleteButton}
-                  contentStyle={styles.buttonContent}
-                  labelStyle={styles.buttonLabel}
-                  icon="close"
-                  onPress={showModal}
-                >
-                  Șterge
-                </Button>
-              </View>
-            </View>
-          )}
-        </Card>
-      ) : (
-        <AddCatCard
-          index={index}
-          isEditingMode={isEditingMode}
-          isCatSterilized={isCatSterilized}
-          saveChanges={updateChanges}
-          deleteCat={deleteFunction}
-        />
-      )}
+      {content}
     </>
   );
 };

@@ -454,14 +454,18 @@ export const CatsView = ({
     ? [...newSterilizedCats, ...hotspotDetails.sterilizedCats]
     : [...newUnsterilizedCats, ...hotspotDetails.unsterilizedCats];
 
-  useEffect(() => {
-    console.log(`${areCatsSterilized ? 'sterilized cats' : 'unsterilized cats'}: `, cats);
-  }, [cats]);
+  // useEffect(() => {
+  //   console.log(`${areCatsSterilized ? 'sterilized cats' : 'unsterilized cats'}: `, cats);
+  // }, [cats]);
 
-  const renderCat = ({ cat, index }: {cat: Cat, index: number}) => (
+  useEffect(() => {
+    console.log("CatsView --> isEditMode: ", isEditMode);
+  }, [isEditMode]);
+
+  const renderCat = ({ cat, index }: {cat: Cat, index: number}) => ( // check this place as well
     cat.isNew ? (
       <AddCatCard
-        key={index}
+        key={`add-cat-card-${index}`}
         index={index}
         isCatSterilized={areCatsSterilized}
         addCat={() => addNewCat && addNewCat(cat)}
@@ -469,7 +473,7 @@ export const CatsView = ({
       />
     ) : (
       <CatCard
-        key={cats[index].id}
+        key={`cat-card-${index}`}//{cats[index].id} // this is the cause of the duplicate key error
         index={index}
         isCatSterilized={areCatsSterilized}
         isEditingMode={isEditMode}
