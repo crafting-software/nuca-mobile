@@ -6,13 +6,13 @@ import {
   Divider,
   IconButton,
   Menu,
-  useTheme,
 } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import logo from '../assets/logo.png';
 import { AuthContext } from '../context';
+import { useNucaTheme as useTheme } from '../hooks/useNucaTheme';
 import { EdgeInsets } from '../types';
 
 export const Appbar = ({
@@ -33,7 +33,7 @@ export const Appbar = ({
   const insets = useSafeAreaInsets();
   const theme = useTheme();
   const styles = getStyles(theme, insets);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(true);
   const navigation = useNavigation();
 
   const defaultAppbarContent = (
@@ -48,29 +48,27 @@ export const Appbar = ({
         }
       >
         <Menu.Item
-          icon="file-chart-outline"
+          leadingIcon="file-chart-outline"
           onPress={() => {}}
           title="Generare raport"
         />
         <Divider />
         <Menu.Item
-          icon="exit-to-app"
+          leadingIcon="exit-to-app"
           onPress={signOut}
           title="Ieșire din cont"
         />
       </Menu>
     </>
   );
-
   const detailScreenAppbarContent = (
     <IconButton
       icon="arrow-left"
-      color={theme.colors.text}
+      iconColor={theme.colors.text}
       size={24}
       onPress={() => navigation.goBack()}
     />
   );
-
   return (
     <PaperAppbar
       style={[styles.defaultBar, forDetailScreen ? styles.detailScreenBar : {}]}
@@ -80,12 +78,12 @@ export const Appbar = ({
   );
 };
 
-const getStyles = (theme: ReactNativePaper.Theme, insets: EdgeInsets) =>
+const getStyles = (theme: NucaCustomTheme, insets: EdgeInsets) =>
   StyleSheet.create({
     defaultBar: {
       paddingTop: insets.top as number,
       paddingHorizontal: 16,
-      height: 'auto',
+      height: Platform.OS === 'web' ? 64 : 100,
       justifyContent: 'space-between',
       backgroundColor: theme.colors.background,
     },

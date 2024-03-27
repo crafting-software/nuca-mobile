@@ -1,6 +1,6 @@
 import { View, StyleSheet } from 'react-native';
-import { ActivityIndicator, useTheme } from 'react-native-paper';
-import { Theme } from 'react-native-paper/lib/typescript/types';
+import { ActivityIndicator } from 'react-native-paper';
+import { useNucaTheme as useTheme } from '../hooks/useNucaTheme';
 
 export const FullScreenActivityIndicator = () => {
   const theme = useTheme();
@@ -13,7 +13,7 @@ export const FullScreenActivityIndicator = () => {
   );
 };
 
-const getStyles = (theme: Theme) =>
+const getStyles = (theme: NucaCustomTheme) =>
   StyleSheet.create({
     container: {
       position: 'absolute',

@@ -7,7 +7,8 @@ import {
   View,
   ViewStyle,
 } from 'react-native';
-import { Caption, TextInput, useTheme } from 'react-native-paper';
+import { Caption, TextInput } from 'react-native-paper';
+import { useNucaTheme as useTheme } from '../hooks/useNucaTheme';
 
 export type InputFieldProps = {
   label?: string;

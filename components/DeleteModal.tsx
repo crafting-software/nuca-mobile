@@ -1,8 +1,9 @@
 import { StyleSheet, View } from 'react-native';
-import { Button, Caption, Card, useTheme } from 'react-native-paper';
+import { Button, Caption, Card } from 'react-native-paper';
+import { useNucaTheme as useTheme } from '../hooks/useNucaTheme';
 import { Cat } from '../models/Cat';
 
-const getModalStyles = (theme: ReactNativePaper.Theme) =>
+const getModalStyles = (theme: NucaCustomTheme) =>
   StyleSheet.create({
     title: {
       marginVertical: 38,

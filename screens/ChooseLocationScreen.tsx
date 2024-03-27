@@ -7,8 +7,7 @@ import {
   View,
 } from 'react-native';
 import MapView from 'react-native-maps';
-import { Caption, FAB, TextInput, useTheme } from 'react-native-paper';
-import { Theme } from 'react-native-paper/lib/typescript/types';
+import { Caption, FAB, TextInput } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import currentLocationIcon from '../assets/current-location.png';
@@ -22,6 +21,7 @@ import {
 } from '../constants/location';
 import { MapContext } from '../context';
 import { findCurrentLocation, findPlace } from '../context/MapContext';
+import { useNucaTheme as useTheme } from '../hooks/useNucaTheme';
 import { Marker } from '../maps';
 import { getHotspotMarker } from '../models/Hotspot';
 import { getFormattedAddress, Location } from '../models/Location';
@@ -204,7 +204,7 @@ export const ChooseLocationScreen = ({
           <View style={styles.confirmAddressButtonIconContainer}>
             <TextInput.Icon
               size={20}
-              name={'check'}
+              icon={'check'}
               color={theme.colors.background}
             />
           </View>
@@ -224,7 +224,7 @@ export const ChooseLocationScreen = ({
   );
 };
 
-const getStyles = (theme: Theme, insets: EdgeInsets) =>
+const getStyles = (theme: NucaCustomTheme, insets: EdgeInsets) =>
   StyleSheet.create({
     mapContainer: {
       position: 'relative',

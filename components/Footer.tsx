@@ -1,14 +1,14 @@
 import { Image, StyleSheet, View } from 'react-native';
-import { useTheme } from 'react-native-paper';
 import catLady2 from '../assets/cat-lady2.png';
 import catLady3 from '../assets/cat-lady3.png';
 import catLady3Web from '../assets/cat-lady3W.png';
 import catLady4 from '../assets/cat-lady4.png';
 import catLady4Web from '../assets/cat-lady4W.png';
 import catLady5Web from '../assets/cat-lady5W.png';
+import { useNucaTheme as useTheme } from '../hooks/useNucaTheme';
 import { isSmallScreen } from '../utils/helperFunc';
 
-const getFooterStyles = (theme: ReactNativePaper.Theme) =>
+const getFooterStyles = (theme: NucaCustomTheme) =>
   StyleSheet.create({
     imageView: {
       marginTop: 32,

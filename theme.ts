@@ -1,5 +1,5 @@
-import { configureFonts, DefaultTheme } from 'react-native-paper';
-import { Fonts, Theme } from 'react-native-paper/lib/typescript/types';
+import { configureFonts, MD2LightTheme } from 'react-native-paper';
+import { MD2Theme } from 'react-native-paper/lib/typescript/types';
 
 export const fontDefinition = {
   regular: {
@@ -31,36 +31,48 @@ export const fontDefinition = {
     fontStyle: 'italic',
     fontWeight: 'normal',
   },
-};
+  labelLarge: {},
+  bodyLarge: {},
+} as const;
 
 export const fontConfig = {
-  default: fontDefinition as Fonts,
-  ios: fontDefinition as Fonts,
-  android: fontDefinition as Fonts,
-  web: fontDefinition as Fonts,
+  default: fontDefinition,
+  ios: fontDefinition,
+  android: fontDefinition,
+  web: fontDefinition,
 };
 
 type CustomColors = {
+  text: string;
+  accent: string;
   secondary: string;
+  disabled: string;
+  placeholder: string;
   warning: string;
   success: string;
   infoText: string;
   infoBg: string;
 };
 
-type PaperColors = Theme['colors'];
+type PaperColors = MD2Theme['colors'];
 type NucaCustomColors = PaperColors & CustomColors;
 declare global {
   namespace ReactNativePaper {
-    interface ThemeColors extends NucaCustomColors {}
+    interface MD2Colors extends NucaCustomColors {}
+  }
+
+  interface NucaCustomTheme extends MD2Theme {
+    colors: NucaCustomColors;
   }
 }
 
-export const getTheme = () => ({
-  ...DefaultTheme,
+export const getTheme = (): NucaCustomTheme => ({
+  // ...DefaultTheme,
+  ...MD2LightTheme,
   roundness: 30,
+  version: 2,
   colors: {
-    ...DefaultTheme.colors,
+    ...MD2LightTheme.colors,
     primary: '#00BAED',
     accent: '#E0D6FF',
     secondary: '#A08CDE',
@@ -75,5 +87,5 @@ export const getTheme = () => ({
     warning: '#FF9212',
     success: '#01C969',
   },
-  fonts: configureFonts(fontConfig),
+  fonts: configureFonts({ config: fontConfig, isV3: false }),
 });

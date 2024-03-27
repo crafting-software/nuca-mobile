@@ -13,11 +13,11 @@ import {
   Caption,
   Card,
   Checkbox,
+  Icon,
   IconButton,
   Modal,
   Portal,
   TextInput,
-  useTheme,
 } from 'react-native-paper';
 import {
   DatePickerInput,
@@ -28,6 +28,7 @@ import SelectDropdown from 'react-native-select-dropdown';
 import imagePlaceholder from '../assets/image-placeholder.png';
 import { isDevelopment, server } from '../config';
 import { HotspotContext } from '../context/HotspotDetailContext';
+import { useNucaTheme as useTheme } from '../hooks/useNucaTheme';
 import { Cat, defaultSterilizedCat } from '../models/Cat';
 import { User } from '../models/User';
 import SnackbarManager from '../utils/SnackbarManager';
@@ -38,7 +39,7 @@ import { InputField } from './InputField';
 
 registerTranslation('en', en);
 
-const getStyles = (theme: ReactNativePaper.Theme) =>
+const getStyles = (theme: NucaCustomTheme) =>
   StyleSheet.create({
     mainContainer: {
       width: '100%',
@@ -100,7 +101,7 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
       width: '60%',
       borderRadius: theme.roundness,
       height: 60,
-      backgroundColor: theme.colors.background,
+      backgroundColor: 'transparent',
       borderWidth: 1,
       borderColor: theme.colors.disabled,
       marginTop: 5,
@@ -144,7 +145,7 @@ const getStyles = (theme: ReactNativePaper.Theme) =>
       width: '100%',
       borderRadius: theme.roundness,
       height: 60,
-      backgroundColor: theme.colors.background,
+      backgroundColor: 'transparent',
       borderWidth: 1,
       borderColor: theme.colors.disabled,
       marginTop: 5,
@@ -370,24 +371,16 @@ export const AddCatCard = ({
           {isEditingMode ? (
             <>
               <Caption style={styles.title}>Editează</Caption>
-              <Button
-                icon="pencil"
-                disabled
-                labelStyle={{ color: theme.colors.text }}
-              >
-                <></>
-              </Button>
+              <View style={{ marginHorizontal: 16 }}>
+                <Icon source={'pencil'} size={16} />
+              </View>
             </>
           ) : (
             <>
               <Caption style={styles.title}>Adaugă</Caption>
-              <Button
-                icon="plus"
-                disabled
-                labelStyle={{ color: theme.colors.text }}
-              >
-                <></>
-              </Button>
+              <View style={{ marginHorizontal: 16 }}>
+                <Icon source={'plus'} size={16} />
+              </View>
             </>
           )}
         </View>
@@ -418,7 +411,7 @@ export const AddCatCard = ({
           dropdownIconPosition="right"
           renderDropdownIcon={(_selectedItem, _index) => (
             <TextInput.Icon
-              name="chevron-down"
+              icon="chevron-down"
               color={theme.colors.text}
               style={{ marginRight: 40 }}
             />
@@ -510,7 +503,7 @@ export const AddCatCard = ({
               dropdownIconPosition="right"
               renderDropdownIcon={() => (
                 <TextInput.Icon
-                  name="chevron-down"
+                  icon="chevron-down"
                   color={theme.colors.text}
                   style={{ marginRight: 40 }}
                 />
