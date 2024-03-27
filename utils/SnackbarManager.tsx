@@ -18,7 +18,7 @@ class SnackbarManager extends Component {
     setTimeout(() => DeviceEventEmitter.emit('info', undefined), 2500);
   }
 
-  public success = (message: string, timeout?: number) =>
+  public success = (message: string) =>
     this.show({ message, severity: 'success' });
 
   public error = (

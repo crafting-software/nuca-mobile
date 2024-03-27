@@ -14,7 +14,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import catLady from '../assets/cat-lady.png';
 import { AuthContext } from '../context';
 import { useNucaTheme as useTheme } from '../hooks/useNucaTheme';
-import SnackbarManager from '../utils/SnackbarManager';
 import { isSmallScreen } from '../utils/helperFunc';
 import { signIn2 } from '../utils/sign-in';
 

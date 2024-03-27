@@ -7,7 +7,7 @@ import {
   View,
 } from 'react-native';
 import MapView from 'react-native-maps';
-import { Caption, FAB, TextInput, Title } from 'react-native-paper';
+import { Caption, FAB, Title } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import currentLocationIcon from '../assets/current-location.png';
@@ -28,7 +28,7 @@ import { getHotspotMarker, Hotspot } from '../models/Hotspot';
 import { Location } from '../models/Location';
 import { EdgeInsets, Region } from '../types';
 import SnackbarManager from '../utils/SnackbarManager';
-import { loadHotspots, searchLocations } from '../utils/hotspots';
+import { loadHotspots } from '../utils/hotspots';
 
 export const MapScreen = () => {
   const { hotspots, setHotspots } = useContext(MapContext);
@@ -61,16 +61,6 @@ export const MapScreen = () => {
     };
     load();
   }, []);
-
-  const searchForAddress = async (address: string) => {
-    try {
-      const results: any = await searchLocations(address, 'ip');
-      return results;
-    } catch (e) {
-      alert('Address not found');
-      return [];
-    }
-  };
 
   const onMapRateLimitExceeded = () => {
     SnackbarManager.error(

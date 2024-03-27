@@ -8,7 +8,7 @@ import catLady5Web from '../assets/cat-lady5W.png';
 import { useNucaTheme as useTheme } from '../hooks/useNucaTheme';
 import { isSmallScreen } from '../utils/helperFunc';
 
-const getFooterStyles = (theme: NucaCustomTheme) =>
+const getFooterStyles = (_theme: NucaCustomTheme) =>
   StyleSheet.create({
     imageView: {
       marginTop: 32,
