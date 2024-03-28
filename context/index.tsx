@@ -71,17 +71,33 @@ export const HotspotContextProvider = ({
   );
   const [newSterilizedCats, setNewSterilizedCats] = useState<Cat[]>([]);
   const [newUnsterilizedCats, setNewUnsterilizedCats] = useState<Cat[]>([]);
+  const [shouldSterilizedCatBeEdited, setShouldSterilizedCatBeEdited] = useState<boolean[]>([]);
+  const [shouldUnsterilizedCatBeEdited, setShouldUnsterilizedCatBeEdited] = useState<boolean[]>([]);
+  const [shouldCatDetailsBeSaved, setShouldCatDetailsBeSaved] = useState<boolean>(false);
 
   const hotspotDetailsValue = useMemo(
     () => ({ 
       hotspotDetails, 
       newSterilizedCats,
       newUnsterilizedCats,
+      shouldCatDetailsBeSaved,
+      shouldSterilizedCatBeEdited, 
+      shouldUnsterilizedCatBeEdited,
       setHotspotDetails,
       setNewSterilizedCats,
-      setNewUnsterilizedCats
+      setNewUnsterilizedCats,
+      setShouldCatDetailsBeSaved,
+      setShouldSterilizedCatBeEdited,
+      setShouldUnsterilizedCatBeEdited,
     }),
-    [hotspotDetails, newSterilizedCats, newUnsterilizedCats]
+    [
+      hotspotDetails, 
+      newSterilizedCats, 
+      newUnsterilizedCats, 
+      shouldSterilizedCatBeEdited, 
+      shouldUnsterilizedCatBeEdited, 
+      shouldCatDetailsBeSaved
+    ]
   );
 
   useEffect(() => {
@@ -91,6 +107,14 @@ export const HotspotContextProvider = ({
   useEffect(() => {
     console.log("HotspotContextProvider --> newUnsterilizedCats: ", newUnsterilizedCats);
   }, [newUnsterilizedCats]);
+
+  useEffect(() => {
+    console.log("HotspotContextProvider --> shouldSterilizedCatBeEdited: ", shouldSterilizedCatBeEdited);
+  }, [ shouldSterilizedCatBeEdited ]);
+
+  useEffect(() => {
+    console.log("HotspotContextProvider --> shouldUnsterilizedCatBeEdited: ", shouldUnsterilizedCatBeEdited);
+  }, [ shouldUnsterilizedCatBeEdited ]);
 
   return (
     <HotspotContext.Provider value={hotspotDetailsValue}>

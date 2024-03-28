@@ -151,11 +151,18 @@ export const CatCard = ({
 }: CatCardProps) => {
   const theme = useTheme();
   const styles = getStyles(theme);
-  const [visible, setVisible] = useState(false);
-  const [shouldEdit, setShouldEdit] = useState(false);
   const {
-    hotspotDetails
+    hotspotDetails,
+    shouldSterilizedCatBeEdited,
+    shouldUnsterilizedCatBeEdited,
+    setShouldSterilizedCatBeEdited,
+    setShouldUnsterilizedCatBeEdited
   } = useContext(HotspotContext);
+  const [visible, setVisible] = useState(false);
+  // const [shouldEdit, setShouldEdit] = useState(isCatSterilized ? shouldSterilizedCatBeEdited.at(index) : shouldUnsterilizedCatBeEdited.at(index));
+  const shouldEditFlags = isCatSterilized ? shouldSterilizedCatBeEdited : shouldUnsterilizedCatBeEdited;
+  const shouldEdit = shouldEditFlags.at(index);
+  const setShouldEditFlags = isCatSterilized ? setShouldSterilizedCatBeEdited : setShouldUnsterilizedCatBeEdited;
   const [ content, setContent ] = useState(<></>);
 
   const cat = isCatSterilized
@@ -166,15 +173,15 @@ export const CatCard = ({
   const hideModal = () => setVisible(false);
 
   const updateChanges = () => {
-    setShouldEdit(false);
-  };
+    setShouldEditFlags((isCatSterilized ? shouldSterilizedCatBeEdited : shouldUnsterilizedCatBeEdited).map((x, catIndex) => catIndex === index ? false : x));
+  }
 
   useEffect(() => {
-    console.log('CatCard --> shouldEdit: ', shouldEdit);
-  }, [shouldEdit]);
+    cat?.isSterilized && console.log('CatCard --> shouldEdit: ', shouldEdit);
+  }, []);
 
   useEffect(() => {
-    console.log(`CatCard --> cat index: ${index}; editing mode: ${isEditingMode}; cat: `, cat);
+    cat?.isSterilized && console.log(`CatCard --> cat index: ${index}; editing mode: ${isEditingMode}; cat: `, cat);
   }, [cat]);
 
   const displayCard = () => ((
@@ -267,7 +274,12 @@ export const CatCard = ({
               contentStyle={styles.buttonContent}
               labelStyle={styles.buttonLabel}
               icon="pencil"
-              onPress={() => setShouldEdit(true)}
+              onPress={() => 
+                // setShouldEdit(true)
+                setShouldEditFlags(
+                  shouldEditFlags.map((x, catIndex) => catIndex === index ? true : x)
+                )
+              }
             >
               Editează
             </Button>
@@ -308,6 +320,9 @@ export const CatCard = ({
   return (
     <>
       {content}
+      {/* {
+        !shouldEdit ? displayCard() : displayCatAdditionCard() 
+      } */}
     </>
   );
 };

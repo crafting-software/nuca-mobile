@@ -203,25 +203,52 @@ export const HotspotDetailScreen = ({
   const styles = getStyles(theme);
   const navigation = useNavigation();
 
-  const { hotspotDetails, setHotspotDetails } = useContext(HotspotContext);
+  const { 
+    hotspotDetails,
+    shouldCatDetailsBeSaved,
+    setHotspotDetails,
+    setShouldCatDetailsBeSaved,
+    setShouldSterilizedCatBeEdited,
+    setShouldUnsterilizedCatBeEdited
+  } = useContext(HotspotContext);
   const [region, setRegion] = useState<Region>();
+  const [hasFlagBeenModifiedYet, setHasFlagBeenModifiedYet] = useState<boolean>(false);
+
+  const load = async () => {
+    const { success, hotspotDetails: hd } = await loadHotspotDetails(
+      route.params.hotspotId
+    );
+    if (!success) alert('Failed to load hotspot details');
+    if (hd) setHotspotDetails(hd);
+    setRegion({
+      latitude: hd?.latitude!,
+      longitude: hd?.longitude!,
+      latitudeDelta: initialLatitudeDelta,
+      longitudeDelta: initialLongitudeDelta,
+    });
+  };
 
   useEffect(() => {
-    const load = async () => {
-      const { success, hotspotDetails: hd } = await loadHotspotDetails(
-        route.params.hotspotId
-      );
-      if (!success) alert('Failed to load hotspot details');
-      if (hd) setHotspotDetails(hd);
-      setRegion({
-        latitude: hd?.latitude!,
-        longitude: hd?.longitude!,
-        latitudeDelta: initialLatitudeDelta,
-        longitudeDelta: initialLongitudeDelta,
-      });
-    };
     load();
   }, []);
+
+  useEffect(() => {
+    if (!hotspotDetails.sterilizedCats.length || !hotspotDetails.unsterilizedCats.length)
+      return;
+
+    if (hasFlagBeenModifiedYet && !shouldCatDetailsBeSaved)
+      return;
+
+    const emptyEditFlagsForSterilizedCats = Array(hotspotDetails.sterilizedCats.length).fill(false);
+    const emptyEditFlagsForUnsterilizedCats = Array(hotspotDetails.unsterilizedCats.length).fill(false);
+    console.log("HotspotDetailScreen.tsx --> emptyEditFlagsForSterilizedCats: ", emptyEditFlagsForSterilizedCats);
+    console.log("HotspotDetailScreen.tsx --> emptyEditFlagsForUnsterilizedCats: ", emptyEditFlagsForUnsterilizedCats);
+    setShouldSterilizedCatBeEdited(emptyEditFlagsForSterilizedCats);
+    setShouldUnsterilizedCatBeEdited(emptyEditFlagsForUnsterilizedCats);
+    setShouldCatDetailsBeSaved(false);
+    setHasFlagBeenModifiedYet(true);
+  }, [hotspotDetails]);
+  // }, [shouldCatDetailsBeSaved]);
 
   if (!hotspotDetails)
     return (
@@ -468,7 +495,7 @@ export const CatsView = ({
         key={`add-cat-card-${index}`}
         index={index}
         isCatSterilized={areCatsSterilized}
-        addCat={() => addNewCat && addNewCat(cat)}
+        addCat={addNewCat}
         deleteCat={deleteFunction}
       />
     ) : (

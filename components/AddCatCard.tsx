@@ -243,7 +243,8 @@ export const AddCatCard = ({
 }: {
   isEditingMode?: boolean;
   index: number;
-  addCat?: () => void;
+  // addCat?: () => void;
+  addCat?: (cat: Cat) => void;
   deleteCat?: (cat: Cat) => void;
   saveChanges?: () => void;
   isCatSterilized: boolean;
@@ -255,9 +256,11 @@ export const AddCatCard = ({
     hotspotDetails, 
     newSterilizedCats,
     newUnsterilizedCats,
+    shouldCatDetailsBeSaved,
     setHotspotDetails,
     setNewSterilizedCats,
-    setNewUnsterilizedCats
+    setNewUnsterilizedCats,
+    setShouldCatDetailsBeSaved
   } = useContext(HotspotContext);
   const [users, setUsers] = useState<User[]>([]);
   const [checked, setChecked] = React.useState(isCatSterilized);
@@ -267,9 +270,9 @@ export const AddCatCard = ({
     ? !addCat && hotspotDetails.sterilizedCats.at(index) || defaultSterilizedCat
     : !addCat && hotspotDetails.unsterilizedCats.at(index) || defaultUnSterilizedCat;
 
-  useEffect(() => {
-    console.log(`AddCatCard.tsx --> cat index: ${index}; cat: `, cat);
-  }, [cat])
+  // useEffect(() => {
+  //   cat?.isSterilized && console.log(`AddCatCard.tsx --> cat index: ${index}; cat: `, cat);
+  // }, [cat]);
 
   useEffect(() => {
     const load = async () => {
@@ -283,10 +286,11 @@ export const AddCatCard = ({
   // this function is used to actually edit the cat
   const saveCat = async () => {
     saveChanges && saveChanges();
-    console.log(`AddCatCard.tsx --> cat index: ${index}; cat: `, cat);
+    setShouldCatDetailsBeSaved(true);
+    cat?.isSterilized && console.log(`AddCatCard.tsx --> cat index: ${index}; cat: `, cat);
 
     if (!isEditingMode) {
-      addCat && addCat();
+      addCat && addCat(cat);
       return;
     }
 
@@ -304,7 +308,7 @@ export const AddCatCard = ({
 
     SnackbarManager.success('Cat updated!');
 
-    console.log("AddCatCard.tsx --> isEditingMode");
+    cat?.isSterilized && console.log("AddCatCard.tsx --> isEditingMode");
 
     if (checked) {
       setHotspotDetails(prev => ({
