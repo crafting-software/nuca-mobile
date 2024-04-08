@@ -1,4 +1,5 @@
 import * as SecureStore from 'expo-secure-store';
+import moment from 'moment';
 import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { server } from '../config';
@@ -23,8 +24,16 @@ const objectToFormData = (
   Object.entries(obj).reduce((fd: FormData, [key, value]: [string, any]) => {
     const propName: string = parentKey ? `${parentKey}[${key}]` : key;
 
-    if (typeof value === 'object' && !(value instanceof File)) {
+    if (
+      typeof value === 'object' &&
+      value !== null &&
+      !(value instanceof File) &&
+      !Date.parse(value)
+    ) {
       return objectToFormData(value, fd, propName);
+    } else if (Date.parse(value)) {
+      const formattedDate = moment(new Date(value)).format('YYYY-MM-DD');
+      fd.append(propName, formattedDate);
     } else if (Array.isArray(value)) {
       value.forEach((item: any, index: number) =>
         objectToFormData(item, fd, `${propName}[${index}]`)
