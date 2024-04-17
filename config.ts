@@ -2,9 +2,9 @@ import Constants from 'expo-constants';
 import { Platform } from 'react-native';
 
 export const googleMapsApiKey = Constants.expoConfig?.extra?.googleMapsApiKey;
-export const mapboxApiKey = Constants.expoConfig?.extra?.mapboxApiKey;
-export const mapboxGeocodingServerAddress =
-  'https://api.mapbox.com/search/geocode/v6';
+export const geocodingMapsCoKey =
+  Constants.expoConfig?.extra?.geocodingMapsCoApiKey;
+export const geocodeMapsCoServerAddress = 'https://geocode.maps.co';
 
 const getEnvConfig = () => {
   const releaseChannel =

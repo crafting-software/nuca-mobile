@@ -1,4 +1,4 @@
-import { mapboxApiKey, mapboxGeocodingServerAddress } from '../config';
+import { geocodeMapsCoServerAddress, geocodingMapsCoKey } from '../config';
 import {
   castToHotspot,
   castToHotspotDetails,
@@ -7,12 +7,7 @@ import {
   LocationItemProps,
   toApiModel,
 } from '../models/Hotspot';
-import {
-  Location,
-  MapboxLocationFeature,
-  MapboxLocationFeatureProperties,
-  convertRawMapboxResponseToEntity,
-} from '../models/Location';
+import { Location } from '../models/Location';
 import { makeRequest } from './server';
 
 export const loadHotspots = async (): Promise<{
@@ -109,19 +104,15 @@ export const deleteHotspot = async (
   return { success: true };
 };
 
-export const searchLocations = async (
-  address: string,
-  proximityPolicy: 'ip' | 'coordinate' | 'none'
-) => {
+export const searchLocations = async (address: string) => {
   try {
     const requestHeaders: HeadersInit = new Headers();
-    requestHeaders.set('Content-Type', 'application/json');
-    const server = mapboxGeocodingServerAddress;
+    const server = geocodeMapsCoServerAddress;
     const search_query = encodeURI(address);
-    const access_token = mapboxApiKey;
+    const access_token = geocodingMapsCoKey;
 
     const response = await fetch(
-      `${server}/forward?q=${search_query}&proximity=${proximityPolicy}&access_token=${access_token}`,
+      `${server}/search?q=${search_query}&api_key=${access_token}`,
       {
         method: 'GET',
         headers: requestHeaders,
@@ -136,16 +127,13 @@ export const searchLocations = async (
     }
 
     const data = await response.json();
-    const mapboxFeatures = convertRawMapboxResponseToEntity(data?.features);
-    const results: LocationItemProps[] = mapboxFeatures
-      ?.map((x: MapboxLocationFeature) => x.properties)
-      .map((x: MapboxLocationFeatureProperties) => ({
-        placeName: x.name + ', ' + x.placeFormatted,
-        coordinates: {
-          latitude: x.coordinates.latitude,
-          longitude: x.coordinates.longitude,
-        },
-      }));
+    const results: LocationItemProps[] = data.map((x: any) => ({
+      placeName: x.display_name,
+      coordinates: {
+        latitude: x.lat,
+        longitude: x.lon,
+      },
+    }));
 
     return results;
   } catch (error) {
@@ -160,12 +148,11 @@ export const findPlaceDetails = async (
 ) => {
   try {
     const requestHeaders: HeadersInit = new Headers();
-    requestHeaders.set('Content-Type', 'application/json');
-    const server = mapboxGeocodingServerAddress;
-    const access_token = mapboxApiKey;
+    const server = geocodeMapsCoServerAddress;
+    const access_token = geocodingMapsCoKey;
 
     const response = await fetch(
-      `${server}/reverse?longitude=${long}&latitude=${lat}&access_token=${access_token}`,
+      `${server}/reverse?lat=${lat}&lon=${long}&api_key=${access_token}`,
       {
         method: 'GET',
         headers: requestHeaders,
@@ -173,27 +160,14 @@ export const findPlaceDetails = async (
     );
 
     const data = await response.json();
-    const mapboxFeatures = convertRawMapboxResponseToEntity(data?.features);
-    const streetFeature = mapboxFeatures?.find((x: MapboxLocationFeature) =>
-      ['street', 'address'].includes(x.properties.featureType)
-    );
-    const postalCodeFeature = data?.features?.find(
-      (x: MapboxLocationFeature) => x.properties.featureType === 'postcode'
-    );
-    const placeFeature = data?.features?.find(
-      (x: MapboxLocationFeature) => x.properties.featureType === 'place'
-    );
-    const streetName =
-      streetFeature?.properties?.context?.address?.streetName ||
-      streetFeature?.properties?.name;
 
     const location: Location = {
       latitude: lat,
       longitude: long,
-      street: streetName,
-      streetNumber: streetFeature?.properties?.context?.address?.addressNumber,
-      postalCode: postalCodeFeature?.properties?.name,
-      city: placeFeature?.properties?.name,
+      street: data?.address?.road,
+      streetNumber: data?.address?.house_number,
+      postalCode: data?.address?.postcode,
+      city: data?.address?.city,
     };
 
     return location;
