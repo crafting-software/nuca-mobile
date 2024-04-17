@@ -1,11 +1,5 @@
 import { useContext, useEffect, useRef, useState } from 'react';
-import {
-  Image,
-  Platform,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
 import MapView, { Details } from 'react-native-maps';
 import { Caption, FAB, Title } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -86,16 +80,6 @@ export const MapScreen = () => {
         >
           {hotspots.map((h: Hotspot) => (
             <Marker
-              icon={
-                Platform.OS === 'web'
-                  ? {
-                      url: getHotspotMarker(h),
-                      scaledSize: new google.maps.Size(40, 40),
-                      origin: new google.maps.Point(0, 0),
-                      anchor: new google.maps.Point(0, 0),
-                    }
-                  : {}
-              }
               key={`${h.latitude} ${h.longitude}`}
               coordinate={{
                 latitude: h.latitude,

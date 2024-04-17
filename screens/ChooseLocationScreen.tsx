@@ -137,16 +137,6 @@ export const ChooseLocationScreen = ({
         >
           {hotspots.map(h => (
             <Marker
-              icon={
-                Platform.OS === 'web'
-                  ? {
-                      url: getHotspotMarker(h),
-                      scaledSize: new google.maps.Size(40, 40),
-                      origin: new google.maps.Point(0, 0),
-                      anchor: new google.maps.Point(0, 0),
-                    }
-                  : {}
-              }
               key={`${h.latitude} ${h.longitude}`}
               coordinate={{
                 latitude: h.latitude,
