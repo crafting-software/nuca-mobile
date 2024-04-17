@@ -274,7 +274,6 @@ export const AddCatCard = ({
             }
           : localCat
       );
-
       if (success && cat) {
         SnackbarManager.success('Cat updated!');
         if (checked) {
@@ -290,7 +289,7 @@ export const AddCatCard = ({
             ? hotspotDetails.sterilizedCats
             : hotspotDetails.unsterilizedCats;
           const catIndex = catList.findIndex((c: Cat) => c.id === cat.id);
-          catList[catIndex] = cat;
+          catList[catIndex] = localCat;
           cat.isSterilized
             ? setHotspotDetails(prev => ({
                 ...prev,
