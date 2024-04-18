@@ -310,7 +310,7 @@ export const HotspotFormScreen = ({
       SnackbarManager.success(
         isUpdate ? 'Editare reuşită' : 'Adăugare reuşită'
       );
-      navigation.goBack();
+      navigation.navigate('HotspotDetail', { hotspotId: newHotspot!.id});
       setSelectedLocation(undefined);
       return { hotspot: newHotspot };
     } else {

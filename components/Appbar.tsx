@@ -63,10 +63,10 @@ export const Appbar = ({
   );
   const detailScreenAppbarContent = (
     <IconButton
-      icon="arrow-left"
+      icon="close"
       iconColor={theme.colors.text}
       size={24}
-      onPress={() => navigation.goBack()}
+      onPress={() => navigation.navigate('Main')}
     />
   );
   return (

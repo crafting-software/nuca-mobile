@@ -324,7 +324,7 @@ export const HotspotDetailScreen = ({
       SnackbarManager.success(
         'Editare reuşită'
       );
-      navigation.goBack();
+      navigation.navigate('Main');
       setSelectedLocation(undefined);
       return { hotspot: newHotspot };
     } else {
