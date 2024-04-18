@@ -8,10 +8,8 @@ import {
   View,
 } from 'react-native';
 import {
-  Avatar,
   Button,
   Caption,
-  FAB,
   Headline,
   TextInput,
   Title,
@@ -28,11 +26,6 @@ import { findCurrentLocation, MapContext } from '../context';
 import { HotspotContext } from '../context/HotspotDetailContext';
 import { useNucaTheme as useTheme } from '../hooks/useNucaTheme';
 import {
-  Cat,
-  defaultSterilizedCat,
-  defaultUnSterilizedCat,
-} from '../models/Cat';
-import {
   defaultHotspotDetails,
   Hotspot,
   HotspotDetails,
@@ -43,7 +36,6 @@ import { getFormattedAddress, Location } from '../models/Location';
 import { User } from '../models/User';
 import { Region, RootStackScreenProps } from '../types';
 import SnackbarManager from '../utils/SnackbarManager';
-import { addCat, deleteCatRequest } from '../utils/cats';
 import { isSmallScreen } from '../utils/helperFunc';
 import {
   addHotspot,
@@ -52,7 +44,6 @@ import {
   updateHotspot,
 } from '../utils/hotspots';
 import { loadUsers } from '../utils/users';
-import { CatsView } from './HotspotDetailScreen';
 
 const getStyles = (theme: NucaCustomTheme) =>
   StyleSheet.create({
@@ -267,9 +258,6 @@ export const HotspotFormScreen = ({
 
   const { hotspotDetails, setHotspotDetails } = useContext(HotspotContext);
 
-  const [newSterilizedCats, setNewSterilizedCats] = useState<Cat[]>([]);
-  const [newUnsterilizedCat, setNewUnsterilizedCat] = useState<Cat[]>([]);
-
   useEffect(() => {
     if (!isUpdate) setHotspotDetails(defaultHotspotDetails);
     const load = async () => {
@@ -351,84 +339,6 @@ export const HotspotFormScreen = ({
       SnackbarManager.error(
         'HotspotFormScreen - delete func.',
         'Ștergere nereuşită, verifică dacă ai sters profilele pisicilor asociate zonei de interes'
-      );
-    }
-  };
-
-  const deleteCat = async (cat: Cat) => {
-    if (
-      !hotspotDetails.sterilizedCats.includes(cat) &&
-      !hotspotDetails.unsterilizedCats.includes(cat)
-    ) {
-      cat.isSterilized ? setNewSterilizedCats([]) : setNewUnsterilizedCat([]);
-      return;
-    }
-    setIsInProgress(true);
-    const { success } = await deleteCatRequest(cat.id);
-
-    if (success) {
-      setIsInProgress(false);
-      SnackbarManager.success('Cat deleted!');
-
-      const unsterilizedCats = hotspotDetails.unsterilizedCats.filter(
-        (c: Cat) => c.id !== cat.id
-      );
-      const sterilizedCats = hotspotDetails.sterilizedCats.filter(
-        (c: Cat) => c.id !== cat.id
-      );
-
-      setHotspotDetails({
-        ...hotspotDetails,
-        unsterilizedCats: unsterilizedCats,
-        sterilizedCats: sterilizedCats,
-      });
-    } else {
-      setIsInProgress(false);
-      SnackbarManager.error(
-        'HotspotFormScreen - deleteCat func.',
-        'Cat not deleted'
-      );
-    }
-  };
-
-  const addNewCat = async (newCat: Cat) => {
-    if (hotspotDetails.id === undefined || hotspotDetails.id === '') {
-      const hotspot = await save();
-      if (hotspot.hotspot) {
-        saveNewCat(newCat, hotspot.hotspot.id);
-      }
-    } else {
-      saveNewCat(newCat, hotspotDetails.id);
-      setIsInProgress(true);
-    }
-  };
-
-  const saveNewCat = async (newCat: Cat, hotspotId: string) => {
-    const { success, cat } = await addCat(newCat, hotspotId);
-
-    if (success) {
-      setIsInProgress(false);
-
-      SnackbarManager.success('Adaugare reuşită');
-
-      if (cat?.isSterilized) {
-        setNewSterilizedCats([]);
-        setHotspotDetails({
-          ...hotspotDetails,
-          sterilizedCats: [cat!, ...hotspotDetails.sterilizedCats],
-        });
-      } else {
-        setNewUnsterilizedCat([]);
-        setHotspotDetails({
-          ...hotspotDetails,
-          unsterilizedCats: [cat!, ...hotspotDetails.unsterilizedCats],
-        });
-      }
-    } else {
-      setIsInProgress(false);
-      SnackbarManager.error(
-        'HotspotFormScreen - addNewCat func.',
-        'Adaugare nereuşită'
       );
     }
   };
@@ -554,63 +464,6 @@ export const HotspotFormScreen = ({
                 }
                 rowTextForSelection={(user: User) => user.name}
                 buttonTextAfterSelection={(user: User) => user.name}
-              />
-              <View style={styles.separator} />
-              <View style={styles.catCategoriesContainer}>
-                <Avatar.Icon
-                  size={24}
-                  icon="close"
-                  color={theme.colors.background}
-                  style={styles.catCategoryTitleIcon}
-                />
-
-                <Caption style={styles.catCategoryTitleLabel}>
-                  Pisici nesterilizate
-                </Caption>
-                <FAB
-                  color={theme.colors.background}
-                  icon="plus"
-                  style={styles.catCategoryAddButton}
-                  size="small"
-                  onPress={() => {
-                    setNewUnsterilizedCat([defaultUnSterilizedCat]);
-                  }}
-                />
-              </View>
-              <CatsView
-                cats={newUnsterilizedCat.concat(
-                  hotspotDetails.unsterilizedCats
-                )}
-                isEditMode={true}
-                deleteFunction={deleteCat}
-                addNewCat={addNewCat}
-              />
-              <View style={styles.separator} />
-              <View style={styles.catCategoriesContainer}>
-                <Avatar.Icon
-                  size={24}
-                  icon="check"
-                  color={theme.colors.background}
-                  style={styles.catCategoryTitleIcon}
-                />
-                <Caption style={styles.catCategoryTitleLabel}>
-                  Pisici sterilizate
-                </Caption>
-                <FAB
-                  color={theme.colors.background}
-                  icon="plus"
-                  style={styles.catCategoryAddButton}
-                  size="small"
-                  onPress={() => {
-                    setNewSterilizedCats([defaultSterilizedCat]);
-                  }}
-                />
-              </View>
-              <CatsView
-                cats={newSterilizedCats.concat(hotspotDetails.sterilizedCats)}
-                isEditMode={true}
-                deleteFunction={deleteCat}
-                addNewCat={addNewCat}
               />
               <View style={styles.separator} />
               <View
