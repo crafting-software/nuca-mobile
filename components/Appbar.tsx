@@ -17,8 +17,10 @@ import { EdgeInsets } from '../types';
 
 export const Appbar = ({
   forDetailScreen = false,
+  showConfirmationModal
 }: {
   forDetailScreen?: boolean;
+  showConfirmationModal?: () => void;
 }) => {
   const { setAuth } = useContext(AuthContext);
   const signOut = () => {
@@ -66,7 +68,11 @@ export const Appbar = ({
       icon="close"
       iconColor={theme.colors.text}
       size={24}
-      onPress={() => navigation.navigate('Main')}
+      onPress={() =>
+        showConfirmationModal
+          ? showConfirmationModal()
+          : navigation.navigate('Main')
+      }
     />
   );
   return (

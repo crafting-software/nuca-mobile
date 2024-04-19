@@ -1,7 +1,7 @@
 import { StyleSheet, View } from 'react-native';
 import { Button, Caption, Card } from 'react-native-paper';
 import { useNucaTheme as useTheme } from '../hooks/useNucaTheme';
-import { Cat } from '../models/Cat';
+import { useNavigation } from '@react-navigation/native';
 
 const getModalStyles = (theme: NucaCustomTheme) =>
   StyleSheet.create({
@@ -62,14 +62,12 @@ const getModalStyles = (theme: NucaCustomTheme) =>
     },
   });
 
-export const DeleteModal = ({
-  cat,
+export const HotspotSaveConfirmationModal = ({
   hideModal,
-  deleteCat,
+  saveHotspot
 }: {
-  cat: Cat;
   hideModal: () => void;
-  deleteCat?: (cat: Cat) => void;
+  saveHotspot?: () => void;
 }) => {
   const theme = useTheme();
   const styles = getModalStyles(theme);
@@ -77,7 +75,7 @@ export const DeleteModal = ({
   return (
     <View style={styles.mainContainer}>
       <Card style={styles.cardStyle}>
-        <Caption style={styles.title}>Ești sigur că vrei să ștergi?</Caption>
+        <Caption style={styles.title}>Ești sigur că vrei să ieși? Modificările tale nu vor fi salvate.</Caption>
         <View style={styles.actionView}>
           <View style={styles.buttonView}>
             <Button
@@ -95,12 +93,10 @@ export const DeleteModal = ({
               style={styles.deleteButton}
               contentStyle={styles.buttonContent}
               labelStyle={styles.buttonLabel}
-              icon="close"
-              onPress={() => {
-                deleteCat && deleteCat(cat);
-              }}
+              icon="pencil"
+              onPress={() => saveHotspot && saveHotspot()}
             >
-              Șterge
+              Salvează
             </Button>
           </View>
         </View>

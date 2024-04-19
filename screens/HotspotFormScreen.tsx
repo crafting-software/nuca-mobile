@@ -11,6 +11,8 @@ import {
   Button,
   Caption,
   Headline,
+  Modal,
+  Portal,
   TextInput,
   Title,
 } from 'react-native-paper';
@@ -44,6 +46,7 @@ import {
   updateHotspot,
 } from '../utils/hotspots';
 import { loadUsers } from '../utils/users';
+import { HotspotSaveConfirmationModal } from '../components/HotspotSaveConfirmationModal';
 
 const getStyles = (theme: NucaCustomTheme) =>
   StyleSheet.create({
@@ -247,6 +250,7 @@ export const HotspotFormScreen = ({
 }: RootStackScreenProps<'AddHotspot'>) => {
   const { hotspots, setHotspots, setSelectedLocation } = useContext(MapContext);
   const [isInProgress, setIsInProgress] = useState(false);
+  const [isConfirmationModalVisible, setConfirmationModalVisibility] = useState(false);
   const navigation = useNavigation();
 
   const theme = useTheme();
@@ -257,9 +261,18 @@ export const HotspotFormScreen = ({
   const location = route.params.location;
 
   const { hotspotDetails, setHotspotDetails } = useContext(HotspotContext);
+  const [ temporaryHotspotDetails, setTemporaryHotspotDetails ] = useState<HotspotDetails>(hotspotDetails);
+
+  const hideConfirmationModal = () => {
+    setConfirmationModalVisibility(false);
+    navigation.goBack();
+  }
+  const dismissConfirmationModal = () => setConfirmationModalVisibility(false);
+  const showConfirmationModal = () => setConfirmationModalVisibility(true);
 
   useEffect(() => {
-    if (!isUpdate) setHotspotDetails(defaultHotspotDetails);
+    if (!isUpdate)
+      setTemporaryHotspotDetails(defaultHotspotDetails);
     const load = async () => {
       const { success, users } = await loadUsers();
       if (!success) alert('Failed to load users');
@@ -270,8 +283,8 @@ export const HotspotFormScreen = ({
 
   useEffect(() => {
     if (location)
-      setHotspotDetails({
-        ...hotspotDetails,
+      setTemporaryHotspotDetails({
+        ...temporaryHotspotDetails,
         city: location.city || '',
         zip: location.postalCode || '',
         address:
@@ -295,8 +308,17 @@ export const HotspotFormScreen = ({
 
     setIsInProgress(true);
 
+    if (!temporaryHotspotDetails) {
+      SnackbarManager.error(
+        'HotspotFormScreen - save func',
+        'Lipsesc detaliile zonei de interes.'
+      );
+      setIsInProgress(false);
+      return { hotspot: undefined };
+    }
+
     const { success, hotspotDetails: newHotspot } = await submitFunc(
-      hotspotDetails
+      temporaryHotspotDetails
     );
 
     if (success) {
@@ -347,7 +369,15 @@ export const HotspotFormScreen = ({
 
   return (
     <>
-      <Appbar forDetailScreen />
+      <Portal>
+        <Modal visible={isConfirmationModalVisible} onDismiss={dismissConfirmationModal}>
+          <HotspotSaveConfirmationModal
+            hideModal={hideConfirmationModal}
+            saveHotspot={save}
+          />
+        </Modal>
+      </Portal>
+      <Appbar forDetailScreen showConfirmationModal={showConfirmationModal} />
       <View style={styles.container}>
         <ScrollView>
           <View
@@ -368,9 +398,9 @@ export const HotspotFormScreen = ({
                 label="Detalii adresă"
                 placeholder="Nume"
                 inputFieldStyle={{ marginTop: 54 }}
-                value={hotspotDetails.description}
+                value={temporaryHotspotDetails.description}
                 onTextInputChangeText={text =>
-                  setHotspotDetails({ ...hotspotDetails, description: text })
+                  setTemporaryHotspotDetails({ ...temporaryHotspotDetails, description: text })
                 }
               />
               <Caption style={styles.textInputTitle}>STATUS</Caption>
@@ -389,7 +419,7 @@ export const HotspotFormScreen = ({
                   />
                 )}
                 onSelect={(selectedItem: HotspotStatus) =>
-                  setHotspotDetails({ ...hotspotDetails, status: selectedItem })
+                  setTemporaryHotspotDetails({ ...temporaryHotspotDetails, status: selectedItem })
                 }
                 buttonTextAfterSelection={(selectedItem: HotspotStatus) =>
                   capitalize(selectedItem as HotspotStatus)
@@ -397,7 +427,7 @@ export const HotspotFormScreen = ({
                 rowTextForSelection={(item: HotspotStatus) =>
                   capitalize(item as HotspotStatus)
                 }
-                defaultValue={hotspotDetails.status}
+                defaultValue={temporaryHotspotDetails.status}
               />
               <InputField
                 multiline={true}
@@ -405,19 +435,19 @@ export const HotspotFormScreen = ({
                 placeholder="Scrie aici"
                 inputFieldStyle={styles.inputField}
                 textInputStyle={{ height: 100 }}
-                value={hotspotDetails.notes}
+                value={temporaryHotspotDetails.notes}
                 onTextInputChangeText={text =>
-                  setHotspotDetails({ ...hotspotDetails, notes: text })
+                  setTemporaryHotspotDetails({ ...temporaryHotspotDetails, notes: text })
                 }
               />
               <InputField
                 label="Pisici nesterilizate"
                 placeholder="0"
                 keyboardType="number-pad"
-                value={String(hotspotDetails.unsterilizedCatsCount || 0)}
+                value={String(temporaryHotspotDetails.unsterilizedCatsCount || 0)}
                 onTextInputChangeText={text =>
-                  setHotspotDetails({
-                    ...hotspotDetails,
+                  setTemporaryHotspotDetails({
+                    ...temporaryHotspotDetails,
                     unsterilizedCatsCount: Number(text),
                   })
                 }
@@ -426,9 +456,9 @@ export const HotspotFormScreen = ({
                 label="Persoana de contact"
                 placeholder="Nume persoana de contact"
                 inputFieldStyle={styles.inputField}
-                value={hotspotDetails.contactName}
+                value={temporaryHotspotDetails.contactName}
                 onTextInputChangeText={text =>
-                  setHotspotDetails({ ...hotspotDetails, contactName: text })
+                  setTemporaryHotspotDetails({ ...temporaryHotspotDetails, contactName: text })
                 }
               />
               <InputField
@@ -436,15 +466,15 @@ export const HotspotFormScreen = ({
                 placeholder="numar de telefon"
                 keyboardType="phone-pad"
                 inputFieldStyle={styles.inputField}
-                value={hotspotDetails.contactPhone}
+                value={temporaryHotspotDetails.contactPhone}
                 onTextInputChangeText={text =>
-                  setHotspotDetails({ ...hotspotDetails, contactPhone: text })
+                  setTemporaryHotspotDetails({ ...temporaryHotspotDetails, contactPhone: text })
                 }
               />
               <Caption style={styles.textInputTitle}>VOLUNTAR</Caption>
               <SelectDropdown
                 defaultButtonText={
-                  hotspotDetails.volunteer?.name || 'Alege voluntar'
+                  temporaryHotspotDetails.volunteer?.name || 'Alege voluntar'
                 }
                 data={users}
                 buttonStyle={styles.dropdownButton}
@@ -460,7 +490,7 @@ export const HotspotFormScreen = ({
                   />
                 )}
                 onSelect={(user: User) =>
-                  setHotspotDetails({ ...hotspotDetails, volunteer: user })
+                  setTemporaryHotspotDetails({ ...temporaryHotspotDetails, volunteer: user })
                 }
                 rowTextForSelection={(user: User) => user.name}
                 buttonTextAfterSelection={(user: User) => user.name}
