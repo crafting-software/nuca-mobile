@@ -1,5 +1,5 @@
 import { useContext, useEffect, useRef, useState } from 'react';
-import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import MapView, { Details } from 'react-native-maps';
 import { Caption, FAB, Title } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -7,12 +7,12 @@ import { useNavigation } from '@react-navigation/native';
 import currentLocationIcon from '../assets/current-location.png';
 import { Appbar } from '../components/Appbar';
 import { FullScreenActivityIndicator } from '../components/FullScreenActivityIndicator';
+import { Marker } from '../components/Marker';
 import { SearchableLocationDropdown } from '../components/SearchableLocationDropdown';
 import { initialLatitude, initialLongitude } from '../constants/location';
 import { MapContext } from '../context';
 import { findCurrentLocation } from '../context/MapContext';
 import { useNucaTheme as useTheme } from '../hooks/useNucaTheme';
-import { Marker } from '../maps';
 import { getHotspotMarker, Hotspot } from '../models/Hotspot';
 import { EdgeInsets, Region } from '../types';
 import SnackbarManager from '../utils/SnackbarManager';
@@ -30,6 +30,7 @@ export const MapScreen = () => {
   const mapRef = useRef<MapView>(null);
   const navigation = useNavigation();
   const [isLoading, setIsLoading] = useState(false);
+  const [isMapReady, setIsMapReady] = useState(false);
   const insets = useSafeAreaInsets();
   const theme = useTheme();
   const styles = getStyles(theme, insets);
@@ -76,6 +77,7 @@ export const MapScreen = () => {
           showsUserLocation
           showsMyLocationButton={false}
           onRegionChangeComplete={onRegionChange}
+          onMapReady={() => setIsMapReady(true)}
           style={styles.map}
         >
           {hotspots.map((h: Hotspot) => (
@@ -85,16 +87,15 @@ export const MapScreen = () => {
                 latitude: h.latitude,
                 longitude: h.longitude,
               }}
+              passthroughKey={h.id}
+              height={styles.marker.height}
+              width={styles.marker.width}
+              isMapReady={isMapReady}
+              imageSource={getHotspotMarker(h)}
               onPress={() =>
                 navigation.navigate('HotspotDetail', { hotspotId: h.id })
               }
-            >
-              <Image
-                source={getHotspotMarker(h)}
-                style={styles.marker}
-                resizeMode="contain"
-              />
-            </Marker>
+            />
           ))}
         </MapView>
         <View style={styles.searchInput}>
