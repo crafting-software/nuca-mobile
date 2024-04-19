@@ -18,6 +18,7 @@ import {
 } from 'react-native-paper';
 import SelectDropdown from 'react-native-select-dropdown';
 import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import currentLocationIcon from '../assets/current-location.png';
 import mapPinIcon from '../assets/map-pin.png';
 import { Appbar } from '../components/Appbar';
@@ -27,6 +28,7 @@ import { InputField } from '../components/InputField';
 import { NucaModal } from '../components/NucaModal';
 import { findCurrentLocation, MapContext } from '../context';
 import { HotspotContext } from '../context/HotspotDetailContext';
+import { useHotspotSave } from '../hooks/useHotspotSave';
 import { useNucaTheme as useTheme } from '../hooks/useNucaTheme';
 import {
   defaultHotspotDetails,
@@ -37,15 +39,10 @@ import {
 } from '../models/Hotspot';
 import { getFormattedAddress, Location } from '../models/Location';
 import { User } from '../models/User';
-import { Region, RootStackScreenProps } from '../types';
+import { Region, RootStackParamList, RootStackScreenProps } from '../types';
 import SnackbarManager from '../utils/SnackbarManager';
 import { isSmallScreen } from '../utils/helperFunc';
-import {
-  addHotspot,
-  deleteHotspot,
-  formatHotspotAddress,
-  updateHotspot,
-} from '../utils/hotspots';
+import { deleteHotspot, formatHotspotAddress } from '../utils/hotspots';
 import { loadUsers } from '../utils/users';
 
 const getStyles = (theme: NucaCustomTheme) =>
@@ -248,11 +245,12 @@ const getStyles = (theme: NucaCustomTheme) =>
 export const HotspotFormScreen = ({
   route,
 }: RootStackScreenProps<'AddHotspot'>) => {
-  const { hotspots, setHotspots, setSelectedLocation } = useContext(MapContext);
+  const { hotspots, setHotspots } = useContext(MapContext);
   const [isInProgress, setIsInProgress] = useState(false);
   const [isConfirmationModalVisible, setConfirmationModalVisibility] =
     useState(false);
-  const navigation = useNavigation();
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   const theme = useTheme();
   const styles = getStyles(theme);
@@ -261,7 +259,7 @@ export const HotspotFormScreen = ({
   const isUpdate = route.params.isUpdate;
   const location = route.params.location;
 
-  const { hotspotDetails, setHotspotDetails } = useContext(HotspotContext);
+  const { hotspotDetails } = useContext(HotspotContext);
   const [temporaryHotspotDetails, setTemporaryHotspotDetails] =
     useState<HotspotDetails>(hotspotDetails);
 
@@ -273,7 +271,10 @@ export const HotspotFormScreen = ({
   const showConfirmationModal = () => setConfirmationModalVisibility(true);
 
   useEffect(() => {
-    if (!isUpdate) setTemporaryHotspotDetails(defaultHotspotDetails);
+    setTemporaryHotspotDetails(
+      !isUpdate ? defaultHotspotDetails : hotspotDetails
+    );
+
     const load = async () => {
       const { success, users } = await loadUsers();
       if (!success) alert('Failed to load users');
@@ -294,58 +295,6 @@ export const HotspotFormScreen = ({
         longitude: location.longitude,
       });
   }, [location]);
-
-  const save = async (): Promise<{
-    hotspot?: HotspotDetails;
-  }> => {
-    if (!location && !isUpdate) {
-      SnackbarManager.error(
-        'HotspotFormScreen - save func',
-        'Locatia lipseste'
-      );
-      return { hotspot: undefined };
-    }
-    const submitFunc = isUpdate ? updateHotspot : addHotspot;
-
-    setIsInProgress(true);
-
-    if (!temporaryHotspotDetails) {
-      SnackbarManager.error(
-        'HotspotFormScreen - save func',
-        'Lipsesc detaliile zonei de interes.'
-      );
-      setIsInProgress(false);
-      return { hotspot: undefined };
-    }
-
-    const { success, hotspotDetails: newHotspot } = await submitFunc(
-      temporaryHotspotDetails
-    );
-
-    if (success) {
-      const newHostpots = [
-        ...hotspots.filter((h: Hotspot) => h.id !== newHotspot!.id),
-        newHotspot!,
-      ];
-      setHotspotDetails(newHotspot!);
-      setHotspots(newHostpots);
-      setIsInProgress(false);
-      SnackbarManager.success(
-        isUpdate ? 'Editare reuşită' : 'Adăugare reuşită'
-      );
-      navigation.navigate('HotspotDetail', { hotspotId: newHotspot!.id });
-      setSelectedLocation(undefined);
-      return { hotspot: newHotspot };
-    } else {
-      setIsInProgress(false);
-
-      SnackbarManager.error(
-        'HotspotFormScreen - save func.',
-        isUpdate ? 'Editare nereuşită' : 'Adăugare nereuşită'
-      );
-      return { hotspot: undefined };
-    }
-  };
 
   const deleteH = async () => {
     setIsInProgress(true);
@@ -368,6 +317,20 @@ export const HotspotFormScreen = ({
 
   const address = formatHotspotAddress(hotspotDetails, true);
 
+  const save = useHotspotSave({
+    hotspotToBeSaved: temporaryHotspotDetails,
+    shouldUpdate: isUpdate,
+    location,
+    setIsInProgress,
+  });
+
+  const saveAndNavigateToDetailScreen = async () => {
+    const { hotspot: newHotspot } = await save();
+    !isUpdate
+      ? navigation.replace('HotspotDetail', { hotspotId: newHotspot!.id })
+      : navigation.navigate('HotspotDetail', { hotspotId: newHotspot!.id });
+  };
+
   return (
     <>
       <Portal>
@@ -377,7 +340,7 @@ export const HotspotFormScreen = ({
         >
           <NucaModal
             leftButtonHandler={hideConfirmationModal}
-            rightButtonHandler={save}
+            rightButtonHandler={saveAndNavigateToDetailScreen}
             leftButtonMessage={'Renunță'}
             rightButtonMessage={'Salvează'}
             leftButtonIcon={'cancel'}
@@ -554,7 +517,7 @@ export const HotspotFormScreen = ({
                   labelStyle={styles.saveButtonLabel}
                   icon="check"
                   mode="contained"
-                  onPress={save}
+                  onPress={saveAndNavigateToDetailScreen}
                 >
                   Salvează
                 </Button>
