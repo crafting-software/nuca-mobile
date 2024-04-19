@@ -57,8 +57,8 @@ export default {
     extra: {
       webReleaseChannel: process.env.RELEASE_CHANNEL,
       mobileReleaseChannel: process.env.MOBILE_RELEASE_CHANNEL,
-      mapboxApiKey: process.env.MAPBOX_API_KEY,
       googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY,
+      geocodingMapsCoApiKey: process.env.GEOCODING_MAPS_CO_API_KEY,
     },
   },
 };
