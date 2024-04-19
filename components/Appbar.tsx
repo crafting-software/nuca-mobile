@@ -17,7 +17,7 @@ import { EdgeInsets } from '../types';
 
 export const Appbar = ({
   forDetailScreen = false,
-  showConfirmationModal
+  showConfirmationModal,
 }: {
   forDetailScreen?: boolean;
   showConfirmationModal?: () => void;

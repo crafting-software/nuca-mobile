@@ -24,6 +24,7 @@ import { Appbar } from '../components/Appbar';
 import { FooterScreens, FooterView } from '../components/Footer';
 import { FullScreenActivityIndicator } from '../components/FullScreenActivityIndicator';
 import { InputField } from '../components/InputField';
+import { NucaModal } from '../components/NucaModal';
 import { findCurrentLocation, MapContext } from '../context';
 import { HotspotContext } from '../context/HotspotDetailContext';
 import { useNucaTheme as useTheme } from '../hooks/useNucaTheme';
@@ -46,7 +47,6 @@ import {
   updateHotspot,
 } from '../utils/hotspots';
 import { loadUsers } from '../utils/users';
-import { HotspotSaveConfirmationModal } from '../components/HotspotSaveConfirmationModal';
 
 const getStyles = (theme: NucaCustomTheme) =>
   StyleSheet.create({
@@ -250,7 +250,8 @@ export const HotspotFormScreen = ({
 }: RootStackScreenProps<'AddHotspot'>) => {
   const { hotspots, setHotspots, setSelectedLocation } = useContext(MapContext);
   const [isInProgress, setIsInProgress] = useState(false);
-  const [isConfirmationModalVisible, setConfirmationModalVisibility] = useState(false);
+  const [isConfirmationModalVisible, setConfirmationModalVisibility] =
+    useState(false);
   const navigation = useNavigation();
 
   const theme = useTheme();
@@ -261,18 +262,18 @@ export const HotspotFormScreen = ({
   const location = route.params.location;
 
   const { hotspotDetails, setHotspotDetails } = useContext(HotspotContext);
-  const [ temporaryHotspotDetails, setTemporaryHotspotDetails ] = useState<HotspotDetails>(hotspotDetails);
+  const [temporaryHotspotDetails, setTemporaryHotspotDetails] =
+    useState<HotspotDetails>(hotspotDetails);
 
   const hideConfirmationModal = () => {
     setConfirmationModalVisibility(false);
     navigation.goBack();
-  }
+  };
   const dismissConfirmationModal = () => setConfirmationModalVisibility(false);
   const showConfirmationModal = () => setConfirmationModalVisibility(true);
 
   useEffect(() => {
-    if (!isUpdate)
-      setTemporaryHotspotDetails(defaultHotspotDetails);
+    if (!isUpdate) setTemporaryHotspotDetails(defaultHotspotDetails);
     const load = async () => {
       const { success, users } = await loadUsers();
       if (!success) alert('Failed to load users');
@@ -332,7 +333,7 @@ export const HotspotFormScreen = ({
       SnackbarManager.success(
         isUpdate ? 'Editare reuşită' : 'Adăugare reuşită'
       );
-      navigation.navigate('HotspotDetail', { hotspotId: newHotspot!.id});
+      navigation.navigate('HotspotDetail', { hotspotId: newHotspot!.id });
       setSelectedLocation(undefined);
       return { hotspot: newHotspot };
     } else {
@@ -370,10 +371,20 @@ export const HotspotFormScreen = ({
   return (
     <>
       <Portal>
-        <Modal visible={isConfirmationModalVisible} onDismiss={dismissConfirmationModal}>
-          <HotspotSaveConfirmationModal
-            hideModal={hideConfirmationModal}
-            saveHotspot={save}
+        <Modal
+          visible={isConfirmationModalVisible}
+          onDismiss={dismissConfirmationModal}
+        >
+          <NucaModal
+            leftButtonHandler={hideConfirmationModal}
+            rightButtonHandler={save}
+            leftButtonMessage={'Renunță'}
+            rightButtonMessage={'Salvează'}
+            leftButtonIcon={'cancel'}
+            rightButtonIcon={'pencil'}
+            caption={
+              'Ești sigur că vrei să ieși? Modificările tale nu vor fi salvate.'
+            }
           />
         </Modal>
       </Portal>
@@ -400,7 +411,10 @@ export const HotspotFormScreen = ({
                 inputFieldStyle={{ marginTop: 54 }}
                 value={temporaryHotspotDetails.description}
                 onTextInputChangeText={text =>
-                  setTemporaryHotspotDetails({ ...temporaryHotspotDetails, description: text })
+                  setTemporaryHotspotDetails({
+                    ...temporaryHotspotDetails,
+                    description: text,
+                  })
                 }
               />
               <Caption style={styles.textInputTitle}>STATUS</Caption>
@@ -419,7 +433,10 @@ export const HotspotFormScreen = ({
                   />
                 )}
                 onSelect={(selectedItem: HotspotStatus) =>
-                  setTemporaryHotspotDetails({ ...temporaryHotspotDetails, status: selectedItem })
+                  setTemporaryHotspotDetails({
+                    ...temporaryHotspotDetails,
+                    status: selectedItem,
+                  })
                 }
                 buttonTextAfterSelection={(selectedItem: HotspotStatus) =>
                   capitalize(selectedItem as HotspotStatus)
@@ -437,14 +454,19 @@ export const HotspotFormScreen = ({
                 textInputStyle={{ height: 100 }}
                 value={temporaryHotspotDetails.notes}
                 onTextInputChangeText={text =>
-                  setTemporaryHotspotDetails({ ...temporaryHotspotDetails, notes: text })
+                  setTemporaryHotspotDetails({
+                    ...temporaryHotspotDetails,
+                    notes: text,
+                  })
                 }
               />
               <InputField
                 label="Pisici nesterilizate"
                 placeholder="0"
                 keyboardType="number-pad"
-                value={String(temporaryHotspotDetails.unsterilizedCatsCount || 0)}
+                value={String(
+                  temporaryHotspotDetails.unsterilizedCatsCount || 0
+                )}
                 onTextInputChangeText={text =>
                   setTemporaryHotspotDetails({
                     ...temporaryHotspotDetails,
@@ -458,7 +480,10 @@ export const HotspotFormScreen = ({
                 inputFieldStyle={styles.inputField}
                 value={temporaryHotspotDetails.contactName}
                 onTextInputChangeText={text =>
-                  setTemporaryHotspotDetails({ ...temporaryHotspotDetails, contactName: text })
+                  setTemporaryHotspotDetails({
+                    ...temporaryHotspotDetails,
+                    contactName: text,
+                  })
                 }
               />
               <InputField
@@ -468,7 +493,10 @@ export const HotspotFormScreen = ({
                 inputFieldStyle={styles.inputField}
                 value={temporaryHotspotDetails.contactPhone}
                 onTextInputChangeText={text =>
-                  setTemporaryHotspotDetails({ ...temporaryHotspotDetails, contactPhone: text })
+                  setTemporaryHotspotDetails({
+                    ...temporaryHotspotDetails,
+                    contactPhone: text,
+                  })
                 }
               />
               <Caption style={styles.textInputTitle}>VOLUNTAR</Caption>
@@ -490,7 +518,10 @@ export const HotspotFormScreen = ({
                   />
                 )}
                 onSelect={(user: User) =>
-                  setTemporaryHotspotDetails({ ...temporaryHotspotDetails, volunteer: user })
+                  setTemporaryHotspotDetails({
+                    ...temporaryHotspotDetails,
+                    volunteer: user,
+                  })
                 }
                 rowTextForSelection={(user: User) => user.name}
                 buttonTextAfterSelection={(user: User) => user.name}

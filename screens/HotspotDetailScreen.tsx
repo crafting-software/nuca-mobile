@@ -14,17 +14,25 @@ import { AddCatCard } from '../components/AddCatCard';
 import { Appbar } from '../components/Appbar';
 import { CatCard } from '../components/CatCard';
 import { FooterScreens, FooterView } from '../components/Footer';
+import { FullScreenActivityIndicator } from '../components/FullScreenActivityIndicator';
+import { MapContext } from '../context';
 import { HotspotContext } from '../context/HotspotDetailContext';
 import { useNucaTheme as useTheme } from '../hooks/useNucaTheme';
-import { Cat, defaultSterilizedCat, defaultUnSterilizedCat } from '../models/Cat';
+import {
+  Cat,
+  defaultSterilizedCat,
+  defaultUnSterilizedCat,
+} from '../models/Cat';
 import { Hotspot, HotspotDetails, HotspotStatus } from '../models/Hotspot';
 import { Region, RootStackParamList } from '../types';
-import { isSmallScreen } from '../utils/helperFunc';
-import { formatHotspotAddress, loadHotspotDetails, updateHotspot } from '../utils/hotspots';
-import { addCat, deleteCatRequest } from '../utils/cats';
 import SnackbarManager from '../utils/SnackbarManager';
-import { MapContext } from '../context';
-import { FullScreenActivityIndicator } from '../components/FullScreenActivityIndicator';
+import { addCat, deleteCatRequest } from '../utils/cats';
+import { isSmallScreen } from '../utils/helperFunc';
+import {
+  formatHotspotAddress,
+  loadHotspotDetails,
+  updateHotspot,
+} from '../utils/hotspots';
 
 const getStyles = (theme: NucaCustomTheme) =>
   StyleSheet.create({
@@ -321,9 +329,7 @@ export const HotspotDetailScreen = ({
       setHotspotDetails(newHotspot!);
       setHotspots(newHostpots);
       setIsInProgress(false);
-      SnackbarManager.success(
-        'Editare reuşită'
-      );
+      SnackbarManager.success('Editare reuşită');
       navigation.navigate('Main');
       setSelectedLocation(undefined);
       return { hotspot: newHotspot };

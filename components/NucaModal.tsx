@@ -1,7 +1,6 @@
 import { StyleSheet, View } from 'react-native';
 import { Button, Caption, Card } from 'react-native-paper';
 import { useNucaTheme as useTheme } from '../hooks/useNucaTheme';
-import { useNavigation } from '@react-navigation/native';
 
 const getModalStyles = (theme: NucaCustomTheme) =>
   StyleSheet.create({
@@ -62,12 +61,22 @@ const getModalStyles = (theme: NucaCustomTheme) =>
     },
   });
 
-export const HotspotSaveConfirmationModal = ({
-  hideModal,
-  saveHotspot
+export const NucaModal = ({
+  leftButtonHandler,
+  rightButtonHandler,
+  leftButtonMessage,
+  rightButtonMessage,
+  leftButtonIcon,
+  rightButtonIcon,
+  caption,
 }: {
-  hideModal: () => void;
-  saveHotspot?: () => void;
+  leftButtonHandler: () => void;
+  rightButtonHandler: () => void;
+  leftButtonMessage: string;
+  rightButtonMessage: string;
+  leftButtonIcon: string;
+  rightButtonIcon: string;
+  caption: string;
 }) => {
   const theme = useTheme();
   const styles = getModalStyles(theme);
@@ -75,17 +84,17 @@ export const HotspotSaveConfirmationModal = ({
   return (
     <View style={styles.mainContainer}>
       <Card style={styles.cardStyle}>
-        <Caption style={styles.title}>Ești sigur că vrei să ieși? Modificările tale nu vor fi salvate.</Caption>
+        <Caption style={styles.title}>{caption}</Caption>
         <View style={styles.actionView}>
           <View style={styles.buttonView}>
             <Button
               style={styles.discardButton}
               contentStyle={styles.buttonContent}
               labelStyle={styles.buttonLabel}
-              icon="cancel"
-              onPress={() => hideModal()}
+              icon={leftButtonIcon}
+              onPress={leftButtonHandler}
             >
-              Renunță
+              {leftButtonMessage}
             </Button>
           </View>
           <View style={styles.buttonView}>
@@ -93,10 +102,10 @@ export const HotspotSaveConfirmationModal = ({
               style={styles.deleteButton}
               contentStyle={styles.buttonContent}
               labelStyle={styles.buttonLabel}
-              icon="pencil"
-              onPress={() => saveHotspot && saveHotspot()}
+              icon={rightButtonIcon}
+              onPress={rightButtonHandler}
             >
-              Salvează
+              {rightButtonMessage}
             </Button>
           </View>
         </View>
