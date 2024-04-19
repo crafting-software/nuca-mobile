@@ -7,7 +7,11 @@ import {
   LocationItemProps,
   toApiModel,
 } from '../models/Hotspot';
-import { Location } from '../models/Location';
+import {
+  GeocodeMapsCoForwardEntity,
+  GeocodeMapsCoReverseEntity,
+  Location,
+} from '../models/Location';
 import { makeRequest } from './server';
 
 export const loadHotspots = async (): Promise<{
@@ -126,14 +130,16 @@ export const searchLocations = async (address: string) => {
       return { error: errorText || response, isNotSignedIn };
     }
 
-    const data = await response.json();
-    const results: LocationItemProps[] = data.map((x: any) => ({
-      placeName: x.display_name,
-      coordinates: {
-        latitude: x.lat,
-        longitude: x.lon,
-      },
-    }));
+    const data: GeocodeMapsCoForwardEntity[] = await response.json();
+    const results: LocationItemProps[] = data.map(
+      (x: GeocodeMapsCoForwardEntity) => ({
+        placeName: x.display_name || '',
+        coordinates: {
+          latitude: parseFloat(x.lat),
+          longitude: parseFloat(x.lon),
+        },
+      })
+    );
 
     return results;
   } catch (error) {
@@ -159,7 +165,7 @@ export const findPlaceDetails = async (
       }
     );
 
-    const data = await response.json();
+    const data: GeocodeMapsCoReverseEntity = await response.json();
 
     const location: Location = {
       latitude: lat,

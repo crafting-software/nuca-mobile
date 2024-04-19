@@ -47,7 +47,7 @@ export const SearchableLocationDropdown = forwardRef(
 
     const searchForAddress = async (address: string) => {
       try {
-        return await searchLocations(address);
+        return searchLocations(address);
       } catch (e) {
         alert('Address not found');
         return [];

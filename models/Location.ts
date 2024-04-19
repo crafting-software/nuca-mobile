@@ -7,6 +7,36 @@ export type Location = {
   streetNumber?: string | null;
 };
 
+export type GeocodeMapsCoForwardEntity = {
+  place_id: number;
+  boundingbox?: number[];
+  lat: string;
+  lon: string;
+  display_name?: string;
+  class?: string;
+  type?: string;
+  importance?: number;
+};
+
+export type GeocodeMapsCoReverseEntity = {
+  place_id: number;
+  lat: string;
+  lon: string;
+  display_name?: string;
+  address?: {
+    house_number?: string;
+    road?: string;
+    suburb?: string;
+    city?: string;
+    municipality?: string;
+    county?: string;
+    postcode?: string;
+    country?: string;
+    country_code?: string;
+  };
+  boundingbox: number[];
+};
+
 export const getFormattedAddress = (location: Location): string => {
   const textOrDefault = (value: string | null | undefined) => value ?? '';
 
