@@ -60,9 +60,14 @@ export type HotspotDetails = Hotspot & {
 };
 
 export const getHotspotMarker = ({ status }: Partial<Hotspot>) => {
-  if (status === HotspotStatus.done) return doneMarkerImage;
-  if (status === HotspotStatus.inProgress) return inProgressMarkerImage;
-  return todoMarkerImage;
+  switch (status) {
+    case HotspotStatus.done:
+      return doneMarkerImage;
+    case HotspotStatus.inProgress:
+      return inProgressMarkerImage;
+    default:
+      return todoMarkerImage;
+  }
 };
 
 export const castToHotspot = ({
