@@ -257,7 +257,8 @@ export const HotspotFormScreen = ({
 }: RootStackScreenProps<'AddHotspot'>) => {
   const { hotspots, setHotspots } = useContext(MapContext);
   const [isInProgress, setIsInProgress] = useState(false);
-  const [isFormValid, setIsFormValid] = useState(true);
+  const [numberOfInvalidInputsInForm, setNumberOfInvalidInputsInForm] =
+    useState(0);
   const [isConfirmationModalVisible, setConfirmationModalVisibility] =
     useState(false);
   const navigation =
@@ -348,7 +349,7 @@ export const HotspotFormScreen = ({
   });
 
   const saveAndNavigateToDetailScreen = async () => {
-    if (!isFormValid) {
+    if (numberOfInvalidInputsInForm) {
       isConfirmationModalVisible && dismissConfirmationModal();
       SnackbarManager.error(
         'HotspotFormScreen - save func.',
@@ -406,10 +407,22 @@ export const HotspotFormScreen = ({
                     description: text,
                   })
                 }
+                maximumLength={255 + 15}
                 onTextInputValidateText={(text: string) => text.length < 255}
-                invalidValueErrorMessage='Detaliile adresei trebuie să nu depășească 255 de caractere.'
-                onInvalidInput={() => setIsFormValid(false)}
-                onValidInput={() => setIsFormValid(true)}
+                invalidValueErrorMessage="Detaliile adresei trebuie să nu depășească 255 de caractere."
+                infoMessage="Maxim 255 de caractere"
+                onInvalidInput={() =>
+                  setNumberOfInvalidInputsInForm(
+                    numberOfInvalidInputsInForm + 1
+                  )
+                }
+                onValidInput={() =>
+                  setNumberOfInvalidInputsInForm(
+                    numberOfInvalidInputsInForm > 0
+                      ? numberOfInvalidInputsInForm - 1
+                      : 0
+                  )
+                }
               />
               <Caption style={styles.textInputTitle}>STATUS</Caption>
               <SelectDropdown
@@ -453,6 +466,22 @@ export const HotspotFormScreen = ({
                     notes: text,
                   })
                 }
+                maximumLength={500 + 15}
+                onTextInputValidateText={(text: string) => text.length <= 500}
+                invalidValueErrorMessage="Observațiile trebuie să nu depășească 500 de caractere."
+                infoMessage="Maxim 500 de caractere"
+                onInvalidInput={() =>
+                  setNumberOfInvalidInputsInForm(
+                    numberOfInvalidInputsInForm + 1
+                  )
+                }
+                onValidInput={() =>
+                  setNumberOfInvalidInputsInForm(
+                    numberOfInvalidInputsInForm > 0
+                      ? numberOfInvalidInputsInForm - 1
+                      : 0
+                  )
+                }
               />
               <InputField
                 label="Persoana de contact"
@@ -464,6 +493,21 @@ export const HotspotFormScreen = ({
                     ...temporaryHotspotDetails,
                     contactName: text,
                   })
+                }
+                maximumLength={255 + 15}
+                onTextInputValidateText={(text: string) => text.length <= 255}
+                invalidValueErrorMessage="Numele persoanei de contact trebuie să nu depășească 255 de caractere."
+                onInvalidInput={() =>
+                  setNumberOfInvalidInputsInForm(
+                    numberOfInvalidInputsInForm + 1
+                  )
+                }
+                onValidInput={() =>
+                  setNumberOfInvalidInputsInForm(
+                    numberOfInvalidInputsInForm > 0
+                      ? numberOfInvalidInputsInForm - 1
+                      : 0
+                  )
                 }
               />
               <InputField
@@ -477,6 +521,26 @@ export const HotspotFormScreen = ({
                     ...temporaryHotspotDetails,
                     contactPhone: text,
                   })
+                }
+                maximumLength={20}
+                onTextInputValidateText={(text: string) =>
+                  text.length < 20 &&
+                  /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im.test(
+                    text
+                  )
+                }
+                invalidValueErrorMessage="Numǎrul de telefon al persoanei de contact trebuie sǎ fie valid."
+                onInvalidInput={() =>
+                  setNumberOfInvalidInputsInForm(
+                    numberOfInvalidInputsInForm + 1
+                  )
+                }
+                onValidInput={() =>
+                  setNumberOfInvalidInputsInForm(
+                    numberOfInvalidInputsInForm > 0
+                      ? numberOfInvalidInputsInForm - 1
+                      : 0
+                  )
                 }
               />
               <Caption style={styles.textInputTitle}>VOLUNTAR</Caption>
@@ -588,6 +652,7 @@ const AddLocation = ({
       <InputField
         placeholder="Adresă"
         multiline={true}
+        maximumLength={255}
         inputFieldStyle={{ marginTop: 30 }}
         value={location && getFormattedAddress(location)}
         editable={false}

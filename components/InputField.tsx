@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import {
   KeyboardTypeOptions,
   ReturnKeyTypeOptions,
@@ -9,7 +10,6 @@ import {
 } from 'react-native';
 import { Caption, HelperText, TextInput } from 'react-native-paper';
 import { useNucaTheme as useTheme } from '../hooks/useNucaTheme';
-import { useEffect, useState } from 'react';
 
 export type InputFieldProps = {
   label?: string;
@@ -28,13 +28,17 @@ export type InputFieldProps = {
   onInvalidInput?: () => void;
   onValidInput?: () => void;
   invalidValueErrorMessage?: string;
+  infoMessage?: string;
   initiallyValid?: boolean;
+  maximumLength: number;
   value?: string | undefined;
 };
 
 export const InputField = (props: InputFieldProps) => {
   const theme = useTheme();
-  const [isValid, setIsValid] = useState<boolean>(props?.initiallyValid || true);
+  const [isValid, setIsValid] = useState<boolean>(
+    props?.initiallyValid || true
+  );
   const styles = StyleSheet.create({
     title: {
       color: theme.colors.text,
@@ -53,20 +57,21 @@ export const InputField = (props: InputFieldProps) => {
 
   useEffect(() => {
     if (isValid) {
-      props.onValidInput && props.onValidInput()
+      props.onValidInput && props.onValidInput();
       return;
     }
 
-    props.onInvalidInput && props.onInvalidInput()
+    props.onInvalidInput && props.onInvalidInput();
   }, [isValid]);
 
   const onChangeText = (text: string) => {
     props.onTextInputChangeText && props.onTextInputChangeText(text);
-    props.onTextInputValidateText && setIsValid(props.onTextInputValidateText(text));
-  }
+    props.onTextInputValidateText &&
+      setIsValid(props.onTextInputValidateText(text));
+  };
 
-  const getOutlineColor = () => !isValid ? 'red' : theme.colors.disabled;
-  const getActiveOutlineColor = () => !isValid ? 'red' : 'green';
+  const getOutlineColor = () => (!isValid ? 'red' : theme.colors.disabled);
+  const getActiveOutlineColor = () => (!isValid ? 'red' : 'green');
 
   return (
     <View style={props.inputFieldStyle}>
@@ -92,14 +97,15 @@ export const InputField = (props: InputFieldProps) => {
         keyboardType={props.keyboardType}
         onChangeText={onChangeText}
         value={props.value}
+        maxLength={props.maximumLength}
       />
-      {
-        !isValid && (
-          <HelperText type="error">
-            {props.invalidValueErrorMessage}
-          </HelperText>
+      {!isValid ? (
+        <HelperText type="error">{props.invalidValueErrorMessage}</HelperText>
+      ) : (
+        props?.infoMessage && (
+          <HelperText type="info">{props.infoMessage}</HelperText>
         )
-      }
+      )}
     </View>
   );
 };
