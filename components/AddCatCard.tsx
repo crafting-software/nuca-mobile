@@ -553,7 +553,7 @@ export const AddCatCard = ({
             contentStyle={styles.buttonContent}
             labelStyle={styles.buttonLabel}
             icon="pencil"
-            onPress={() => saveCat()}
+            onPress={saveCat}
           >
             Salvează
           </Button>
@@ -564,7 +564,7 @@ export const AddCatCard = ({
             contentStyle={styles.buttonContent}
             labelStyle={styles.buttonLabel}
             icon="close"
-            onPress={() => showModal()}
+            onPress={showModal}
           >
             Șterge
           </Button>

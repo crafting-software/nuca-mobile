@@ -305,15 +305,14 @@ export const HotspotDetailScreen = ({
   });
 
   const addNewCat = async (newCat: Cat) => {
-    if (hotspotDetails.id === undefined || hotspotDetails.id === '') {
-      const hotspot = await save();
-      if (hotspot.hotspot) {
-        saveNewCat(newCat, hotspot.hotspot.id);
-      }
-    } else {
+    if (![undefined, ''].includes(hotspotDetails.id)) {
       saveNewCat(newCat, hotspotDetails.id);
       setIsInProgress(true);
+      return;
     }
+
+    const hotspot = await save();
+    hotspot.hotspot && saveNewCat(newCat, hotspot.hotspot.id);
   };
 
   const saveNewCat = async (newCat: Cat, hotspotId: string) => {
