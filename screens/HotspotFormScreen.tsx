@@ -25,6 +25,13 @@ import { FooterScreens, FooterView } from '../components/Footer';
 import { FullScreenActivityIndicator } from '../components/FullScreenActivityIndicator';
 import { InputField } from '../components/InputField';
 import { NucaModal } from '../components/NucaModal';
+import {
+  allowedNumberOfCharactersOverLimit,
+  maximumAddressDetailsLength,
+  maximumKeyContactIndividualNameLength,
+  maximumNotesLength,
+  maximumPhoneNumberInputLength,
+} from '../constants/inputLimits';
 import { findCurrentLocation, MapContext } from '../context';
 import { HotspotContext } from '../context/HotspotDetailContext';
 import { useHotspotSave } from '../hooks/useHotspotSave';
@@ -407,10 +414,15 @@ export const HotspotFormScreen = ({
                     description: text,
                   })
                 }
-                maximumLength={255 + 15}
-                onTextInputValidateText={(text: string) => text.length < 255}
-                invalidValueErrorMessage="Detaliile adresei trebuie să nu depășească 255 de caractere."
-                infoMessage="Maxim 255 de caractere"
+                maximumLength={
+                  maximumAddressDetailsLength +
+                  allowedNumberOfCharactersOverLimit
+                }
+                onTextInputValidateText={(text: string) =>
+                  text.length <= maximumAddressDetailsLength
+                }
+                invalidValueErrorMessage={`Detaliile adresei trebuie să nu depășească ${maximumAddressDetailsLength} de caractere.`}
+                infoMessage={`Maxim ${maximumAddressDetailsLength} de caractere`}
                 onInvalidInput={() =>
                   setNumberOfInvalidInputsInForm(
                     numberOfInvalidInputsInForm + 1
@@ -466,10 +478,14 @@ export const HotspotFormScreen = ({
                     notes: text,
                   })
                 }
-                maximumLength={500 + 15}
-                onTextInputValidateText={(text: string) => text.length <= 500}
-                invalidValueErrorMessage="Observațiile trebuie să nu depășească 500 de caractere."
-                infoMessage="Maxim 500 de caractere"
+                maximumLength={
+                  maximumNotesLength + allowedNumberOfCharactersOverLimit
+                }
+                onTextInputValidateText={(text: string) =>
+                  text.length <= maximumNotesLength
+                }
+                invalidValueErrorMessage={`Observațiile trebuie să nu depășească ${maximumNotesLength} de caractere.`}
+                infoMessage={`Maxim ${maximumNotesLength} de caractere`}
                 onInvalidInput={() =>
                   setNumberOfInvalidInputsInForm(
                     numberOfInvalidInputsInForm + 1
@@ -494,9 +510,14 @@ export const HotspotFormScreen = ({
                     contactName: text,
                   })
                 }
-                maximumLength={255 + 15}
-                onTextInputValidateText={(text: string) => text.length <= 255}
-                invalidValueErrorMessage="Numele persoanei de contact trebuie să nu depășească 255 de caractere."
+                maximumLength={
+                  maximumKeyContactIndividualNameLength +
+                  allowedNumberOfCharactersOverLimit
+                }
+                onTextInputValidateText={(text: string) =>
+                  text.length <= maximumKeyContactIndividualNameLength
+                }
+                invalidValueErrorMessage={`Numele persoanei de contact trebuie să nu depășească ${maximumKeyContactIndividualNameLength} de caractere.`}
                 onInvalidInput={() =>
                   setNumberOfInvalidInputsInForm(
                     numberOfInvalidInputsInForm + 1
@@ -522,9 +543,9 @@ export const HotspotFormScreen = ({
                     contactPhone: text,
                   })
                 }
-                maximumLength={20}
+                maximumLength={maximumPhoneNumberInputLength}
                 onTextInputValidateText={(text: string) =>
-                  text.length < 20 &&
+                  text.length <= maximumPhoneNumberInputLength &&
                   /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im.test(
                     text
                   )
