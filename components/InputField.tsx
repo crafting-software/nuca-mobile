@@ -7,8 +7,9 @@ import {
   View,
   ViewStyle,
 } from 'react-native';
-import { Caption, TextInput } from 'react-native-paper';
+import { Caption, HelperText, TextInput } from 'react-native-paper';
 import { useNucaTheme as useTheme } from '../hooks/useNucaTheme';
+import { useEffect, useState } from 'react';
 
 export type InputFieldProps = {
   label?: string;
@@ -23,11 +24,17 @@ export type InputFieldProps = {
   editable?: boolean;
   keyboardType?: KeyboardTypeOptions | undefined;
   onTextInputChangeText?: ((text: string) => void) | undefined;
+  onTextInputValidateText?: (text: string) => boolean;
+  onInvalidInput?: () => void;
+  onValidInput?: () => void;
+  invalidValueErrorMessage?: string;
+  initiallyValid?: boolean;
   value?: string | undefined;
 };
 
 export const InputField = (props: InputFieldProps) => {
   const theme = useTheme();
+  const [isValid, setIsValid] = useState<boolean>(props?.initiallyValid || true);
   const styles = StyleSheet.create({
     title: {
       color: theme.colors.text,
@@ -44,6 +51,23 @@ export const InputField = (props: InputFieldProps) => {
     },
   });
 
+  useEffect(() => {
+    if (isValid) {
+      props.onValidInput && props.onValidInput()
+      return;
+    }
+
+    props.onInvalidInput && props.onInvalidInput()
+  }, [isValid]);
+
+  const onChangeText = (text: string) => {
+    props.onTextInputChangeText && props.onTextInputChangeText(text);
+    props.onTextInputValidateText && setIsValid(props.onTextInputValidateText(text));
+  }
+
+  const getOutlineColor = () => !isValid ? 'red' : theme.colors.disabled;
+  const getActiveOutlineColor = () => !isValid ? 'red' : 'green';
+
   return (
     <View style={props.inputFieldStyle}>
       {props.label ? (
@@ -58,15 +82,24 @@ export const InputField = (props: InputFieldProps) => {
         mode="outlined"
         multiline={props.multiline}
         numberOfLines={props.numberOfLines ?? 1}
-        outlineColor={theme.colors.disabled}
+        selectionColor={getActiveOutlineColor()}
+        outlineColor={getOutlineColor()}
+        activeOutlineColor={getActiveOutlineColor()}
         style={[styles.input, props.textInputStyle]}
         returnKeyType={props.returnKeyType}
         right={props.rightIcon}
         editable={props.editable}
         keyboardType={props.keyboardType}
-        onChangeText={props.onTextInputChangeText}
+        onChangeText={onChangeText}
         value={props.value}
       />
+      {
+        !isValid && (
+          <HelperText type="error">
+            {props.invalidValueErrorMessage}
+          </HelperText>
+        )
+      }
     </View>
   );
 };

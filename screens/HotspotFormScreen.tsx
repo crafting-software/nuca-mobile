@@ -257,6 +257,7 @@ export const HotspotFormScreen = ({
 }: RootStackScreenProps<'AddHotspot'>) => {
   const { hotspots, setHotspots } = useContext(MapContext);
   const [isInProgress, setIsInProgress] = useState(false);
+  const [isFormValid, setIsFormValid] = useState(true);
   const [isConfirmationModalVisible, setConfirmationModalVisibility] =
     useState(false);
   const navigation =
@@ -273,7 +274,7 @@ export const HotspotFormScreen = ({
   const [temporaryHotspotDetails, setTemporaryHotspotDetails] =
     useState<HotspotDetails>(hotspotDetails);
 
-  const hideConfirmationModal = () => {
+  const hideConfirmationModalAndExit = () => {
     setConfirmationModalVisibility(false);
     navigation.goBack();
   };
@@ -347,6 +348,15 @@ export const HotspotFormScreen = ({
   });
 
   const saveAndNavigateToDetailScreen = async () => {
+    if (!isFormValid) {
+      isConfirmationModalVisible && dismissConfirmationModal();
+      SnackbarManager.error(
+        'HotspotFormScreen - save func.',
+        'Formularul este încă invalid. Verifică dacă datele introduse corespund restricțiilor menționate.'
+      );
+      return;
+    }
+
     const { hotspot: newHotspot } = await save();
     !isUpdate
       ? navigation.replace('HotspotDetail', { hotspotId: newHotspot!.id })
@@ -356,7 +366,7 @@ export const HotspotFormScreen = ({
   return (
     <>
       <NucaModal
-        leftButtonHandler={hideConfirmationModal}
+        leftButtonHandler={hideConfirmationModalAndExit}
         rightButtonHandler={saveAndNavigateToDetailScreen}
         leftButtonMessage={'Renunță'}
         rightButtonMessage={'Salvează'}
@@ -396,6 +406,10 @@ export const HotspotFormScreen = ({
                     description: text,
                   })
                 }
+                onTextInputValidateText={(text: string) => text.length < 255}
+                invalidValueErrorMessage='Detaliile adresei trebuie să nu depășească 255 de caractere.'
+                onInvalidInput={() => setIsFormValid(false)}
+                onValidInput={() => setIsFormValid(true)}
               />
               <Caption style={styles.textInputTitle}>STATUS</Caption>
               <SelectDropdown
@@ -437,20 +451,6 @@ export const HotspotFormScreen = ({
                   setTemporaryHotspotDetails({
                     ...temporaryHotspotDetails,
                     notes: text,
-                  })
-                }
-              />
-              <InputField
-                label="Pisici nesterilizate"
-                placeholder="0"
-                keyboardType="number-pad"
-                value={String(
-                  temporaryHotspotDetails.unsterilizedCatsCount || 0
-                )}
-                onTextInputChangeText={text =>
-                  setTemporaryHotspotDetails({
-                    ...temporaryHotspotDetails,
-                    unsterilizedCatsCount: Number(text),
                   })
                 }
               />
