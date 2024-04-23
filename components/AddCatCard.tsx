@@ -34,8 +34,8 @@ import { User } from '../models/User';
 import SnackbarManager from '../utils/SnackbarManager';
 import { updateCat } from '../utils/cats';
 import { loadUsers } from '../utils/users';
-import { DeleteModal } from './DeleteModal';
 import { InputField } from './InputField';
+import { NucaModal } from './NucaModal';
 
 registerTranslation('en', en);
 
@@ -263,6 +263,12 @@ export const AddCatCard = ({
     load();
   }, []);
 
+  const deleteCatCallback = () =>
+    deleteCat &&
+    !hotspotDetails.sterilizedCats.includes(localCat) &&
+    !hotspotDetails.unsterilizedCats.includes(localCat) &&
+    deleteCat(localCat);
+
   const saveCat = async () => {
     if (saveChanges) saveChanges();
     if (isEditingMode) {
@@ -311,17 +317,6 @@ export const AddCatCard = ({
   const showModal = () => setVisible(true);
   const hideModal = () => setVisible(false);
 
-  const deleteC = () => {
-    if (
-      !hotspotDetails.sterilizedCats.includes(localCat) &&
-      !hotspotDetails.unsterilizedCats.includes(localCat)
-    ) {
-      if (deleteCat) deleteCat(localCat);
-      return;
-    }
-    showModal();
-  };
-
   const pickImage = async () => {
     const result: ImagePicker.ImagePickerResult =
       await ImagePicker.launchImageLibraryAsync({
@@ -358,10 +353,14 @@ export const AddCatCard = ({
     <Card style={styles.mainContainer}>
       <Portal>
         <Modal visible={visible} onDismiss={hideModal}>
-          <DeleteModal
-            cat={localCat}
-            hideModal={hideModal}
-            deleteCat={deleteCat}
+          <NucaModal
+            leftButtonHandler={hideModal}
+            rightButtonHandler={deleteCatCallback}
+            leftButtonMessage={'Renunță'}
+            rightButtonMessage={'Șterge'}
+            leftButtonIcon={'cancel'}
+            rightButtonIcon={'close'}
+            caption={'Ești sigur că vrei să ștergi?'}
           />
         </Modal>
       </Portal>
@@ -554,7 +553,7 @@ export const AddCatCard = ({
             contentStyle={styles.buttonContent}
             labelStyle={styles.buttonLabel}
             icon="pencil"
-            onPress={() => saveCat()}
+            onPress={saveCat}
           >
             Salvează
           </Button>
@@ -565,7 +564,7 @@ export const AddCatCard = ({
             contentStyle={styles.buttonContent}
             labelStyle={styles.buttonLabel}
             icon="close"
-            onPress={deleteC}
+            onPress={showModal}
           >
             Șterge
           </Button>

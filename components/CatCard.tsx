@@ -12,7 +12,7 @@ import {
 import { useNucaTheme as useTheme } from '../hooks/useNucaTheme';
 import { Cat, getDateText } from '../models/Cat';
 import { AddCatCard } from './AddCatCard';
-import { DeleteModal } from './DeleteModal';
+import { NucaModal } from './NucaModal';
 
 const getStyles = (theme: NucaCustomTheme) =>
   StyleSheet.create({
@@ -159,6 +159,7 @@ export const CatCard = ({
   const updateChanges = () => {
     setShouldEdit(false);
   };
+  const deleteCatCallback = () => deleteFunction && deleteFunction(cat);
 
   return (
     <>
@@ -166,10 +167,14 @@ export const CatCard = ({
         <Card style={styles.mainContainer}>
           <Portal>
             <Modal visible={visible} onDismiss={hideModal}>
-              <DeleteModal
-                cat={cat}
-                hideModal={hideModal}
-                deleteCat={deleteFunction}
+              <NucaModal
+                leftButtonHandler={hideModal}
+                rightButtonHandler={deleteCatCallback}
+                leftButtonMessage={'Renunță'}
+                rightButtonMessage={'Șterge'}
+                leftButtonIcon={'cancel'}
+                rightButtonIcon={'close'}
+                caption={'Ești sigur că vrei să ștergi?'}
               />
             </Modal>
           </Portal>

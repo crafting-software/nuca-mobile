@@ -7,18 +7,26 @@ import {
   StyleSheet,
   View,
 } from 'react-native';
-import { Button, Caption, IconButton, Title } from 'react-native-paper';
+import { Avatar, Button, Caption, FAB, Title } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AddCatCard } from '../components/AddCatCard';
 import { Appbar } from '../components/Appbar';
 import { CatCard } from '../components/CatCard';
 import { FooterScreens, FooterView } from '../components/Footer';
+import { FullScreenActivityIndicator } from '../components/FullScreenActivityIndicator';
 import { HotspotContext } from '../context/HotspotDetailContext';
+import { useHotspotSave } from '../hooks/useHotspotSave';
 import { useNucaTheme as useTheme } from '../hooks/useNucaTheme';
-import { Cat } from '../models/Cat';
+import {
+  Cat,
+  defaultSterilizedCat,
+  defaultUnSterilizedCat,
+} from '../models/Cat';
 import { HotspotDetails, HotspotStatus } from '../models/Hotspot';
 import { Region, RootStackParamList } from '../types';
+import SnackbarManager from '../utils/SnackbarManager';
+import { addCat, deleteCatRequest } from '../utils/cats';
 import { isSmallScreen } from '../utils/helperFunc';
 import { formatHotspotAddress, loadHotspotDetails } from '../utils/hotspots';
 
@@ -95,11 +103,6 @@ const getStyles = (theme: NucaCustomTheme) =>
     },
     catCategoryIcon: {
       margin: 0,
-    },
-    catCategoryTitleLabel: {
-      fontSize: 18,
-      fontFamily: 'Nunito_700Bold',
-      color: theme.colors.text,
     },
     scrollView: {
       width: '100%',
@@ -193,6 +196,28 @@ const getStyles = (theme: NucaCustomTheme) =>
       marginBottom: 10,
       flexDirection: 'column',
     },
+    catCategoriesContainer: {
+      flexDirection: 'row',
+      paddingTop: 24,
+      paddingBottom: 24,
+      alignItems: 'center',
+    },
+    catCategoryTitleIcon: {
+      backgroundColor: theme.colors.text,
+    },
+    catCategoryTitleLabel: {
+      fontSize: 18,
+      fontFamily: 'Nunito_700Bold',
+      color: theme.colors.text,
+      marginStart: 8,
+    },
+    catCategoryAddButton: {
+      backgroundColor: theme.colors.primary,
+      alignItems: 'center',
+      position: 'absolute',
+      margin: 1,
+      right: 0,
+    },
   });
 
 export const HotspotDetailScreen = ({
@@ -201,9 +226,12 @@ export const HotspotDetailScreen = ({
   const theme = useTheme();
   const styles = getStyles(theme);
   const navigation = useNavigation();
-
+  const [isInProgress, setIsInProgress] = useState(false);
   const { hotspotDetails, setHotspotDetails } = useContext(HotspotContext);
   const [region, setRegion] = useState<Region>();
+
+  const [newSterilizedCats, setNewSterilizedCats] = useState<Cat[]>([]);
+  const [newUnsterilizedCat, setNewUnsterilizedCat] = useState<Cat[]>([]);
 
   useEffect(() => {
     const load = async () => {
@@ -233,6 +261,89 @@ export const HotspotDetailScreen = ({
     );
 
   const address = formatHotspotAddress(hotspotDetails, false);
+
+  const deleteCat = async (cat: Cat) => {
+    if (
+      !hotspotDetails.sterilizedCats.includes(cat) &&
+      !hotspotDetails.unsterilizedCats.includes(cat)
+    ) {
+      cat.isSterilized ? setNewSterilizedCats([]) : setNewUnsterilizedCat([]);
+      return;
+    }
+    setIsInProgress(true);
+    const { success } = await deleteCatRequest(cat.id);
+
+    if (success) {
+      setIsInProgress(false);
+      SnackbarManager.success('Cat deleted!');
+
+      const unsterilizedCats = hotspotDetails.unsterilizedCats.filter(
+        (c: Cat) => c.id !== cat.id
+      );
+      const sterilizedCats = hotspotDetails.sterilizedCats.filter(
+        (c: Cat) => c.id !== cat.id
+      );
+
+      setHotspotDetails({
+        ...hotspotDetails,
+        unsterilizedCats: unsterilizedCats,
+        sterilizedCats: sterilizedCats,
+      });
+    } else {
+      setIsInProgress(false);
+      SnackbarManager.error(
+        'HotspotFormScreen - deleteCat func.',
+        'Cat not deleted'
+      );
+    }
+  };
+
+  const save = useHotspotSave({
+    hotspotToBeSaved: hotspotDetails,
+    shouldUpdate: true,
+    setIsInProgress,
+  });
+
+  const addNewCat = async (newCat: Cat) => {
+    if (![undefined, ''].includes(hotspotDetails.id)) {
+      saveNewCat(newCat, hotspotDetails.id);
+      setIsInProgress(true);
+      return;
+    }
+
+    const hotspot = await save();
+    hotspot.hotspot && saveNewCat(newCat, hotspot.hotspot.id);
+  };
+
+  const saveNewCat = async (newCat: Cat, hotspotId: string) => {
+    const { success, cat } = await addCat(newCat, hotspotId);
+
+    if (success) {
+      setIsInProgress(false);
+
+      SnackbarManager.success('Adaugare reuşită');
+
+      if (cat?.isSterilized) {
+        setNewSterilizedCats([]);
+        setHotspotDetails({
+          ...hotspotDetails,
+          sterilizedCats: [cat!, ...hotspotDetails.sterilizedCats],
+        });
+      } else {
+        setNewUnsterilizedCat([]);
+        setHotspotDetails({
+          ...hotspotDetails,
+          unsterilizedCats: [cat!, ...hotspotDetails.unsterilizedCats],
+        });
+      }
+    } else {
+      setIsInProgress(false);
+      SnackbarManager.error(
+        'HotspotFormScreen - addNewCat func.',
+        'Adaugare nereuşită'
+      );
+    }
+  };
 
   return (
     <>
@@ -272,36 +383,68 @@ export const HotspotDetailScreen = ({
                 <Caption style={styles.notes}>{hotspotDetails.notes}</Caption>
               )}
               <SummaryView hotspotDetails={hotspotDetails} />
-              <View style={styles.catCategoryContainer}>
-                <IconButton
+              <View style={styles.catCategoriesContainer}>
+                <Avatar.Icon
                   size={24}
-                  icon="close-circle"
-                  iconColor={theme.colors.text}
-                  style={styles.catCategoryIcon}
+                  icon="close"
+                  color={theme.colors.background}
+                  style={styles.catCategoryTitleIcon}
                 />
-                <Title style={styles.catCategoryTitleLabel}>
+
+                <Caption style={styles.catCategoryTitleLabel}>
                   Pisici nesterilizate
-                </Title>
-              </View>
-              <CatsView cats={hotspotDetails.unsterilizedCats} />
-              <View style={styles.separator} />
-              <View style={styles.catCategoryContainer}>
-                <IconButton
-                  size={24}
-                  icon="check-circle"
-                  iconColor={theme.colors.text}
-                  style={styles.catCategoryIcon}
+                </Caption>
+                <FAB
+                  color={theme.colors.background}
+                  icon="plus"
+                  style={styles.catCategoryAddButton}
+                  size="small"
+                  onPress={() => {
+                    setNewUnsterilizedCat([defaultUnSterilizedCat]);
+                  }}
                 />
-                <Title style={styles.catCategoryTitleLabel}>
-                  Pisici sterilizate
-                </Title>
               </View>
-              <CatsView cats={hotspotDetails.sterilizedCats} />
+              <CatsView
+                cats={newUnsterilizedCat.concat(
+                  hotspotDetails.unsterilizedCats
+                )}
+                isEditMode={true}
+                deleteFunction={deleteCat}
+                addNewCat={addNewCat}
+              />
+              <View style={styles.separator} />
+              <View style={styles.catCategoriesContainer}>
+                <Avatar.Icon
+                  size={24}
+                  icon="check"
+                  color={theme.colors.background}
+                  style={styles.catCategoryTitleIcon}
+                />
+                <Caption style={styles.catCategoryTitleLabel}>
+                  Pisici sterilizate
+                </Caption>
+                <FAB
+                  color={theme.colors.background}
+                  icon="plus"
+                  style={styles.catCategoryAddButton}
+                  size="small"
+                  onPress={() => {
+                    setNewSterilizedCats([defaultSterilizedCat]);
+                  }}
+                />
+              </View>
+              <CatsView
+                cats={newSterilizedCats.concat(hotspotDetails.sterilizedCats)}
+                isEditMode={true}
+                deleteFunction={deleteCat}
+                addNewCat={addNewCat}
+              />
             </View>
           </View>
           <FooterView screen={FooterScreens.HotspotDetailScreen} />
         </ScrollView>
       </View>
+      {isInProgress && <FullScreenActivityIndicator />}
     </>
   );
 };

@@ -1,7 +1,6 @@
 import { StyleSheet, View } from 'react-native';
 import { Button, Caption, Card } from 'react-native-paper';
 import { useNucaTheme as useTheme } from '../hooks/useNucaTheme';
-import { Cat } from '../models/Cat';
 
 const getModalStyles = (theme: NucaCustomTheme) =>
   StyleSheet.create({
@@ -62,14 +61,22 @@ const getModalStyles = (theme: NucaCustomTheme) =>
     },
   });
 
-export const DeleteModal = ({
-  cat,
-  hideModal,
-  deleteCat,
+export const NucaModal = ({
+  leftButtonHandler,
+  rightButtonHandler,
+  leftButtonMessage,
+  rightButtonMessage,
+  leftButtonIcon,
+  rightButtonIcon,
+  caption,
 }: {
-  cat: Cat;
-  hideModal: () => void;
-  deleteCat?: (cat: Cat) => void;
+  leftButtonHandler: () => void;
+  rightButtonHandler: () => void;
+  leftButtonMessage: string;
+  rightButtonMessage: string;
+  leftButtonIcon: string;
+  rightButtonIcon: string;
+  caption: string;
 }) => {
   const theme = useTheme();
   const styles = getModalStyles(theme);
@@ -77,17 +84,17 @@ export const DeleteModal = ({
   return (
     <View style={styles.mainContainer}>
       <Card style={styles.cardStyle}>
-        <Caption style={styles.title}>Ești sigur că vrei să ștergi?</Caption>
+        <Caption style={styles.title}>{caption}</Caption>
         <View style={styles.actionView}>
           <View style={styles.buttonView}>
             <Button
               style={styles.discardButton}
               contentStyle={styles.buttonContent}
               labelStyle={styles.buttonLabel}
-              icon="pencil"
-              onPress={() => hideModal()}
+              icon={leftButtonIcon}
+              onPress={leftButtonHandler}
             >
-              Renunță
+              {leftButtonMessage}
             </Button>
           </View>
           <View style={styles.buttonView}>
@@ -95,12 +102,10 @@ export const DeleteModal = ({
               style={styles.deleteButton}
               contentStyle={styles.buttonContent}
               labelStyle={styles.buttonLabel}
-              icon="close"
-              onPress={() => {
-                deleteCat && deleteCat(cat);
-              }}
+              icon={rightButtonIcon}
+              onPress={rightButtonHandler}
             >
-              Șterge
+              {rightButtonMessage}
             </Button>
           </View>
         </View>

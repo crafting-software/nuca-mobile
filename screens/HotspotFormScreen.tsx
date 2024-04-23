@@ -8,30 +8,28 @@ import {
   View,
 } from 'react-native';
 import {
-  Avatar,
   Button,
   Caption,
-  FAB,
   Headline,
+  Modal,
+  Portal,
   TextInput,
   Title,
 } from 'react-native-paper';
 import SelectDropdown from 'react-native-select-dropdown';
 import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import currentLocationIcon from '../assets/current-location.png';
 import mapPinIcon from '../assets/map-pin.png';
 import { Appbar } from '../components/Appbar';
 import { FooterScreens, FooterView } from '../components/Footer';
 import { FullScreenActivityIndicator } from '../components/FullScreenActivityIndicator';
 import { InputField } from '../components/InputField';
+import { NucaModal } from '../components/NucaModal';
 import { findCurrentLocation, MapContext } from '../context';
 import { HotspotContext } from '../context/HotspotDetailContext';
+import { useHotspotSave } from '../hooks/useHotspotSave';
 import { useNucaTheme as useTheme } from '../hooks/useNucaTheme';
-import {
-  Cat,
-  defaultSterilizedCat,
-  defaultUnSterilizedCat,
-} from '../models/Cat';
 import {
   defaultHotspotDetails,
   Hotspot,
@@ -41,18 +39,11 @@ import {
 } from '../models/Hotspot';
 import { getFormattedAddress, Location } from '../models/Location';
 import { User } from '../models/User';
-import { Region, RootStackScreenProps } from '../types';
+import { Region, RootStackParamList, RootStackScreenProps } from '../types';
 import SnackbarManager from '../utils/SnackbarManager';
-import { addCat, deleteCatRequest } from '../utils/cats';
 import { isSmallScreen } from '../utils/helperFunc';
-import {
-  addHotspot,
-  deleteHotspot,
-  formatHotspotAddress,
-  updateHotspot,
-} from '../utils/hotspots';
+import { deleteHotspot, formatHotspotAddress } from '../utils/hotspots';
 import { loadUsers } from '../utils/users';
-import { CatsView } from './HotspotDetailScreen';
 
 const getStyles = (theme: NucaCustomTheme) =>
   StyleSheet.create({
@@ -254,9 +245,12 @@ const getStyles = (theme: NucaCustomTheme) =>
 export const HotspotFormScreen = ({
   route,
 }: RootStackScreenProps<'AddHotspot'>) => {
-  const { hotspots, setHotspots, setSelectedLocation } = useContext(MapContext);
+  const { hotspots, setHotspots } = useContext(MapContext);
   const [isInProgress, setIsInProgress] = useState(false);
-  const navigation = useNavigation();
+  const [isConfirmationModalVisible, setConfirmationModalVisibility] =
+    useState(false);
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   const theme = useTheme();
   const styles = getStyles(theme);
@@ -265,13 +259,22 @@ export const HotspotFormScreen = ({
   const isUpdate = route.params.isUpdate;
   const location = route.params.location;
 
-  const { hotspotDetails, setHotspotDetails } = useContext(HotspotContext);
+  const { hotspotDetails } = useContext(HotspotContext);
+  const [temporaryHotspotDetails, setTemporaryHotspotDetails] =
+    useState<HotspotDetails>(hotspotDetails);
 
-  const [newSterilizedCats, setNewSterilizedCats] = useState<Cat[]>([]);
-  const [newUnsterilizedCat, setNewUnsterilizedCat] = useState<Cat[]>([]);
+  const hideConfirmationModal = () => {
+    setConfirmationModalVisibility(false);
+    navigation.goBack();
+  };
+  const dismissConfirmationModal = () => setConfirmationModalVisibility(false);
+  const showConfirmationModal = () => setConfirmationModalVisibility(true);
 
   useEffect(() => {
-    if (!isUpdate) setHotspotDetails(defaultHotspotDetails);
+    setTemporaryHotspotDetails(
+      !isUpdate ? defaultHotspotDetails : hotspotDetails
+    );
+
     const load = async () => {
       const { success, users } = await loadUsers();
       if (!success) alert('Failed to load users');
@@ -282,8 +285,8 @@ export const HotspotFormScreen = ({
 
   useEffect(() => {
     if (location)
-      setHotspotDetails({
-        ...hotspotDetails,
+      setTemporaryHotspotDetails({
+        ...temporaryHotspotDetails,
         city: location.city || '',
         zip: location.postalCode || '',
         address:
@@ -292,49 +295,6 @@ export const HotspotFormScreen = ({
         longitude: location.longitude,
       });
   }, [location]);
-
-  const save = async (): Promise<{
-    hotspot?: HotspotDetails;
-  }> => {
-    if (!location && !isUpdate) {
-      SnackbarManager.error(
-        'HotspotFormScreen - save func',
-        'Locatia lipseste'
-      );
-      return { hotspot: undefined };
-    }
-    const submitFunc = isUpdate ? updateHotspot : addHotspot;
-
-    setIsInProgress(true);
-
-    const { success, hotspotDetails: newHotspot } = await submitFunc(
-      hotspotDetails
-    );
-
-    if (success) {
-      const newHostpots = [
-        ...hotspots.filter((h: Hotspot) => h.id !== newHotspot!.id),
-        newHotspot!,
-      ];
-      setHotspotDetails(newHotspot!);
-      setHotspots(newHostpots);
-      setIsInProgress(false);
-      SnackbarManager.success(
-        isUpdate ? 'Editare reuşită' : 'Adăugare reuşită'
-      );
-      navigation.goBack();
-      setSelectedLocation(undefined);
-      return { hotspot: newHotspot };
-    } else {
-      setIsInProgress(false);
-
-      SnackbarManager.error(
-        'HotspotFormScreen - save func.',
-        isUpdate ? 'Editare nereuşită' : 'Adăugare nereuşită'
-      );
-      return { hotspot: undefined };
-    }
-  };
 
   const deleteH = async () => {
     setIsInProgress(true);
@@ -355,89 +315,43 @@ export const HotspotFormScreen = ({
     }
   };
 
-  const deleteCat = async (cat: Cat) => {
-    if (
-      !hotspotDetails.sterilizedCats.includes(cat) &&
-      !hotspotDetails.unsterilizedCats.includes(cat)
-    ) {
-      cat.isSterilized ? setNewSterilizedCats([]) : setNewUnsterilizedCat([]);
-      return;
-    }
-    setIsInProgress(true);
-    const { success } = await deleteCatRequest(cat.id);
-
-    if (success) {
-      setIsInProgress(false);
-      SnackbarManager.success('Cat deleted!');
-
-      const unsterilizedCats = hotspotDetails.unsterilizedCats.filter(
-        (c: Cat) => c.id !== cat.id
-      );
-      const sterilizedCats = hotspotDetails.sterilizedCats.filter(
-        (c: Cat) => c.id !== cat.id
-      );
-
-      setHotspotDetails({
-        ...hotspotDetails,
-        unsterilizedCats: unsterilizedCats,
-        sterilizedCats: sterilizedCats,
-      });
-    } else {
-      setIsInProgress(false);
-      SnackbarManager.error(
-        'HotspotFormScreen - deleteCat func.',
-        'Cat not deleted'
-      );
-    }
-  };
-
-  const addNewCat = async (newCat: Cat) => {
-    if (hotspotDetails.id === undefined || hotspotDetails.id === '') {
-      const hotspot = await save();
-      if (hotspot.hotspot) {
-        saveNewCat(newCat, hotspot.hotspot.id);
-      }
-    } else {
-      saveNewCat(newCat, hotspotDetails.id);
-      setIsInProgress(true);
-    }
-  };
-
-  const saveNewCat = async (newCat: Cat, hotspotId: string) => {
-    const { success, cat } = await addCat(newCat, hotspotId);
-
-    if (success) {
-      setIsInProgress(false);
-
-      SnackbarManager.success('Adaugare reuşită');
-
-      if (cat?.isSterilized) {
-        setNewSterilizedCats([]);
-        setHotspotDetails({
-          ...hotspotDetails,
-          sterilizedCats: [cat!, ...hotspotDetails.sterilizedCats],
-        });
-      } else {
-        setNewUnsterilizedCat([]);
-        setHotspotDetails({
-          ...hotspotDetails,
-          unsterilizedCats: [cat!, ...hotspotDetails.unsterilizedCats],
-        });
-      }
-    } else {
-      setIsInProgress(false);
-      SnackbarManager.error(
-        'HotspotFormScreen - addNewCat func.',
-        'Adaugare nereuşită'
-      );
-    }
-  };
-
   const address = formatHotspotAddress(hotspotDetails, true);
+
+  const save = useHotspotSave({
+    hotspotToBeSaved: temporaryHotspotDetails,
+    shouldUpdate: isUpdate,
+    location,
+    setIsInProgress,
+  });
+
+  const saveAndNavigateToDetailScreen = async () => {
+    const { hotspot: newHotspot } = await save();
+    !isUpdate
+      ? navigation.replace('HotspotDetail', { hotspotId: newHotspot!.id })
+      : navigation.navigate('HotspotDetail', { hotspotId: newHotspot!.id });
+  };
 
   return (
     <>
-      <Appbar forDetailScreen />
+      <Portal>
+        <Modal
+          visible={isConfirmationModalVisible}
+          onDismiss={dismissConfirmationModal}
+        >
+          <NucaModal
+            leftButtonHandler={hideConfirmationModal}
+            rightButtonHandler={saveAndNavigateToDetailScreen}
+            leftButtonMessage={'Renunță'}
+            rightButtonMessage={'Salvează'}
+            leftButtonIcon={'cancel'}
+            rightButtonIcon={'pencil'}
+            caption={
+              'Ești sigur că vrei să ieși? Modificările tale nu vor fi salvate.'
+            }
+          />
+        </Modal>
+      </Portal>
+      <Appbar forDetailScreen showConfirmationModal={showConfirmationModal} />
       <View style={styles.container}>
         <ScrollView>
           <View
@@ -458,9 +372,12 @@ export const HotspotFormScreen = ({
                 label="Detalii adresă"
                 placeholder="Nume"
                 inputFieldStyle={{ marginTop: 54 }}
-                value={hotspotDetails.description}
+                value={temporaryHotspotDetails.description}
                 onTextInputChangeText={text =>
-                  setHotspotDetails({ ...hotspotDetails, description: text })
+                  setTemporaryHotspotDetails({
+                    ...temporaryHotspotDetails,
+                    description: text,
+                  })
                 }
               />
               <Caption style={styles.textInputTitle}>STATUS</Caption>
@@ -479,7 +396,10 @@ export const HotspotFormScreen = ({
                   />
                 )}
                 onSelect={(selectedItem: HotspotStatus) =>
-                  setHotspotDetails({ ...hotspotDetails, status: selectedItem })
+                  setTemporaryHotspotDetails({
+                    ...temporaryHotspotDetails,
+                    status: selectedItem,
+                  })
                 }
                 buttonTextAfterSelection={(selectedItem: HotspotStatus) =>
                   capitalize(selectedItem as HotspotStatus)
@@ -487,7 +407,7 @@ export const HotspotFormScreen = ({
                 rowTextForSelection={(item: HotspotStatus) =>
                   capitalize(item as HotspotStatus)
                 }
-                defaultValue={hotspotDetails.status}
+                defaultValue={temporaryHotspotDetails.status}
               />
               <InputField
                 multiline={true}
@@ -495,19 +415,24 @@ export const HotspotFormScreen = ({
                 placeholder="Scrie aici"
                 inputFieldStyle={styles.inputField}
                 textInputStyle={{ height: 100 }}
-                value={hotspotDetails.notes}
+                value={temporaryHotspotDetails.notes}
                 onTextInputChangeText={text =>
-                  setHotspotDetails({ ...hotspotDetails, notes: text })
+                  setTemporaryHotspotDetails({
+                    ...temporaryHotspotDetails,
+                    notes: text,
+                  })
                 }
               />
               <InputField
                 label="Pisici nesterilizate"
                 placeholder="0"
                 keyboardType="number-pad"
-                value={String(hotspotDetails.unsterilizedCatsCount || 0)}
+                value={String(
+                  temporaryHotspotDetails.unsterilizedCatsCount || 0
+                )}
                 onTextInputChangeText={text =>
-                  setHotspotDetails({
-                    ...hotspotDetails,
+                  setTemporaryHotspotDetails({
+                    ...temporaryHotspotDetails,
                     unsterilizedCatsCount: Number(text),
                   })
                 }
@@ -516,9 +441,12 @@ export const HotspotFormScreen = ({
                 label="Persoana de contact"
                 placeholder="Nume persoana de contact"
                 inputFieldStyle={styles.inputField}
-                value={hotspotDetails.contactName}
+                value={temporaryHotspotDetails.contactName}
                 onTextInputChangeText={text =>
-                  setHotspotDetails({ ...hotspotDetails, contactName: text })
+                  setTemporaryHotspotDetails({
+                    ...temporaryHotspotDetails,
+                    contactName: text,
+                  })
                 }
               />
               <InputField
@@ -526,15 +454,18 @@ export const HotspotFormScreen = ({
                 placeholder="numar de telefon"
                 keyboardType="phone-pad"
                 inputFieldStyle={styles.inputField}
-                value={hotspotDetails.contactPhone}
+                value={temporaryHotspotDetails.contactPhone}
                 onTextInputChangeText={text =>
-                  setHotspotDetails({ ...hotspotDetails, contactPhone: text })
+                  setTemporaryHotspotDetails({
+                    ...temporaryHotspotDetails,
+                    contactPhone: text,
+                  })
                 }
               />
               <Caption style={styles.textInputTitle}>VOLUNTAR</Caption>
               <SelectDropdown
                 defaultButtonText={
-                  hotspotDetails.volunteer?.name || 'Alege voluntar'
+                  temporaryHotspotDetails.volunteer?.name || 'Alege voluntar'
                 }
                 data={users}
                 buttonStyle={styles.dropdownButton}
@@ -550,67 +481,13 @@ export const HotspotFormScreen = ({
                   />
                 )}
                 onSelect={(user: User) =>
-                  setHotspotDetails({ ...hotspotDetails, volunteer: user })
+                  setTemporaryHotspotDetails({
+                    ...temporaryHotspotDetails,
+                    volunteer: user,
+                  })
                 }
                 rowTextForSelection={(user: User) => user.name}
                 buttonTextAfterSelection={(user: User) => user.name}
-              />
-              <View style={styles.separator} />
-              <View style={styles.catCategoriesContainer}>
-                <Avatar.Icon
-                  size={24}
-                  icon="close"
-                  color={theme.colors.background}
-                  style={styles.catCategoryTitleIcon}
-                />
-
-                <Caption style={styles.catCategoryTitleLabel}>
-                  Pisici nesterilizate
-                </Caption>
-                <FAB
-                  color={theme.colors.background}
-                  icon="plus"
-                  style={styles.catCategoryAddButton}
-                  size="small"
-                  onPress={() => {
-                    setNewUnsterilizedCat([defaultUnSterilizedCat]);
-                  }}
-                />
-              </View>
-              <CatsView
-                cats={newUnsterilizedCat.concat(
-                  hotspotDetails.unsterilizedCats
-                )}
-                isEditMode={true}
-                deleteFunction={deleteCat}
-                addNewCat={addNewCat}
-              />
-              <View style={styles.separator} />
-              <View style={styles.catCategoriesContainer}>
-                <Avatar.Icon
-                  size={24}
-                  icon="check"
-                  color={theme.colors.background}
-                  style={styles.catCategoryTitleIcon}
-                />
-                <Caption style={styles.catCategoryTitleLabel}>
-                  Pisici sterilizate
-                </Caption>
-                <FAB
-                  color={theme.colors.background}
-                  icon="plus"
-                  style={styles.catCategoryAddButton}
-                  size="small"
-                  onPress={() => {
-                    setNewSterilizedCats([defaultSterilizedCat]);
-                  }}
-                />
-              </View>
-              <CatsView
-                cats={newSterilizedCats.concat(hotspotDetails.sterilizedCats)}
-                isEditMode={true}
-                deleteFunction={deleteCat}
-                addNewCat={addNewCat}
               />
               <View style={styles.separator} />
               <View
@@ -640,7 +517,7 @@ export const HotspotFormScreen = ({
                   labelStyle={styles.saveButtonLabel}
                   icon="check"
                   mode="contained"
-                  onPress={save}
+                  onPress={saveAndNavigateToDetailScreen}
                 >
                   Salvează
                 </Button>
