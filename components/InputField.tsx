@@ -70,8 +70,10 @@ export const InputField = (props: InputFieldProps) => {
       setIsValid(props.onTextInputValidateText(text));
   };
 
-  const getOutlineColor = () => (!isValid ? 'red' : theme.colors.disabled);
-  const getActiveOutlineColor = () => (!isValid ? 'red' : 'green');
+  const getOutlineColor = () =>
+    !isValid ? theme.colors.error : theme.colors.disabled;
+  const getActiveOutlineColor = () =>
+    !isValid ? theme.colors.error : theme.colors.success;
 
   return (
     <View style={props.inputFieldStyle}>
