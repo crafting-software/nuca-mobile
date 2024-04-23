@@ -1,18 +1,12 @@
-import { useContext, useEffect, useRef } from 'react';
-import {
-  Image,
-  Platform,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { useContext, useEffect, useRef, useState } from 'react';
+import { Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
 import MapView from 'react-native-maps';
 import { Caption, FAB, TextInput } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import currentLocationIcon from '../assets/current-location.png';
-import markerNewImage from '../assets/marker-new.png';
 import { Appbar } from '../components/Appbar';
+import { Marker } from '../components/Marker';
 import { SearchableLocationDropdown } from '../components/SearchableLocationDropdown';
 import {
   deltaRatio,
@@ -22,8 +16,7 @@ import {
 import { MapContext } from '../context';
 import { findCurrentLocation, findPlace } from '../context/MapContext';
 import { useNucaTheme as useTheme } from '../hooks/useNucaTheme';
-import { Marker } from '../maps';
-import { getHotspotMarker } from '../models/Hotspot';
+import { HotspotStatus, getHotspotMarker } from '../models/Hotspot';
 import { getFormattedAddress, Location } from '../models/Location';
 import { EdgeInsets, RootStackScreenProps } from '../types';
 import SnackbarManager from '../utils/SnackbarManager';
@@ -42,10 +35,10 @@ export const ChooseLocationScreen = ({
 
   const mapRef = useRef<MapView>(null);
   const navigation = useNavigation();
-
   const insets = useSafeAreaInsets();
   const theme = useTheme();
   const styles = getStyles(theme, insets);
+  const [isMapReady, setIsMapReady] = useState(false);
 
   const animateMapToRegion = (_location: Location) => {
     mapRef.current?.animateToRegion({
@@ -108,6 +101,7 @@ export const ChooseLocationScreen = ({
               setSelectedLocation(location);
             }
           }}
+          onMapReady={() => setIsMapReady(true)}
           onPress={async e => {
             const getCoords = () => {
               if (Platform.OS === 'web') {
@@ -142,13 +136,15 @@ export const ChooseLocationScreen = ({
                 latitude: h.latitude,
                 longitude: h.longitude,
               }}
-            >
-              <Image
-                source={getHotspotMarker(h)}
-                style={styles.marker}
-                resizeMode="contain"
-              />
-            </Marker>
+              passthroughKey={h.id}
+              height={styles.marker.height}
+              width={styles.marker.width}
+              isMapReady={isMapReady}
+              imageSource={getHotspotMarker(h)}
+              onPress={() =>
+                navigation.navigate('HotspotDetail', { hotspotId: h.id })
+              }
+            />
           ))}
 
           {selectedLocation ? (
@@ -158,16 +154,11 @@ export const ChooseLocationScreen = ({
                 latitude: selectedLocation.latitude,
                 longitude: selectedLocation.longitude,
               }}
-              onPress={() => {
-                setSelectedLocation(undefined);
-              }}
-            >
-              <Image
-                source={markerNewImage}
-                style={styles.marker}
-                resizeMode="contain"
-              />
-            </Marker>
+              height={styles.marker.height}
+              width={styles.marker.width}
+              imageSource={getHotspotMarker({ status: HotspotStatus.toDo })}
+              onPress={() => setSelectedLocation(undefined)}
+            />
           ) : null}
         </MapView>
         <View style={styles.searchInput}>

@@ -2,8 +2,21 @@ import { camelCase } from 'lodash';
 import doneMarker from '../assets/marker-done.png';
 import inProgressMarker from '../assets/marker-in-progress.png';
 import todoMarker from '../assets/marker-todo.png';
+import { isWeb } from '../utils/platform';
 import { castToCat, Cat } from './Cat';
 import { castToUser, User } from './User';
+
+const markers = isWeb()
+  ? {
+      doneMarkerImage: '/assets/assets/marker-done.png',
+      inProgressMarkerImage: '/assets/assets/marker-in-progress.png',
+      todoMarkerImage: '/assets/assets/marker-todo.png',
+    }
+  : {
+      doneMarkerImage: doneMarker,
+      inProgressMarkerImage: inProgressMarker,
+      todoMarkerImage: todoMarker,
+    };
 
 export enum HotspotStatus {
   toDo = 'în așteptare',
@@ -53,9 +66,14 @@ export type HotspotDetails = Hotspot & {
 };
 
 export const getHotspotMarker = ({ status }: Partial<Hotspot>) => {
-  if (status === HotspotStatus.done) return doneMarker;
-  if (status === HotspotStatus.inProgress) return inProgressMarker;
-  return todoMarker;
+  switch (status) {
+    case HotspotStatus.done:
+      return markers.doneMarkerImage;
+    case HotspotStatus.inProgress:
+      return markers.inProgressMarkerImage;
+    default:
+      return markers.todoMarkerImage;
+  }
 };
 
 export const castToHotspot = ({
