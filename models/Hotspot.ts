@@ -6,11 +6,17 @@ import { isWeb } from '../utils/platform';
 import { castToCat, Cat } from './Cat';
 import { castToUser, User } from './User';
 
-const doneMarkerImage = isWeb() ? '/assets/assets/marker-done.png' : doneMarker;
-const inProgressMarkerImage = isWeb()
-  ? '/assets/assets/marker-in-progress.png'
-  : inProgressMarker;
-const todoMarkerImage = isWeb() ? '/assets/assets/marker-todo.png' : todoMarker;
+const markers = isWeb()
+  ? {
+      doneMarkerImage: '/assets/assets/marker-done.png',
+      inProgressMarkerImage: '/assets/assets/marker-in-progress.png',
+      todoMarkerImage: '/assets/assets/marker-todo.png',
+    }
+  : {
+      doneMarkerImage: doneMarker,
+      inProgressMarkerImage: inProgressMarker,
+      todoMarkerImage: todoMarker,
+    };
 
 export enum HotspotStatus {
   toDo = 'în așteptare',
@@ -62,11 +68,11 @@ export type HotspotDetails = Hotspot & {
 export const getHotspotMarker = ({ status }: Partial<Hotspot>) => {
   switch (status) {
     case HotspotStatus.done:
-      return doneMarkerImage;
+      return markers.doneMarkerImage;
     case HotspotStatus.inProgress:
-      return inProgressMarkerImage;
+      return markers.inProgressMarkerImage;
     default:
-      return todoMarkerImage;
+      return markers.todoMarkerImage;
   }
 };
 

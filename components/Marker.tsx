@@ -22,19 +22,16 @@ export const Marker = ({
   onPress,
   isMapReady,
 }: MarkerProps) => {
-  // Used only on Web, instead of the Pin component
-  const webIcon = isWeb() && {
-    // @ts-ignore
-    scaledSize: new google.maps.Size(width, height),
-    url: imageSource,
-  };
-
   return isWeb() ? (
     // @ts-ignore
     <MapView.Marker
       coordinate={coordinate}
       key={passthroughKey}
-      icon={webIcon}
+      icon={{
+        // @ts-ignore
+        scaledSize: new google.maps.Size(width, height),
+        url: imageSource,
+      }}
       onPress={onPress}
     />
   ) : (
