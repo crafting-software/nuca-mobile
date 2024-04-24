@@ -318,7 +318,7 @@ export const AddCatCard = ({
   const saveCat = async () => {
     if (saveChanges) saveChanges();
     if (isEditingMode) {
-      const { success, cat } = await updateCat(
+      const { success, cat: savedCat } = await updateCat(
         checked
           ? {
               ...localCat,
@@ -326,12 +326,16 @@ export const AddCatCard = ({
             }
           : localCat
       );
-      if (success && cat) {
+
+      if (success && cat && savedCat) {
         SnackbarManager.success('Cat updated!');
         if (checked) {
           setHotspotDetails(prev => ({
             ...prev,
-            sterilizedCats: [cat, ...hotspotDetails.sterilizedCats],
+            sterilizedCats: [
+              { ...savedCat, isSterilized: true },
+              ...hotspotDetails.sterilizedCats,
+            ],
             unsterilizedCats: hotspotDetails.unsterilizedCats.filter(
               (c: Cat) => c.id !== cat.id
             ),
@@ -342,7 +346,7 @@ export const AddCatCard = ({
             : hotspotDetails.unsterilizedCats;
           const catIndex = catList.findIndex((c: Cat) => c.id === cat.id);
           catList[catIndex] = localCat;
-          cat.isSterilized
+          localCat.isSterilized
             ? setHotspotDetails(prev => ({
                 ...prev,
                 sterilizedCats: catList,
