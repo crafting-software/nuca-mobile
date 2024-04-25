@@ -33,7 +33,7 @@ import { Cat, defaultSterilizedCat } from '../models/Cat';
 import { User } from '../models/User';
 import SnackbarManager from '../utils/SnackbarManager';
 import { updateCat } from '../utils/cats';
-import { loadUsers } from '../utils/users';
+import { loadUsersRequest } from '../utils/users';
 import { InputField } from './InputField';
 import { NucaModal } from './NucaModal';
 
@@ -256,7 +256,7 @@ export const AddCatCard = ({
 
   useEffect(() => {
     const load = async () => {
-      const { success, users } = await loadUsers();
+      const { success, users } = await loadUsersRequest();
       if (!success) alert('Failed to load users');
       setUsers(users);
     };
