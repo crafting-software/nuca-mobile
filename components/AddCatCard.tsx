@@ -316,50 +316,61 @@ export const AddCatCard = ({
     deleteCat(localCat);
 
   const saveCat = async () => {
-    if (saveChanges) saveChanges();
-    if (isEditingMode) {
-      const { success, cat: savedCat } = await updateCat(
-        checked
-          ? {
-              ...localCat,
-              isSterilized: checked,
-            }
-          : localCat
-      );
+    saveChanges && saveChanges();
 
-      if (success && cat && savedCat) {
-        SnackbarManager.success('Cat updated!');
-        if (checked) {
-          setHotspotDetails(prev => ({
-            ...prev,
-            sterilizedCats: [
-              { ...savedCat, isSterilized: true },
-              ...hotspotDetails.sterilizedCats,
-            ],
-            unsterilizedCats: hotspotDetails.unsterilizedCats.filter(
-              (c: Cat) => c.id !== cat.id
-            ),
-          }));
-        } else {
-          const catList = cat.isSterilized
-            ? hotspotDetails.sterilizedCats
-            : hotspotDetails.unsterilizedCats;
-          const catIndex = catList.findIndex((c: Cat) => c.id === cat.id);
-          catList[catIndex] = localCat;
-          localCat.isSterilized
-            ? setHotspotDetails(prev => ({
-                ...prev,
-                sterilizedCats: catList,
-              }))
-            : setHotspotDetails(prev => ({
-                ...prev,
-                unsterilizedCats: catList,
-              }));
-        }
-      }
-    } else {
-      if (addCat) addCat(localCat);
+    if (!isEditingMode) {
+      addCat && addCat(localCat);
+      return;
     }
+
+    const { success, cat: savedCat } = await updateCat(
+      checked
+        ? {
+            ...localCat,
+            isSterilized: checked,
+          }
+        : localCat
+    );
+
+    if (!success || !cat || !savedCat) {
+      SnackbarManager.error(
+        'AddCatCard - saveCat request',
+        'Informațiile pisicii nu au putut fi actualizate. Verificǎ dacǎ dispozitivul tãu este conectat la internet.'
+      );
+      return;
+    }
+
+    SnackbarManager.success('Cat updated!');
+
+    if (checked) {
+      setHotspotDetails(prev => ({
+        ...prev,
+        sterilizedCats: [
+          { ...savedCat, isSterilized: true },
+          ...hotspotDetails.sterilizedCats,
+        ],
+        unsterilizedCats: hotspotDetails.unsterilizedCats.filter(
+          (c: Cat) => c.id !== cat.id
+        ),
+      }));
+
+      return;
+    }
+
+    const catList = cat.isSterilized
+      ? hotspotDetails.sterilizedCats
+      : hotspotDetails.unsterilizedCats;
+    const catIndex = catList.findIndex((c: Cat) => c.id === cat.id);
+    catList[catIndex] = localCat;
+    localCat.isSterilized
+      ? setHotspotDetails(prev => ({
+          ...prev,
+          sterilizedCats: catList,
+        }))
+      : setHotspotDetails(prev => ({
+          ...prev,
+          unsterilizedCats: catList,
+        }));
   };
 
   const [visible, setVisible] = useState(false);
