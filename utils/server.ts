@@ -31,7 +31,12 @@ const objectToFormData = (
       !Date.parse(value)
     ) {
       return objectToFormData(value, fd, propName);
-    } else if (Date.parse(value)) {
+    } else if (
+      Date.parse(value)
+      && typeof value == 'string'
+      && moment(value, 'YYYY-MM-DD', true).isValid()
+      || moment.utc(value, 'ddd MMM DD YYYY HH:mm:ss', true).isValid()
+    ) {
       const formattedDate = moment(new Date(value)).format('YYYY-MM-DD');
       fd.append(propName, formattedDate);
     } else if (Array.isArray(value)) {
