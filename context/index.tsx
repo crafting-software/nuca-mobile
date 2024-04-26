@@ -6,13 +6,14 @@ import {
   initialLongitude,
   initialLongitudeDelta,
 } from '../constants/location';
+import { useAuthentication } from '../hooks/useAuthentication';
 import {
   defaultHotspotDetails,
   Hotspot,
   HotspotDetails,
 } from '../models/Hotspot';
 import { Location } from '../models/Location';
-import { Auth, AuthContext } from './AuthContext';
+import { AuthContext } from './AuthContext';
 import { HotspotContext } from './HotspotDetailContext';
 import { MapContext } from './MapContext';
 
@@ -21,7 +22,7 @@ export * from './MapContext';
 export * from '../models/Hotspot';
 
 export const AuthContextProvider = ({ children }: { children: ReactNode }) => {
-  const [auth, setAuth] = useState<Auth>({ inProgress: false });
+  const { auth, setAuth } = useAuthentication();
 
   const authValue = useMemo(() => ({ auth, setAuth }), [auth]);
 

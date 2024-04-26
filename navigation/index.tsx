@@ -28,6 +28,7 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 const RootNavigator = () => {
   const { auth } = useContext(AuthContext);
+  if (auth.inProgress) return null;
   const isAuthenticated = !!auth.token;
   return (
     <Stack.Navigator>

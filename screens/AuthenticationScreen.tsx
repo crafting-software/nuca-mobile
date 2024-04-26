@@ -1,6 +1,6 @@
 import AppLoading from 'expo-app-loading';
 import * as SecureStore from 'expo-secure-store';
-import { useContext, useEffect, useRef, useState } from 'react';
+import { useContext, useRef, useState } from 'react';
 import {
   Image,
   KeyboardAvoidingView,
@@ -92,32 +92,6 @@ export const AuthenticationScreen = () => {
 
   const [isInvalidUserName, setIsInvalidUserName] = useState(false);
   const [isInvalidPassword, setIsInvalidPassword] = useState(false);
-
-  const restoreAuth = async () => {
-    if (Platform.OS === 'web') {
-      try {
-        const value = await AsyncStorage.getItem('auth');
-        if (value !== null) {
-          const { token, username } = JSON.parse(value);
-          setAuth({ token, username, inProgress: false });
-        }
-      } catch (e) {
-        setAuth({ token: '', username: '', inProgress: false });
-      }
-    } else {
-      const authString = await SecureStore.getItemAsync('auth');
-      if (!authString) {
-        setAuth({ token: '', username: '', inProgress: false });
-      } else {
-        const { token, username } = JSON.parse(authString);
-        setAuth({ token, username, inProgress: false });
-      }
-    }
-  };
-
-  useEffect(() => {
-    restoreAuth();
-  }, []);
 
   const signIn = async () => {
     if (!username) setIsInvalidUserName(true);
