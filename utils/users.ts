@@ -1,7 +1,7 @@
 import { castToUser, User } from '../models/User';
 import { makeRequest } from './server';
 
-export const loadUsers = async (): Promise<{
+export const loadUsersRequest = async (): Promise<{
   success: boolean;
   users: User[];
 }> => {

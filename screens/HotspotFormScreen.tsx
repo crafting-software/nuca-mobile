@@ -1,6 +1,7 @@
 import { capitalize } from 'lodash';
 import { useContext, useEffect, useState } from 'react';
 import {
+  BackHandler,
   Image,
   ScrollView,
   StyleSheet,
@@ -43,7 +44,7 @@ import { Region, RootStackParamList, RootStackScreenProps } from '../types';
 import SnackbarManager from '../utils/SnackbarManager';
 import { isSmallScreen } from '../utils/helperFunc';
 import { deleteHotspot, formatHotspotAddress } from '../utils/hotspots';
-import { loadUsers } from '../utils/users';
+import { loadUsersRequest } from '../utils/users';
 
 const getStyles = (theme: NucaCustomTheme) =>
   StyleSheet.create({
@@ -268,19 +269,31 @@ export const HotspotFormScreen = ({
     navigation.goBack();
   };
   const dismissConfirmationModal = () => setConfirmationModalVisibility(false);
-  const showConfirmationModal = () => setConfirmationModalVisibility(true);
+  const showConfirmationModal = () => {
+    setConfirmationModalVisibility(true);
+    return true;
+  };
+  const loadUsers = async () => {
+    const { success, users } = await loadUsersRequest();
+    if (!success) alert('Failed to load users');
+    setUsers(users);
+  };
 
-  useEffect(() => {
+  const initializeTemporaryHotspotDetails = () =>
     setTemporaryHotspotDetails(
       !isUpdate ? defaultHotspotDetails : hotspotDetails
     );
 
-    const load = async () => {
-      const { success, users } = await loadUsers();
-      if (!success) alert('Failed to load users');
-      setUsers(users);
-    };
-    load();
+  useEffect(() => {
+    initializeTemporaryHotspotDetails();
+    loadUsers();
+
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      showConfirmationModal
+    );
+
+    return () => backHandler.remove();
   }, []);
 
   useEffect(() => {
