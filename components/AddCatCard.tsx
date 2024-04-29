@@ -15,6 +15,7 @@ import {
   Checkbox,
   Icon,
   IconButton,
+  Text,
   TextInput,
 } from 'react-native-paper';
 import {
@@ -107,8 +108,16 @@ const getStyles = (theme: NucaCustomTheme) =>
       borderWidth: 1,
       borderColor: theme.colors.disabled,
       marginTop: 5,
+      textAlign: 'center'
     },
     genderButtonText: {
+      fontSize: 15,
+      textAlign: 'left',
+      paddingHorizontal: 8,
+      fontFamily: 'Nunito_400Regular',
+      color: theme.colors.text,
+    },
+    volunteerButtonText: {
       fontSize: 15,
       textAlign: 'left',
       paddingHorizontal: 8,
@@ -118,6 +127,12 @@ const getStyles = (theme: NucaCustomTheme) =>
     genderDropdown: {
       borderRadius: theme.roundness,
       width: 150,
+      textAlign: 'center'
+    },
+    volunteerDropdown: {
+      borderRadius: theme.roundness,
+      width: 150,
+      textAlign: 'center'
     },
     genderRowText: {
       textAlign: 'left',
@@ -125,6 +140,7 @@ const getStyles = (theme: NucaCustomTheme) =>
       paddingVertical: 18,
       fontSize: 15,
       fontFamily: 'Nunito_400Regular',
+      borderBottomWidth: 1
     },
     title: {
       color: theme.colors.text,
@@ -144,15 +160,6 @@ const getStyles = (theme: NucaCustomTheme) =>
       fontFamily: 'Nunito_700Bold',
       textTransform: 'uppercase',
     },
-    dropdownButton: {
-      width: '100%',
-      borderRadius: theme.roundness,
-      height: 60,
-      backgroundColor: 'transparent',
-      borderWidth: 1,
-      borderColor: theme.colors.disabled,
-      marginTop: 5,
-    },
     dropdownText: {
       fontSize: 15,
       textAlign: 'left',
@@ -162,6 +169,10 @@ const getStyles = (theme: NucaCustomTheme) =>
     },
     statusDropdown: {
       borderRadius: theme.roundness,
+    },
+    statusRow: {
+      borderTopWidth: 0.2,
+      color: theme.colors.text,
     },
     statusRowText: {
       textAlign: 'left',
@@ -231,6 +242,45 @@ const getStyles = (theme: NucaCustomTheme) =>
       position: 'absolute',
       right: -14,
       top: -14,
+    },
+    dropdownButton: {
+      width: '100%',
+      borderRadius: theme.roundness,
+      height: 60,
+      backgroundColor: 'transparent',
+      justifyContent: 'center',
+      alignItems: 'center',
+      borderWidth: 1,
+      borderColor: theme.colors.disabled,
+      marginTop: 5,
+    },
+    volunteerDropdownButton: {
+      width: '100%',
+      borderRadius: theme.roundness,
+      height: 60,
+      backgroundColor: 'white',
+      justifyContent: 'center',
+      alignItems: 'flex-start',
+      borderWidth: 1,
+      borderColor: theme.colors.disabled,
+      paddingLeft: 10
+    },
+    genderDropdownButtonContainer: {
+      flexDirection: 'row',
+      justifyContent: 'flex-end',
+      alignItems: 'center',
+      width: '50%'
+    },
+    volunteerDropdownButtonContainer: {
+      flexDirection: 'row',
+      justifyContent: 'flex-end',
+      alignItems: 'center',
+      width: '100%'
+    },
+    arrowIcon: {
+      alignItems: 'center',
+      marginRight: 25,
+      marginTop: '50%'
     },
     imageContainer: {
       maxWidth: '80%',
@@ -406,28 +456,32 @@ export const AddCatCard = ({
         <SelectDropdown
           data={['M', 'F']}
           defaultValue={localCat.sex}
-          buttonStyle={styles.genderButton}
-          buttonTextStyle={styles.genderButtonText}
-          dropdownStyle={styles.genderDropdown}
-          rowTextStyle={styles.genderRowText}
-          dropdownIconPosition="right"
-          renderDropdownIcon={(_selectedItem, _index) => (
-            <TextInput.Icon
-              icon="chevron-down"
-              color={theme.colors.text}
-              style={{ marginRight: 40 }}
-            />
+          renderButton={(selectedItem: any, isOpened: boolean) => (
+            <View style={styles.genderDropdownButtonContainer}>
+              <TextInput.Icon 
+                icon={isOpened ? 'chevron-up' : 'chevron-down'}
+                color={theme.colors.text}
+                style={styles.arrowIcon}
+              />
+              <View style={styles.dropdownButton}>
+                <Text style={styles.genderButtonText}>
+                  {selectedItem}
+                </Text>
+              </View>
+            </View>
           )}
+          renderItem={(item, _index, isSelected) => (
+            <View style={styles.statusRow}>
+              <Text style={styles.genderRowText}>{isSelected ? capitalize(item) : item}</Text>
+            </View>
+          )}
+          dropdownStyle={styles.genderDropdown}
           onSelect={selectedValue => {
             setCat(prev => ({
               ...prev,
               sex: selectedValue,
             }));
           }}
-          buttonTextAfterSelection={(selectedItem: string, _index) =>
-            capitalize(selectedItem)
-          }
-          rowTextForSelection={(item: string, _index) => capitalize(item)}
         />
         <InputField
           multiline={true}
@@ -515,26 +569,32 @@ export const AddCatCard = ({
             </View>
             <Caption style={styles.volunteerTitle}>VOLUNTAR</Caption>
             <SelectDropdown
-              defaultButtonText={localCat.capturedBy?.name || 'Alege voluntar'}
               data={users}
-              buttonStyle={styles.dropdownButton}
-              buttonTextStyle={styles.dropdownText}
-              dropdownStyle={styles.statusDropdown}
-              rowTextStyle={styles.statusRowText}
-              dropdownIconPosition="right"
-              renderDropdownIcon={() => (
-                <TextInput.Icon
-                  icon="chevron-down"
-                  color={theme.colors.text}
-                  style={{ marginRight: 40 }}
-                />
+              defaultValue={localCat?.capturedBy?.name}
+              renderButton={(_selectedVolunteer: any, isOpened: boolean) => (
+                <View style={styles.volunteerDropdownButtonContainer}>
+                  <View style={styles.volunteerDropdownButton}>
+                    <Text style={styles.dropdownText}>
+                      {localCat?.capturedBy?.name || "Alege voluntar"}
+                    </Text>
+                  </View>
+                  <TextInput.Icon 
+                    icon={isOpened ? 'chevron-up' : 'chevron-down'}
+                    color={theme.colors.text}
+                    style={styles.arrowIcon}
+                    pointerEvents="none" //https://stackoverflow.com/questions/59384985/how-do-i-disable-the-touch-of-a-child-element-in-touchable-component
+                  />
+                </View>
               )}
-              onSelect={selectedVolunteer =>
+              renderItem={(volunteer, _index, _isSelected) => (
+                <View style={styles.statusRow}>
+                  <Text style={styles.statusRowText}>{volunteer?.name}</Text>
+                </View>
+              )}
+              dropdownStyle={styles.statusDropdown}
+              onSelect={selectedVolunteer => {
                 setCat(prev => ({ ...prev, capturedBy: selectedVolunteer }))
-              }
-              rowTextForSelection={(user: User) => user.name}
-              buttonTextAfterSelection={(user: User) => user.name}
-              defaultValue={localCat.capturedBy?.name}
+              }}
             />
           </>
         )}
