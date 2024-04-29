@@ -122,6 +122,7 @@ const getStyles = (theme: NucaCustomTheme) =>
     genderRowText: {
       textAlign: 'left',
       paddingHorizontal: 18,
+      paddingVertical: 18,
       fontSize: 15,
       fontFamily: 'Nunito_400Regular',
     },
@@ -165,6 +166,7 @@ const getStyles = (theme: NucaCustomTheme) =>
     statusRowText: {
       textAlign: 'left',
       paddingHorizontal: 18,
+      paddingVertical: 18,
       fontSize: 15,
       fontFamily: 'Nunito_400Regular',
     },
