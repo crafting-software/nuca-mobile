@@ -1,5 +1,5 @@
 import { StyleSheet, View } from 'react-native';
-import { Button, Caption, Card } from 'react-native-paper';
+import { Button, Caption, Card, Modal, Portal } from 'react-native-paper';
 import { useNucaTheme as useTheme } from '../hooks/useNucaTheme';
 
 const getModalStyles = (theme: NucaCustomTheme) =>
@@ -12,6 +12,17 @@ const getModalStyles = (theme: NucaCustomTheme) =>
       lineHeight: 22,
       fontFamily: 'Nunito_700Bold',
       paddingLeft: 8,
+    },
+    modalWrapperStyle: {
+      width: '100%',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    modalWrapperContainerStyle: {
+      shadowOffset: {
+        width: 0,
+        height: 0,
+      },
     },
     discardButton: {
       height: 66,
@@ -69,6 +80,8 @@ export const NucaModal = ({
   leftButtonIcon,
   rightButtonIcon,
   caption,
+  visible,
+  onDismiss,
 }: {
   leftButtonHandler: () => void;
   rightButtonHandler: () => void;
@@ -77,39 +90,50 @@ export const NucaModal = ({
   leftButtonIcon: string;
   rightButtonIcon: string;
   caption: string;
+  visible: boolean;
+  onDismiss: () => void;
 }) => {
   const theme = useTheme();
   const styles = getModalStyles(theme);
 
   return (
-    <View style={styles.mainContainer}>
-      <Card style={styles.cardStyle}>
-        <Caption style={styles.title}>{caption}</Caption>
-        <View style={styles.actionView}>
-          <View style={styles.buttonView}>
-            <Button
-              style={styles.discardButton}
-              contentStyle={styles.buttonContent}
-              labelStyle={styles.buttonLabel}
-              icon={leftButtonIcon}
-              onPress={leftButtonHandler}
-            >
-              {leftButtonMessage}
-            </Button>
-          </View>
-          <View style={styles.buttonView}>
-            <Button
-              style={styles.deleteButton}
-              contentStyle={styles.buttonContent}
-              labelStyle={styles.buttonLabel}
-              icon={rightButtonIcon}
-              onPress={rightButtonHandler}
-            >
-              {rightButtonMessage}
-            </Button>
-          </View>
+    <Portal>
+      <Modal
+        visible={visible}
+        onDismiss={onDismiss}
+        style={styles.modalWrapperStyle}
+        contentContainerStyle={styles.modalWrapperContainerStyle}
+      >
+        <View style={styles.mainContainer}>
+          <Card style={styles.cardStyle}>
+            <Caption style={styles.title}>{caption}</Caption>
+            <View style={styles.actionView}>
+              <View style={styles.buttonView}>
+                <Button
+                  style={styles.discardButton}
+                  contentStyle={styles.buttonContent}
+                  labelStyle={styles.buttonLabel}
+                  icon={leftButtonIcon}
+                  onPress={leftButtonHandler}
+                >
+                  {leftButtonMessage}
+                </Button>
+              </View>
+              <View style={styles.buttonView}>
+                <Button
+                  style={styles.deleteButton}
+                  contentStyle={styles.buttonContent}
+                  labelStyle={styles.buttonLabel}
+                  icon={rightButtonIcon}
+                  onPress={rightButtonHandler}
+                >
+                  {rightButtonMessage}
+                </Button>
+              </View>
+            </View>
+          </Card>
         </View>
-      </Card>
-    </View>
+      </Modal>
+    </Portal>
   );
 };

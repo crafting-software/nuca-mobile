@@ -1,14 +1,7 @@
 import { isEmpty } from 'lodash';
 import { useState } from 'react';
 import { FlatList, Image, StyleSheet, View } from 'react-native';
-import {
-  Button,
-  Caption,
-  Card,
-  IconButton,
-  Modal,
-  Portal,
-} from 'react-native-paper';
+import { Button, Caption, Card, IconButton } from 'react-native-paper';
 import { useNucaTheme as useTheme } from '../hooks/useNucaTheme';
 import { Cat, getDateText } from '../models/Cat';
 import { AddCatCard } from './AddCatCard';
@@ -22,6 +15,17 @@ const getStyles = (theme: NucaCustomTheme) =>
       backgroundColor: theme.colors.surface,
       borderRadius: 30,
       marginBottom: 10,
+    },
+    modalWrapperStyle: {
+      width: '100%',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    modalWrapperContainerStyle: {
+      shadowOffset: {
+        width: 0,
+        height: 0,
+      },
     },
     container: {
       padding: 20,
@@ -165,19 +169,17 @@ export const CatCard = ({
     <>
       {!shouldEdit ? (
         <Card style={styles.mainContainer}>
-          <Portal>
-            <Modal visible={visible} onDismiss={hideModal}>
-              <NucaModal
-                leftButtonHandler={hideModal}
-                rightButtonHandler={deleteCatCallback}
-                leftButtonMessage={'Renunță'}
-                rightButtonMessage={'Șterge'}
-                leftButtonIcon={'cancel'}
-                rightButtonIcon={'close'}
-                caption={'Ești sigur că vrei să ștergi?'}
-              />
-            </Modal>
-          </Portal>
+          <NucaModal
+            leftButtonHandler={hideModal}
+            rightButtonHandler={deleteCatCallback}
+            leftButtonMessage={'Renunță'}
+            rightButtonMessage={'Șterge'}
+            leftButtonIcon={'cancel'}
+            rightButtonIcon={'close'}
+            caption={'Ești sigur că vrei să ștergi?'}
+            visible={visible}
+            onDismiss={hideModal}
+          />
           <View style={styles.container}>
             <View style={styles.titleRow}>
               <Caption style={styles.index}>{index}.</Caption>

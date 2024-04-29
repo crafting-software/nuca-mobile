@@ -12,8 +12,6 @@ import {
   Button,
   Caption,
   Headline,
-  Modal,
-  Portal,
   TextInput,
   Title,
 } from 'react-native-paper';
@@ -51,6 +49,17 @@ const getStyles = (theme: NucaCustomTheme) =>
     container: {
       backgroundColor: theme.colors.background,
       flex: 1,
+    },
+    modalWrapperStyle: {
+      width: '100%',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    modalWrapperContainerStyle: {
+      shadowOffset: {
+        width: 0,
+        height: 0,
+      },
     },
     form: {
       padding: 20,
@@ -346,24 +355,19 @@ export const HotspotFormScreen = ({
 
   return (
     <>
-      <Portal>
-        <Modal
-          visible={isConfirmationModalVisible}
-          onDismiss={dismissConfirmationModal}
-        >
-          <NucaModal
-            leftButtonHandler={hideConfirmationModal}
-            rightButtonHandler={saveAndNavigateToDetailScreen}
-            leftButtonMessage={'Renunță'}
-            rightButtonMessage={'Salvează'}
-            leftButtonIcon={'cancel'}
-            rightButtonIcon={'pencil'}
-            caption={
-              'Ești sigur că vrei să ieși? Modificările tale nu vor fi salvate.'
-            }
-          />
-        </Modal>
-      </Portal>
+      <NucaModal
+        leftButtonHandler={hideConfirmationModal}
+        rightButtonHandler={saveAndNavigateToDetailScreen}
+        leftButtonMessage={'Renunță'}
+        rightButtonMessage={'Salvează'}
+        leftButtonIcon={'cancel'}
+        rightButtonIcon={'pencil'}
+        caption={
+          'Ești sigur că vrei să ieși? Modificările tale nu vor fi salvate.'
+        }
+        visible={isConfirmationModalVisible}
+        onDismiss={dismissConfirmationModal}
+      />
       <Appbar forDetailScreen showConfirmationModal={showConfirmationModal} />
       <View style={styles.container}>
         <ScrollView>
