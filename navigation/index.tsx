@@ -1,4 +1,5 @@
 import { useContext } from 'react';
+import { Platform } from 'react-native';
 import { DefaultTheme, NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { AuthContext } from '../context';
@@ -28,7 +29,7 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 const RootNavigator = () => {
   const { auth } = useContext(AuthContext);
-  if (auth.inProgress) return null;
+  if (auth.inProgress && Platform.OS === 'web') return null;
   const isAuthenticated = !!auth.token;
   return (
     <Stack.Navigator>

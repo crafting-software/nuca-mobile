@@ -5,7 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Auth } from '../context';
 
 export const useAuthentication = () => {
-  const [auth, setAuth] = useState<Auth>({ inProgress: true });
+  const [auth, setAuth] = useState<Auth>({ inProgress: Platform.OS === 'web' });
 
   useEffect(() => {
     const restoreAuth = async () => {
