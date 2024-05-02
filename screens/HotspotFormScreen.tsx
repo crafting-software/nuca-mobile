@@ -50,7 +50,7 @@ import { Region, RootStackParamList, RootStackScreenProps } from '../types';
 import SnackbarManager from '../utils/SnackbarManager';
 import { isSmallScreen } from '../utils/helperFunc';
 import { deleteHotspot, formatHotspotAddress } from '../utils/hotspots';
-import { loadUsersRequest } from '../utils/users';
+import { VolunteerDropdown } from '../components/VolunteerDropdown';
 
 const getStyles = (theme: NucaCustomTheme) =>
   StyleSheet.create({
@@ -319,7 +319,6 @@ export const HotspotFormScreen = ({
   const theme = useTheme();
   const styles = getStyles(theme);
 
-  const [users, setUsers] = useState<User[]>([]);
   const isUpdate = route.params.isUpdate;
   const location = route.params.location;
 
@@ -336,11 +335,6 @@ export const HotspotFormScreen = ({
     setConfirmationModalVisibility(true);
     return true;
   };
-  const loadUsers = async () => {
-    const { success, users } = await loadUsersRequest();
-    if (!success) alert('Failed to load users');
-    setUsers(users);
-  };
 
   const initializeTemporaryHotspotDetails = () =>
     setTemporaryHotspotDetails(
@@ -349,7 +343,6 @@ export const HotspotFormScreen = ({
 
   useEffect(() => {
     initializeTemporaryHotspotDetails();
-    loadUsers();
 
     const backHandler = BackHandler.addEventListener(
       'hardwareBackPress',
@@ -500,7 +493,7 @@ export const HotspotFormScreen = ({
                     />
                   </View>
                 )}
-                renderItem={(item, index, _isSelected) => (
+                renderItem={(item, _index, _isSelected) => (
                   <View style={styles.statusRow}>
                     <Text style={styles.statusRowText}>{capitalize(item)}</Text>
                   </View>
@@ -613,33 +606,12 @@ export const HotspotFormScreen = ({
                 }
               />
               <Caption style={styles.textInputTitle}>VOLUNTAR</Caption>
-              <SelectDropdown
-                data={users}
-                renderButton={(_selectedVolunteer: any, isOpened: boolean) => (
-                  <View style={styles.volunteerDropdownButtonContainer}>
-                    <View style={styles.volunteerDropdownButton}>
-                      <Text style={styles.dropdownText}>
-                        {temporaryHotspotDetails.volunteer?.name || "Alege voluntar"}
-                      </Text>
-                    </View>
-                    <TextInput.Icon 
-                      icon={isOpened ? 'chevron-up' : 'chevron-down'}
-                      color={theme.colors.text}
-                      style={styles.arrowIcon}
-                      pointerEvents="none"
-                    />
-                  </View>
-                )}
-                renderItem={(volunteer, _index, _isSelected) => (
-                  <View style={styles.statusRow}>
-                    <Text style={styles.statusRowText}>{volunteer?.name}</Text>
-                  </View>
-                )}
-                dropdownStyle={styles.statusDropdown}
-                onSelect={(user: User) =>
+              <VolunteerDropdown
+                volunteer={hotspotDetails.volunteer}
+                onSelect={(selectedVolunteer?: User) =>
                   setTemporaryHotspotDetails({
                     ...temporaryHotspotDetails,
-                    volunteer: user,
+                    volunteer: selectedVolunteer,
                   })
                 }
               />

@@ -1,6 +1,6 @@
 import * as ImagePicker from 'expo-image-picker';
 import { capitalize } from 'lodash';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import {
   FlatList,
   Image,
@@ -36,9 +36,9 @@ import { Cat, defaultSterilizedCat } from '../models/Cat';
 import { User } from '../models/User';
 import SnackbarManager from '../utils/SnackbarManager';
 import { updateCat } from '../utils/cats';
-import { loadUsersRequest } from '../utils/users';
 import { InputField } from './InputField';
 import { NucaModal } from './NucaModal';
+import { VolunteerDropdown } from './VolunteerDropdown';
 
 registerTranslation('en', en);
 
@@ -302,22 +302,12 @@ export const AddCatCard = ({
 }) => {
   const theme = useTheme();
   const styles = getStyles(theme);
-  const [users, setUsers] = useState<User[]>([]);
   const [localCat, setCat] = useState<Cat>(cat || defaultSterilizedCat);
   const { hotspotDetails, setHotspotDetails } = useContext(HotspotContext);
   const [checked, setChecked] = React.useState(false);
   const [numberOfInvalidInputsInForm, setNumberOfInvalidInputsInForm] =
     useState(0);
   // const [images, setImages] = useState<ImagePicker.ImagePickerAsset[]>([]);
-
-  useEffect(() => {
-    const load = async () => {
-      const { success, users } = await loadUsersRequest();
-      if (!success) alert('Failed to load users');
-      setUsers(users);
-    };
-    load();
-  }, []);
 
   const deleteCatCallback = () =>
     deleteCat &&
@@ -568,33 +558,9 @@ export const AddCatCard = ({
               </View>
             </View>
             <Caption style={styles.volunteerTitle}>VOLUNTAR</Caption>
-            <SelectDropdown
-              data={users}
-              defaultValue={localCat?.capturedBy?.name}
-              renderButton={(_selectedVolunteer: any, isOpened: boolean) => (
-                <View style={styles.volunteerDropdownButtonContainer}>
-                  <View style={styles.volunteerDropdownButton}>
-                    <Text style={styles.dropdownText}>
-                      {localCat?.capturedBy?.name || "Alege voluntar"}
-                    </Text>
-                  </View>
-                  <TextInput.Icon 
-                    icon={isOpened ? 'chevron-up' : 'chevron-down'}
-                    color={theme.colors.text}
-                    style={styles.arrowIcon}
-                    pointerEvents="none" //https://stackoverflow.com/questions/59384985/how-do-i-disable-the-touch-of-a-child-element-in-touchable-component
-                  />
-                </View>
-              )}
-              renderItem={(volunteer, _index, _isSelected) => (
-                <View style={styles.statusRow}>
-                  <Text style={styles.statusRowText}>{volunteer?.name}</Text>
-                </View>
-              )}
-              dropdownStyle={styles.statusDropdown}
-              onSelect={selectedVolunteer => {
-                setCat(prev => ({ ...prev, capturedBy: selectedVolunteer }))
-              }}
+            <VolunteerDropdown 
+              volunteer={localCat.capturedBy}
+              onSelect={(selectedVolunteer?: User) => setCat(prev => ({ ...prev, capturedBy: selectedVolunteer }))}
             />
           </>
         )}
