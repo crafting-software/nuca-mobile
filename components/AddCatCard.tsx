@@ -15,8 +15,6 @@ import {
   Checkbox,
   Icon,
   IconButton,
-  Modal,
-  Portal,
   TextInput,
 } from 'react-native-paper';
 import {
@@ -351,19 +349,17 @@ export const AddCatCard = ({
 
   return (
     <Card style={styles.mainContainer}>
-      <Portal>
-        <Modal visible={visible} onDismiss={hideModal}>
-          <NucaModal
-            leftButtonHandler={hideModal}
-            rightButtonHandler={deleteCatCallback}
-            leftButtonMessage={'Renunță'}
-            rightButtonMessage={'Șterge'}
-            leftButtonIcon={'cancel'}
-            rightButtonIcon={'close'}
-            caption={'Ești sigur că vrei să ștergi?'}
-          />
-        </Modal>
-      </Portal>
+      <NucaModal
+        leftButtonHandler={hideModal}
+        rightButtonHandler={deleteCatCallback}
+        leftButtonMessage={'Renunță'}
+        rightButtonMessage={'Șterge'}
+        leftButtonIcon={'cancel'}
+        rightButtonIcon={'close'}
+        caption={'Ești sigur că vrei să ștergi?'}
+        visible={visible}
+        onDismiss={hideModal}
+      />
       <View style={styles.container}>
         <View style={styles.titleRow}>
           {isEditingMode ? (
