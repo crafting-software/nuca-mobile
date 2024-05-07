@@ -673,7 +673,7 @@ const AddLocation = ({
       <InputField
         placeholder="Adresă"
         multiline={true}
-        maximumLength={255}
+        maximumLength={maximumAddressDetailsLength}
         inputFieldStyle={{ marginTop: 30 }}
         value={location && getFormattedAddress(location)}
         editable={false}
