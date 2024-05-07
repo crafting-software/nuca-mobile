@@ -27,8 +27,14 @@ import { HotspotDetails, HotspotStatus } from '../models/Hotspot';
 import { Region, RootStackParamList } from '../types';
 import SnackbarManager from '../utils/SnackbarManager';
 import { addCat, deleteCatRequest } from '../utils/cats';
-import { isSmallScreen } from '../utils/helperFunc';
+import { isSmallMobileScreen, isSmallScreen } from '../utils/helperFunc';
 import { formatHotspotAddress, loadHotspotDetails } from '../utils/hotspots';
+
+const textSizes = isSmallMobileScreen()
+  ? { title: 10, subtitle: 12 }
+  : { title: 12, subtitle: 14 };
+
+const cardPadding = isSmallMobileScreen() ? 4 : 16;
 
 const getStyles = (theme: NucaCustomTheme) =>
   StyleSheet.create({
@@ -118,10 +124,11 @@ const getStyles = (theme: NucaCustomTheme) =>
       flex: 1,
       margin: 5,
       marginLeft: 0,
+      paddingHorizontal: cardPadding,
     },
     statusText: {
       color: theme.colors.text,
-      fontSize: 12,
+      fontSize: textSizes.title,
       fontFamily: 'Nunito_800ExtraBold',
       textTransform: 'uppercase',
       textAlign: 'center',
@@ -132,26 +139,39 @@ const getStyles = (theme: NucaCustomTheme) =>
       justifyContent: 'space-between',
     },
     informationView: {
-      paddingVertical: 16,
+      paddingVertical: 12,
       backgroundColor: theme.colors.infoBg,
       alignItems: 'center',
       borderRadius: theme.roundness,
-      height: 100,
       flex: 1,
       margin: 5,
+      paddingHorizontal: cardPadding,
+      height: 100,
       justifyContent: 'space-between',
       flexDirection: 'column',
     },
+    titleContainer: {
+      height: 40,
+      display: 'flex',
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      justifyContent: 'center',
+    },
+    subtitleContainer: {
+      height: 50,
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center',
+    },
     informationTitle: {
       color: theme.colors.infoText,
-      fontSize: 12,
+      fontSize: textSizes.title,
       fontFamily: 'Nunito_800ExtraBold',
-      flexWrap: 'wrap',
       textTransform: 'uppercase',
       textAlign: 'center',
     },
     informationSubtitle: {
-      fontSize: 14,
+      fontSize: textSizes.subtitle,
       fontFamily: 'Nunito_700Bold',
     },
     informationCount: {
@@ -489,11 +509,15 @@ const InformationView = ({
 
   return (
     <View style={styles.informationView}>
-      <Caption style={styles.informationTitle}>{title}</Caption>
-      {!!subtitle && (
-        <Caption style={styles.informationSubtitle}>{subtitle}</Caption>
-      )}
-      {!!count && <Title style={styles.informationCount}>{count}</Title>}
+      <View style={styles.titleContainer}>
+        <Caption style={styles.informationTitle}>{title}</Caption>
+      </View>
+      <View style={styles.subtitleContainer}>
+        {!!subtitle && (
+          <Caption style={styles.informationSubtitle}>{subtitle}</Caption>
+        )}
+        {!!count && <Title style={styles.informationCount}>{count}</Title>}
+      </View>
     </View>
   );
 };
@@ -510,7 +534,7 @@ const SummaryView = ({
     <View style={styles.informationContainer}>
       <StatusView status={hotspotDetails.status} />
       <InformationView
-        title={'pisici \nnesterilizate'}
+        title={'pisici nesterilizate'}
         count={`${
           hotspotDetails.unsterilizedCatsCount ||
           hotspotDetails.unsterilizedCats.length
@@ -538,7 +562,7 @@ const SummaryView = ({
       <View style={styles.informationContainer}>
         <StatusView status={hotspotDetails.status} />
         <InformationView
-          title={'pisici \nnesterilizate'}
+          title={'pisici nesterilizate'}
           count={`${
             hotspotDetails.unsterilizedCatsCount ||
             hotspotDetails.unsterilizedCats.length
