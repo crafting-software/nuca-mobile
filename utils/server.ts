@@ -16,6 +16,14 @@ const getAuthorizationHeader = async () => {
   }
 };
 
+const isValueAnObject = (value: any) =>
+  value && typeof value === 'object' && !(value instanceof File);
+const isValueADate = (value: any) =>
+  moment(value, 'YYYY-MM-DD', true).isValid() ||
+  moment.utc(value, 'ddd MMM DD YYYY HH:mm:ss', true).isValid();
+const isValueAnArray = (value: any) => Array.isArray(value);
+const isValueUndefined = (value: any) => value !== undefined;
+
 const objectToFormData = (
   obj: Record<string, any>,
   formData: FormData = new FormData(),
@@ -24,22 +32,21 @@ const objectToFormData = (
   Object.entries(obj).reduce((fd: FormData, [key, value]: [string, any]) => {
     const propName: string = parentKey ? `${parentKey}[${key}]` : key;
 
-    if (
-      typeof value === 'object' &&
-      value !== null &&
-      !(value instanceof File) &&
-      !Date.parse(value)
-    ) {
-      return objectToFormData(value, fd, propName);
-    } else if (Date.parse(value)) {
-      const formattedDate = moment(new Date(value)).format('YYYY-MM-DD');
-      fd.append(propName, formattedDate);
-    } else if (Array.isArray(value)) {
-      value.forEach((item: any, index: number) =>
-        objectToFormData(item, fd, `${propName}[${index}]`)
-      );
-    } else {
-      if (value !== undefined) fd.append(propName, value);
+    switch (true) {
+      case isValueADate(value):
+        const formattedDate = moment(new Date(value)).format('YYYY-MM-DD');
+        fd.append(propName, formattedDate);
+        break;
+      case isValueAnObject(value):
+        return objectToFormData(value, fd, propName);
+      case isValueAnArray(value):
+        value.forEach((item: any, index: number) =>
+          objectToFormData(item, fd, `${propName}[${index}]`)
+        );
+        break;
+      case isValueUndefined(value):
+        fd.append(propName, value);
+        break;
     }
 
     return fd;
