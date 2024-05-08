@@ -7,7 +7,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   View,
-  Text
+  Text,
 } from 'react-native';
 import {
   Button,
@@ -26,6 +26,7 @@ import { FooterScreens, FooterView } from '../components/Footer';
 import { FullScreenActivityIndicator } from '../components/FullScreenActivityIndicator';
 import { InputField } from '../components/InputField';
 import { NucaModal } from '../components/NucaModal';
+import { VolunteerDropdown } from '../components/VolunteerDropdown';
 import {
   allowedNumberOfCharactersOverLimit,
   maximumAddressDetailsLength,
@@ -50,7 +51,6 @@ import { Region, RootStackParamList, RootStackScreenProps } from '../types';
 import SnackbarManager from '../utils/SnackbarManager';
 import { isSmallScreen } from '../utils/helperFunc';
 import { deleteHotspot, formatHotspotAddress } from '../utils/hotspots';
-import { VolunteerDropdown } from '../components/VolunteerDropdown';
 
 const getStyles = (theme: NucaCustomTheme) =>
   StyleSheet.create({
@@ -232,7 +232,7 @@ const getStyles = (theme: NucaCustomTheme) =>
       flexDirection: 'row',
       justifyContent: 'flex-end',
       alignItems: 'center',
-      width: '100%'
+      width: '100%',
     },
     statusButtonText: {
       fontSize: 15,
@@ -257,7 +257,7 @@ const getStyles = (theme: NucaCustomTheme) =>
     arrowIcon: {
       alignItems: 'center',
       marginRight: 25,
-      marginTop: '50%'
+      marginTop: '50%',
     },
     imageView: {
       marginTop: 32,
@@ -280,7 +280,7 @@ const getStyles = (theme: NucaCustomTheme) =>
       flexDirection: 'row',
       justifyContent: 'flex-end',
       alignItems: 'center',
-      width: '100%'
+      width: '100%',
     },
     volunteerDropdownButton: {
       width: '100%',
@@ -291,7 +291,7 @@ const getStyles = (theme: NucaCustomTheme) =>
       alignItems: 'flex-start',
       borderWidth: 1,
       borderColor: theme.colors.disabled,
-      paddingLeft: 10
+      paddingLeft: 10,
     },
     separator: {
       borderColor: theme.colors.disabled,

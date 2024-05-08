@@ -1,9 +1,4 @@
-import {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { View, StyleSheet, Platform, Text, TextInput } from 'react-native';
 import {
   AutocompleteDropdown,
@@ -23,11 +18,11 @@ import { loadUsersRequest } from '../utils/users';
 type VolunteerDropdownProps = {
   volunteer?: User;
   onSelect: (selectedVolunteer?: User) => void;
-}
+};
 
 export const VolunteerDropdown = ({
   volunteer,
-  onSelect
+  onSelect,
 }: VolunteerDropdownProps) => {
   const [loading, setLoading] = useState(false);
   const [suggestionsList, setSuggestionsList] = useState<
@@ -35,31 +30,42 @@ export const VolunteerDropdown = ({
   >(null);
   const searchRef = useRef<TextInput>(null);
   const dropdownController = useRef<AutocompleteDropdownRef | undefined>();
-  const [selectedVolunteer, setSelectedVolunteer] = useState<User | undefined>(volunteer);
+  const [selectedVolunteer, setSelectedVolunteer] = useState<User | undefined>(
+    volunteer
+  );
 
   const insets = useSafeAreaInsets();
   const theme = useTheme();
   const styles = getStyles(theme, insets);
 
-  const encodeUserDetailsAsString = (user?: User) => `${user?.id};${user?.email};${user?.phone};${user?.username}`;
+  const encodeUserDetailsAsString = (user?: User) =>
+    `${user?.id};${user?.email};${user?.phone};${user?.username}`;
   const decodeUserDetailsFromId = (userId: string) => userId.split(';');
 
   const getSuggestions = useCallback(async (query: string) => {
     setLoading(true);
-    const { success, users: volunteers} = await loadUsersRequest();
+    const { success, users: volunteers } = await loadUsersRequest();
     if (!success) alert('Failed to load users');
 
     // setUsers(users);
-    const tokenizedQuery = query.split(" ");
-    const queryRegexPattern = tokenizedQuery.reduce((acc, x) => acc + "|" + x);
-    const regex = new RegExp(queryRegexPattern, "i");
-    const relevantVolunteers = volunteers.filter((x: User) => x.name.match(regex));
+    const tokenizedQuery = query.split(' ');
+    const queryRegexPattern = tokenizedQuery.reduce((acc, x) => acc + '|' + x);
+    const regex = new RegExp(queryRegexPattern, 'i');
+    const relevantVolunteers = volunteers.filter((x: User) =>
+      x.name.match(regex)
+    );
+
+    type UserIdNamePair = { id: string; title: string };
 
     setSuggestionsList(
-      relevantVolunteers.map((item: User) => ({
-        id: encodeUserDetailsAsString(item),
-        title: item.name,
-      }))
+      relevantVolunteers
+        .map((item: User) => ({
+          id: encodeUserDetailsAsString(item),
+          title: item.name,
+        }))
+        .sort((a: UserIdNamePair, b: UserIdNamePair) =>
+          a.title.localeCompare(b.title)
+        )
     );
     setLoading(false);
   }, []);
@@ -72,15 +78,13 @@ export const VolunteerDropdown = ({
   }, []);
 
   const onBlur = () =>
-    dropdownController && dropdownController?.current?.setItem({
+    dropdownController &&
+    dropdownController?.current?.setItem({
       id: encodeUserDetailsAsString(selectedVolunteer),
       title: selectedVolunteer?.name || null,
     });
 
-  const onFocus = () => {
-    setSelectedVolunteer(undefined);
-    dropdownController?.current?.open();
-  }
+  const onFocus = () => setSelectedVolunteer(undefined);
 
   const onOpenSuggestionsList = useCallback((_isOpened: boolean) => {}, []);
 
@@ -97,9 +101,15 @@ export const VolunteerDropdown = ({
   const setSelectedSuggestedVolunteer = (item: TAutocompleteDropdownItem) => {
     if (!item) return;
 
-    const volunteerName = item.title || "";
+    const volunteerName = item.title || '';
     const [id, email, phone, username] = decodeUserDetailsFromId(item.id);
-    const selectedVolunteerToBeUpdated: User = {name: volunteerName, id: id, email: email, phone: phone, username: username};
+    const selectedVolunteerToBeUpdated: User = {
+      name: volunteerName,
+      id: id,
+      email: email,
+      phone: phone,
+      username: username,
+    };
     setSelectedVolunteer(selectedVolunteerToBeUpdated);
     onSelect(selectedVolunteerToBeUpdated);
     dropdownController.current?.setInputText(volunteerName);
@@ -113,7 +123,7 @@ export const VolunteerDropdown = ({
   useEffect(() => {
     selectedVolunteer
       ? dropdownController.current?.setInputText(selectedVolunteer.name)
-      : getSuggestions("");
+      : getSuggestions('');
   }, [selectedVolunteer]);
 
   return (
@@ -143,15 +153,13 @@ export const VolunteerDropdown = ({
       containerStyle={styles.containerStyle}
       renderItem={renderVolunteerItem}
       inputHeight={dropdownInputHeight}
-      emptyResultText='Niciun rezultat gǎsit!'
+      emptyResultText="Niciun rezultat gǎsit!"
       useFilter={false}
-      showChevron={false}
       closeOnBlur={false}
       showClear={true}
     />
   );
 };
-
 
 const getStyles = (theme: NucaCustomTheme, _insets: EdgeInsets) =>
   StyleSheet.create({

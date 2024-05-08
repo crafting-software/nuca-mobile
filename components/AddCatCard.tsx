@@ -108,7 +108,7 @@ const getStyles = (theme: NucaCustomTheme) =>
       borderWidth: 1,
       borderColor: theme.colors.disabled,
       marginTop: 5,
-      textAlign: 'center'
+      textAlign: 'center',
     },
     genderButtonText: {
       fontSize: 15,
@@ -127,12 +127,12 @@ const getStyles = (theme: NucaCustomTheme) =>
     genderDropdown: {
       borderRadius: theme.roundness,
       width: 150,
-      textAlign: 'center'
+      textAlign: 'center',
     },
     volunteerDropdown: {
       borderRadius: theme.roundness,
       width: 150,
-      textAlign: 'center'
+      textAlign: 'center',
     },
     genderRowText: {
       textAlign: 'left',
@@ -140,7 +140,7 @@ const getStyles = (theme: NucaCustomTheme) =>
       paddingVertical: 18,
       fontSize: 15,
       fontFamily: 'Nunito_400Regular',
-      borderBottomWidth: 1
+      borderBottomWidth: 1,
     },
     title: {
       color: theme.colors.text,
@@ -263,24 +263,24 @@ const getStyles = (theme: NucaCustomTheme) =>
       alignItems: 'flex-start',
       borderWidth: 1,
       borderColor: theme.colors.disabled,
-      paddingLeft: 10
+      paddingLeft: 10,
     },
     genderDropdownButtonContainer: {
       flexDirection: 'row',
       justifyContent: 'flex-end',
       alignItems: 'center',
-      width: '50%'
+      width: '50%',
     },
     volunteerDropdownButtonContainer: {
       flexDirection: 'row',
       justifyContent: 'flex-end',
       alignItems: 'center',
-      width: '100%'
+      width: '100%',
     },
     arrowIcon: {
       alignItems: 'center',
       marginRight: 25,
-      marginTop: '50%'
+      marginTop: '50%',
     },
     imageContainer: {
       maxWidth: '80%',
@@ -448,21 +448,21 @@ export const AddCatCard = ({
           defaultValue={localCat.sex}
           renderButton={(selectedItem: any, isOpened: boolean) => (
             <View style={styles.genderDropdownButtonContainer}>
-              <TextInput.Icon 
+              <TextInput.Icon
                 icon={isOpened ? 'chevron-up' : 'chevron-down'}
                 color={theme.colors.text}
                 style={styles.arrowIcon}
               />
               <View style={styles.dropdownButton}>
-                <Text style={styles.genderButtonText}>
-                  {selectedItem}
-                </Text>
+                <Text style={styles.genderButtonText}>{selectedItem}</Text>
               </View>
             </View>
           )}
           renderItem={(item, _index, isSelected) => (
             <View style={styles.statusRow}>
-              <Text style={styles.genderRowText}>{isSelected ? capitalize(item) : item}</Text>
+              <Text style={styles.genderRowText}>
+                {isSelected ? capitalize(item) : item}
+              </Text>
             </View>
           )}
           dropdownStyle={styles.genderDropdown}
@@ -558,9 +558,11 @@ export const AddCatCard = ({
               </View>
             </View>
             <Caption style={styles.volunteerTitle}>VOLUNTAR</Caption>
-            <VolunteerDropdown 
+            <VolunteerDropdown
               volunteer={localCat.capturedBy}
-              onSelect={(selectedVolunteer?: User) => setCat(prev => ({ ...prev, capturedBy: selectedVolunteer }))}
+              onSelect={(selectedVolunteer?: User) =>
+                setCat(prev => ({ ...prev, capturedBy: selectedVolunteer }))
+              }
             />
           </>
         )}
