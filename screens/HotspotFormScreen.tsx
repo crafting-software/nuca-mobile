@@ -25,6 +25,13 @@ import { FooterScreens, FooterView } from '../components/Footer';
 import { FullScreenActivityIndicator } from '../components/FullScreenActivityIndicator';
 import { InputField } from '../components/InputField';
 import { NucaModal } from '../components/NucaModal';
+import {
+  allowedNumberOfCharactersOverLimit,
+  maximumAddressDetailsLength,
+  maximumKeyContactIndividualNameLength,
+  maximumNotesLength,
+  maximumPhoneNumberInputLength,
+} from '../constants/inputLimits';
 import { findCurrentLocation, MapContext } from '../context';
 import { HotspotContext } from '../context/HotspotDetailContext';
 import { useHotspotSave } from '../hooks/useHotspotSave';
@@ -257,6 +264,8 @@ export const HotspotFormScreen = ({
 }: RootStackScreenProps<'AddHotspot'>) => {
   const { hotspots, setHotspots } = useContext(MapContext);
   const [isInProgress, setIsInProgress] = useState(false);
+  const [numberOfInvalidInputsInForm, setNumberOfInvalidInputsInForm] =
+    useState(0);
   const [isConfirmationModalVisible, setConfirmationModalVisibility] =
     useState(false);
   const navigation =
@@ -273,7 +282,7 @@ export const HotspotFormScreen = ({
   const [temporaryHotspotDetails, setTemporaryHotspotDetails] =
     useState<HotspotDetails>(hotspotDetails);
 
-  const hideConfirmationModal = () => {
+  const hideConfirmationModalAndExit = () => {
     setConfirmationModalVisibility(false);
     navigation.goBack();
   };
@@ -347,6 +356,15 @@ export const HotspotFormScreen = ({
   });
 
   const saveAndNavigateToDetailScreen = async () => {
+    if (numberOfInvalidInputsInForm) {
+      isConfirmationModalVisible && dismissConfirmationModal();
+      SnackbarManager.error(
+        'HotspotFormScreen - save func.',
+        'Formularul este încă invalid. Verifică dacă datele introduse corespund restricțiilor menționate.'
+      );
+      return;
+    }
+
     const { hotspot: newHotspot } = await save();
     !isUpdate
       ? navigation.replace('HotspotDetail', { hotspotId: newHotspot!.id })
@@ -356,7 +374,7 @@ export const HotspotFormScreen = ({
   return (
     <>
       <NucaModal
-        leftButtonHandler={hideConfirmationModal}
+        leftButtonHandler={hideConfirmationModalAndExit}
         rightButtonHandler={saveAndNavigateToDetailScreen}
         leftButtonMessage={'Renunță'}
         rightButtonMessage={'Salvează'}
@@ -395,6 +413,27 @@ export const HotspotFormScreen = ({
                     ...temporaryHotspotDetails,
                     description: text,
                   })
+                }
+                maximumLength={
+                  maximumAddressDetailsLength +
+                  allowedNumberOfCharactersOverLimit
+                }
+                onTextInputValidateText={(text: string) =>
+                  text.length <= maximumAddressDetailsLength
+                }
+                invalidValueErrorMessage={`Detaliile adresei trebuie să nu depășească ${maximumAddressDetailsLength} de caractere.`}
+                infoMessage={`Maxim ${maximumAddressDetailsLength} de caractere`}
+                onInvalidInput={() =>
+                  setNumberOfInvalidInputsInForm(
+                    numberOfInvalidInputsInForm + 1
+                  )
+                }
+                onValidInput={() =>
+                  setNumberOfInvalidInputsInForm(
+                    numberOfInvalidInputsInForm > 0
+                      ? numberOfInvalidInputsInForm - 1
+                      : 0
+                  )
                 }
               />
               <Caption style={styles.textInputTitle}>STATUS</Caption>
@@ -439,19 +478,25 @@ export const HotspotFormScreen = ({
                     notes: text,
                   })
                 }
-              />
-              <InputField
-                label="Pisici nesterilizate"
-                placeholder="0"
-                keyboardType="number-pad"
-                value={String(
-                  temporaryHotspotDetails.unsterilizedCatsCount || 0
-                )}
-                onTextInputChangeText={text =>
-                  setTemporaryHotspotDetails({
-                    ...temporaryHotspotDetails,
-                    unsterilizedCatsCount: Number(text),
-                  })
+                maximumLength={
+                  maximumNotesLength + allowedNumberOfCharactersOverLimit
+                }
+                onTextInputValidateText={(text: string) =>
+                  text.length <= maximumNotesLength
+                }
+                invalidValueErrorMessage={`Observațiile trebuie să nu depășească ${maximumNotesLength} de caractere.`}
+                infoMessage={`Maxim ${maximumNotesLength} de caractere`}
+                onInvalidInput={() =>
+                  setNumberOfInvalidInputsInForm(
+                    numberOfInvalidInputsInForm + 1
+                  )
+                }
+                onValidInput={() =>
+                  setNumberOfInvalidInputsInForm(
+                    numberOfInvalidInputsInForm > 0
+                      ? numberOfInvalidInputsInForm - 1
+                      : 0
+                  )
                 }
               />
               <InputField
@@ -465,6 +510,26 @@ export const HotspotFormScreen = ({
                     contactName: text,
                   })
                 }
+                maximumLength={
+                  maximumKeyContactIndividualNameLength +
+                  allowedNumberOfCharactersOverLimit
+                }
+                onTextInputValidateText={(text: string) =>
+                  text.length <= maximumKeyContactIndividualNameLength
+                }
+                invalidValueErrorMessage={`Numele persoanei de contact trebuie să nu depășească ${maximumKeyContactIndividualNameLength} de caractere.`}
+                onInvalidInput={() =>
+                  setNumberOfInvalidInputsInForm(
+                    numberOfInvalidInputsInForm + 1
+                  )
+                }
+                onValidInput={() =>
+                  setNumberOfInvalidInputsInForm(
+                    numberOfInvalidInputsInForm > 0
+                      ? numberOfInvalidInputsInForm - 1
+                      : 0
+                  )
+                }
               />
               <InputField
                 label="Telefon persoana de contact"
@@ -477,6 +542,26 @@ export const HotspotFormScreen = ({
                     ...temporaryHotspotDetails,
                     contactPhone: text,
                   })
+                }
+                maximumLength={maximumPhoneNumberInputLength}
+                onTextInputValidateText={(text: string) =>
+                  text.length <= maximumPhoneNumberInputLength &&
+                  /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im.test(
+                    text
+                  )
+                }
+                invalidValueErrorMessage="Numǎrul de telefon al persoanei de contact trebuie sǎ fie valid."
+                onInvalidInput={() =>
+                  setNumberOfInvalidInputsInForm(
+                    numberOfInvalidInputsInForm + 1
+                  )
+                }
+                onValidInput={() =>
+                  setNumberOfInvalidInputsInForm(
+                    numberOfInvalidInputsInForm > 0
+                      ? numberOfInvalidInputsInForm - 1
+                      : 0
+                  )
                 }
               />
               <Caption style={styles.textInputTitle}>VOLUNTAR</Caption>
@@ -588,6 +673,7 @@ const AddLocation = ({
       <InputField
         placeholder="Adresă"
         multiline={true}
+        maximumLength={maximumAddressDetailsLength}
         inputFieldStyle={{ marginTop: 30 }}
         value={location && getFormattedAddress(location)}
         editable={false}

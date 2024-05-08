@@ -25,6 +25,10 @@ import {
 import SelectDropdown from 'react-native-select-dropdown';
 import imagePlaceholder from '../assets/image-placeholder.png';
 import { isDevelopment, server } from '../config';
+import {
+  allowedNumberOfCharactersOverLimit,
+  maximumAddCatCardDescriptionLength,
+} from '../constants/inputLimits';
 import { HotspotContext } from '../context/HotspotDetailContext';
 import { useNucaTheme as useTheme } from '../hooks/useNucaTheme';
 import { Cat, defaultSterilizedCat } from '../models/Cat';
@@ -250,6 +254,8 @@ export const AddCatCard = ({
   const [localCat, setCat] = useState<Cat>(cat || defaultSterilizedCat);
   const { hotspotDetails, setHotspotDetails } = useContext(HotspotContext);
   const [checked, setChecked] = React.useState(false);
+  const [numberOfInvalidInputsInForm, setNumberOfInvalidInputsInForm] =
+    useState(0);
   // const [images, setImages] = useState<ImagePicker.ImagePickerAsset[]>([]);
 
   useEffect(() => {
@@ -434,6 +440,25 @@ export const AddCatCard = ({
               notes: text,
             }));
           }}
+          maximumLength={
+            maximumAddCatCardDescriptionLength +
+            allowedNumberOfCharactersOverLimit
+          }
+          onTextInputValidateText={(text: string) =>
+            text.length <= maximumAddCatCardDescriptionLength
+          }
+          invalidValueErrorMessage={`Descrierea trebuie să nu depășească ${maximumAddCatCardDescriptionLength} de caractere.`}
+          infoMessage={`Maxim ${maximumAddCatCardDescriptionLength} de caractere`}
+          onInvalidInput={() =>
+            setNumberOfInvalidInputsInForm(numberOfInvalidInputsInForm + 1)
+          }
+          onValidInput={() =>
+            setNumberOfInvalidInputsInForm(
+              numberOfInvalidInputsInForm > 0
+                ? numberOfInvalidInputsInForm - 1
+                : 0
+            )
+          }
         />
         {(localCat.isSterilized || checked) && (
           <>
