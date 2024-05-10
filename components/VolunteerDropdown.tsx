@@ -47,7 +47,6 @@ export const VolunteerDropdown = ({
     const { success, users: volunteers } = await loadUsersRequest();
     if (!success) alert('Failed to load users');
 
-    // setUsers(users);
     const tokenizedQuery = query.split(' ');
     const queryRegexPattern = tokenizedQuery.reduce((acc, x) => acc + '|' + x);
     const regex = new RegExp(queryRegexPattern, 'i');
