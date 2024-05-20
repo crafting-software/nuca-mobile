@@ -191,7 +191,7 @@ const getStyles = (theme: NucaCustomTheme) =>
       height: 40,
       marginTop: 24,
       marginBottom: 24,
-      maxWidth: 150,
+      minWidth: 150,
     },
     moreButtonContent: {
       height: 40,
