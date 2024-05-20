@@ -28,7 +28,8 @@ import { Region, RootStackParamList } from '../types';
 import SnackbarManager from '../utils/SnackbarManager';
 import { addCat, deleteCatRequest } from '../utils/cats';
 import { isSmallMobileScreen, isSmallScreen } from '../utils/helperFunc';
-import { formatHotspotAddress, loadHotspotDetails } from '../utils/hotspots';
+import { formatHotspotAddress, loadHotspotDetailsRequest } from '../utils/hotspots';
+import { HotspotLoader } from '../components/HotspotLoader';
 
 const textSizes = isSmallMobileScreen()
   ? { title: 10, subtitle: 12 }
@@ -247,27 +248,32 @@ export const HotspotDetailScreen = ({
   const styles = getStyles(theme);
   const navigation = useNavigation();
   const [isInProgress, setIsInProgress] = useState(false);
+  const [showLoader, setShowLoader] = useState(false);
+  // const [showLoader, setShowLoader] = useState(true);
   const { hotspotDetails, setHotspotDetails } = useContext(HotspotContext);
   const [region, setRegion] = useState<Region>();
 
   const [newSterilizedCats, setNewSterilizedCats] = useState<Cat[]>([]);
   const [newUnsterilizedCat, setNewUnsterilizedCat] = useState<Cat[]>([]);
+  const loadHotspotDetails = async () => {
+    setShowLoader(true);
+    const { success, hotspotDetails: hd } = await loadHotspotDetailsRequest(
+      route.params.hotspotId
+    );
+    if (!success) alert('Failed to load hotspot details');
+    if (hd) setHotspotDetails(hd);
+    setRegion({
+      latitude: hd?.latitude!,
+      longitude: hd?.longitude!,
+      latitudeDelta: 0.0922,
+      longitudeDelta: 0.0421,
+    });
+    setShowLoader(false);
+  };
 
   useEffect(() => {
-    const load = async () => {
-      const { success, hotspotDetails: hd } = await loadHotspotDetails(
-        route.params.hotspotId
-      );
-      if (!success) alert('Failed to load hotspot details');
-      if (hd) setHotspotDetails(hd);
-      setRegion({
-        latitude: hd?.latitude!,
-        longitude: hd?.longitude!,
-        latitudeDelta: 0.0922,
-        longitudeDelta: 0.0421,
-      });
-    };
-    load();
+    loadHotspotDetails(); // this line might need some conditions checked beforehand 
+                          // (the loader is displayed whenever the component is reloaded)
   }, []);
 
   if (!hotspotDetails)
@@ -365,8 +371,11 @@ export const HotspotDetailScreen = ({
     }
   };
 
-  return (
-    <>
+  return showLoader 
+    ? (
+        <HotspotLoader/>
+      )
+    : (<>
       <Appbar forDetailScreen />
       <View style={styles.container}>
         <ScrollView style={styles.scrollView}>
