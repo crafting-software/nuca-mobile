@@ -15,6 +15,7 @@ import { Appbar } from '../components/Appbar';
 import { CatCard } from '../components/CatCard';
 import { FooterScreens, FooterView } from '../components/Footer';
 import { FullScreenActivityIndicator } from '../components/FullScreenActivityIndicator';
+import { HotspotLoader } from '../components/HotspotLoader';
 import { HotspotContext } from '../context/HotspotDetailContext';
 import { useHotspotSave } from '../hooks/useHotspotSave';
 import { useNucaTheme as useTheme } from '../hooks/useNucaTheme';
@@ -28,8 +29,10 @@ import { Region, RootStackParamList } from '../types';
 import SnackbarManager from '../utils/SnackbarManager';
 import { addCat, deleteCatRequest } from '../utils/cats';
 import { isSmallMobileScreen, isSmallScreen } from '../utils/helperFunc';
-import { formatHotspotAddress, loadHotspotDetailsRequest } from '../utils/hotspots';
-import { HotspotLoader } from '../components/HotspotLoader';
+import {
+  formatHotspotAddress,
+  loadHotspotDetailsRequest,
+} from '../utils/hotspots';
 
 const textSizes = isSmallMobileScreen()
   ? { title: 10, subtitle: 12 }
@@ -272,8 +275,7 @@ export const HotspotDetailScreen = ({
   };
 
   useEffect(() => {
-    loadHotspotDetails(); // this line might need some conditions checked beforehand 
-                          // (the loader is displayed whenever the component is reloaded)
+    loadHotspotDetails();
   }, []);
 
   if (!hotspotDetails)
@@ -374,107 +376,106 @@ export const HotspotDetailScreen = ({
   return (
     <>
       <Appbar forDetailScreen />
-      {showLoader 
-        ? (<HotspotLoader/>) 
-        : (
-          <View style={styles.container}>
-            <ScrollView style={styles.scrollView}>
-              <View
-                style={{
-                  alignItems: 'center',
-                }}
-              >
-                <View style={styles.contentCotainer}>
-                  <View style={styles.addressContainer}>
-                    <Title style={styles.addressTitle}>{address}</Title>
-                    <Button
-                      style={styles.editButton}
-                      contentStyle={styles.buttonContent}
-                      labelStyle={styles.buttonLabel}
-                      icon="pencil-outline"
-                      mode="contained"
-                      onPress={() => {
-                        navigation.navigate('AddHotspot', {
-                          region: region!,
-                          isUpdate: true,
-                        });
-                      }}
-                      compact
-                    >
-                      Editează
-                    </Button>
-                  </View>
-                  <Caption style={styles.subTitle}>
-                    {hotspotDetails.description}
-                  </Caption>
-                  <View style={styles.separator} />
-                  {!!hotspotDetails.notes && (
-                    <Caption style={styles.notes}>{hotspotDetails.notes}</Caption>
-                  )}
-                  <SummaryView hotspotDetails={hotspotDetails} />
-                  <View style={styles.catCategoriesContainer}>
-                    <Avatar.Icon
-                      size={24}
-                      icon="close"
-                      color={theme.colors.background}
-                      style={styles.catCategoryTitleIcon}
-                    />
-
-                    <Caption style={styles.catCategoryTitleLabel}>
-                      Pisici nesterilizate
-                    </Caption>
-                    <FAB
-                      color={theme.colors.background}
-                      icon="plus"
-                      style={styles.catCategoryAddButton}
-                      size="small"
-                      onPress={() => {
-                        setNewUnsterilizedCat([defaultUnSterilizedCat]);
-                      }}
-                    />
-                  </View>
-                  <CatsView
-                    cats={newUnsterilizedCat.concat(
-                      hotspotDetails.unsterilizedCats
-                    )}
-                    isEditMode={true}
-                    deleteFunction={deleteCat}
-                    addNewCat={addNewCat}
+      {showLoader ? (
+        <HotspotLoader />
+      ) : (
+        <View style={styles.container}>
+          <ScrollView style={styles.scrollView}>
+            <View
+              style={{
+                alignItems: 'center',
+              }}
+            >
+              <View style={styles.contentCotainer}>
+                <View style={styles.addressContainer}>
+                  <Title style={styles.addressTitle}>{address}</Title>
+                  <Button
+                    style={styles.editButton}
+                    contentStyle={styles.buttonContent}
+                    labelStyle={styles.buttonLabel}
+                    icon="pencil-outline"
+                    mode="contained"
+                    onPress={() => {
+                      navigation.navigate('AddHotspot', {
+                        region: region!,
+                        isUpdate: true,
+                      });
+                    }}
+                    compact
+                  >
+                    Editează
+                  </Button>
+                </View>
+                <Caption style={styles.subTitle}>
+                  {hotspotDetails.description}
+                </Caption>
+                <View style={styles.separator} />
+                {!!hotspotDetails.notes && (
+                  <Caption style={styles.notes}>{hotspotDetails.notes}</Caption>
+                )}
+                <SummaryView hotspotDetails={hotspotDetails} />
+                <View style={styles.catCategoriesContainer}>
+                  <Avatar.Icon
+                    size={24}
+                    icon="close"
+                    color={theme.colors.background}
+                    style={styles.catCategoryTitleIcon}
                   />
-                  <View style={styles.separator} />
-                  <View style={styles.catCategoriesContainer}>
-                    <Avatar.Icon
-                      size={24}
-                      icon="check"
-                      color={theme.colors.background}
-                      style={styles.catCategoryTitleIcon}
-                    />
-                    <Caption style={styles.catCategoryTitleLabel}>
-                      Pisici sterilizate
-                    </Caption>
-                    <FAB
-                      color={theme.colors.background}
-                      icon="plus"
-                      style={styles.catCategoryAddButton}
-                      size="small"
-                      onPress={() => {
-                        setNewSterilizedCats([defaultSterilizedCat]);
-                      }}
-                    />
-                  </View>
-                  <CatsView
-                    cats={newSterilizedCats.concat(hotspotDetails.sterilizedCats)}
-                    isEditMode={true}
-                    deleteFunction={deleteCat}
-                    addNewCat={addNewCat}
+
+                  <Caption style={styles.catCategoryTitleLabel}>
+                    Pisici nesterilizate
+                  </Caption>
+                  <FAB
+                    color={theme.colors.background}
+                    icon="plus"
+                    style={styles.catCategoryAddButton}
+                    size="small"
+                    onPress={() => {
+                      setNewUnsterilizedCat([defaultUnSterilizedCat]);
+                    }}
                   />
                 </View>
+                <CatsView
+                  cats={newUnsterilizedCat.concat(
+                    hotspotDetails.unsterilizedCats
+                  )}
+                  isEditMode={true}
+                  deleteFunction={deleteCat}
+                  addNewCat={addNewCat}
+                />
+                <View style={styles.separator} />
+                <View style={styles.catCategoriesContainer}>
+                  <Avatar.Icon
+                    size={24}
+                    icon="check"
+                    color={theme.colors.background}
+                    style={styles.catCategoryTitleIcon}
+                  />
+                  <Caption style={styles.catCategoryTitleLabel}>
+                    Pisici sterilizate
+                  </Caption>
+                  <FAB
+                    color={theme.colors.background}
+                    icon="plus"
+                    style={styles.catCategoryAddButton}
+                    size="small"
+                    onPress={() => {
+                      setNewSterilizedCats([defaultSterilizedCat]);
+                    }}
+                  />
+                </View>
+                <CatsView
+                  cats={newSterilizedCats.concat(hotspotDetails.sterilizedCats)}
+                  isEditMode={true}
+                  deleteFunction={deleteCat}
+                  addNewCat={addNewCat}
+                />
               </View>
-              <FooterView screen={FooterScreens.HotspotDetailScreen} />
-            </ScrollView>
-          </View>
-        ) 
-      }
+            </View>
+            <FooterView screen={FooterScreens.HotspotDetailScreen} />
+          </ScrollView>
+        </View>
+      )}
       {isInProgress && <FullScreenActivityIndicator />}
     </>
   );
