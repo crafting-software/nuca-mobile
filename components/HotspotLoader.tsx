@@ -19,15 +19,12 @@ const styles = getStyles(theme, insets);
   return ( 
     <View style={styles.container}>
       <ContentLoader 
-        speed={2}
-        // width={400}
-        // height={900}
+        speed={0.5}
         width={loaderWidth}
         height={loaderHeight}
-        viewBox="0 0 400 800"
-        backgroundColor="#f3f3f3"
-        foregroundColor="#ecebeb"
-        // {...props}
+        viewBox={`0 0 ${width} ${loaderHeight}`}
+        backgroundColor="#d9dcde"
+        foregroundColor="#ffffff"
       >
         <Rect x="8" y="240" rx="25" ry="25" width="119" height="92" /> 
         <Rect x="138" y="240" rx="25" ry="25" width="119" height="92" /> 
