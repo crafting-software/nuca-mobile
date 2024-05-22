@@ -1,3 +1,4 @@
+import { debounce } from 'lodash';
 import { useContext, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
@@ -251,13 +252,14 @@ export const HotspotDetailScreen = ({
   const styles = getStyles(theme);
   const navigation = useNavigation();
   const [isInProgress, setIsInProgress] = useState(false);
-  const [showLoader, setShowLoader] = useState(false);
-  // const [showLoader, setShowLoader] = useState(true);
+  const [showLoader, setShowLoader] = useState(true);
   const { hotspotDetails, setHotspotDetails } = useContext(HotspotContext);
   const [region, setRegion] = useState<Region>();
 
   const [newSterilizedCats, setNewSterilizedCats] = useState<Cat[]>([]);
   const [newUnsterilizedCat, setNewUnsterilizedCat] = useState<Cat[]>([]);
+  const hideLoader = debounce(() => setShowLoader(false), 500);
+
   const loadHotspotDetails = async () => {
     setShowLoader(true);
     const { success, hotspotDetails: hd } = await loadHotspotDetailsRequest(
@@ -271,7 +273,8 @@ export const HotspotDetailScreen = ({
       latitudeDelta: 0.0922,
       longitudeDelta: 0.0421,
     });
-    setShowLoader(false);
+
+    hideLoader();
   };
 
   useEffect(() => {

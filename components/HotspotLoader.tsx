@@ -38,6 +38,7 @@ export const HotspotLoader = () => {
           <Rect x="10" y="162" rx="15" ry="15" width="368" height="52" />
           <Rect x="14" y="129" rx="10" ry="10" width="368" height="6" />
           <Rect x="13" y="78" rx="15" ry="15" width="188" height="28" />
+
           <Rect x="14" y="15" rx="15" ry="15" width="231" height="46" />
           <Rect x="265" y="19" rx="15" ry="15" width="110" height="37" />
           <Circle cx="36" cy="496" r="19" />
