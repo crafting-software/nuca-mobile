@@ -18,6 +18,7 @@ export const HotspotLoader = () => {
   const informationViewCardPadding = 10;
   const horizontalLoaderOffset = 40;
   const largeScreenTopPosition = 20;
+  const topElementsPadding = 10;
 
   return (
     <View style={styles.container}>
@@ -27,44 +28,211 @@ export const HotspotLoader = () => {
           width={loaderWidth}
           height={loaderHeight}
           viewBox={`0 0 ${width} ${loaderHeight}`}
-          backgroundColor="#d9dcde"
+          backgroundColor="#f0eded"
           foregroundColor="#ffffff"
         >
-          <Rect x="8" y="240" rx="25" ry="25" width="119" height="92" />
-          <Rect x="138" y="240" rx="25" ry="25" width="119" height="92" />
-          <Rect x="268" y="240" rx="25" ry="25" width="119" height="92" />
-          <Rect x="15" y="345" rx="25" ry="25" width="178" height="105" />
-          <Rect x="205" y="345" rx="25" ry="25" width="178" height="105" />
-          <Rect x="10" y="162" rx="15" ry="15" width="368" height="52" />
-          <Rect x="14" y="129" rx="10" ry="10" width="368" height="6" />
-          <Rect x="13" y="78" rx="15" ry="15" width="188" height="28" />
+          <Rect
+            x="14"
+            y="15"
+            rx="15"
+            ry="15"
+            width={`${(2 * loaderWidth) / 3 - topElementsPadding}`}
+            height="46"
+          />
+          <Rect
+            x={`${loaderWidth - loaderWidth / 3 + topElementsPadding}`}
+            y="19"
+            rx="15"
+            ry="15"
+            width={`${loaderWidth / 3}`}
+            height="37"
+          />
+          <Rect
+            x="13"
+            y="78"
+            rx="15"
+            ry="15"
+            width={`${(2 * loaderWidth) / 3 - topElementsPadding}`}
+            height="28"
+          />
 
-          <Rect x="14" y="15" rx="15" ry="15" width="231" height="46" />
-          <Rect x="265" y="19" rx="15" ry="15" width="110" height="37" />
+          <Rect
+            x="14"
+            y="129"
+            rx="10"
+            ry="10"
+            width={`${loaderWidth}`}
+            height="6"
+          />
+
+          <Rect
+            x="19"
+            y="155"
+            rx="3"
+            ry="3"
+            width={`${loaderWidth / 3}`}
+            height="10"
+          />
+          <Rect
+            x="139"
+            y="155"
+            rx="3"
+            ry="3"
+            width={`${loaderWidth / 3}`}
+            height="10"
+          />
+          <Rect
+            x="19"
+            y="175"
+            rx="3"
+            ry="3"
+            width={`${loaderWidth / 6}`}
+            height="10"
+          />
+          <Rect
+            x="89"
+            y="175"
+            rx="3"
+            ry="3"
+            width={`${loaderWidth / 6}`}
+            height="10"
+          />
+          <Rect
+            x="159"
+            y="175"
+            rx="3"
+            ry="3"
+            width={`${loaderWidth / 6}`}
+            height="10"
+          />
+          <Rect
+            x="19"
+            y="195"
+            rx="3"
+            ry="3"
+            width={`${loaderWidth / 4}`}
+            height="10"
+          />
+          <Rect
+            x="89"
+            y="195"
+            rx="3"
+            ry="3"
+            width={`${loaderWidth / 4}`}
+            height="10"
+          />
+
+          <Rect
+            x={`${
+              loaderWidth -
+              (3 * loaderWidth) / 3 -
+              2 * informationViewCardPadding +
+              horizontalLoaderOffset / 2
+            }`}
+            y="240"
+            rx="25"
+            ry="25"
+            width={`${loaderWidth / 3}`}
+            height="92"
+          />
+          <Rect
+            x={`${
+              loaderWidth -
+              (2 * loaderWidth) / 3 -
+              informationViewCardPadding +
+              horizontalLoaderOffset / 2
+            }`}
+            y="240"
+            rx="25"
+            ry="25"
+            width={`${loaderWidth / 3}`}
+            height="92"
+          />
+          <Rect
+            x={`${loaderWidth - loaderWidth / 3 + horizontalLoaderOffset / 2}`}
+            y="240"
+            rx="25"
+            ry="25"
+            width={`${loaderWidth / 3}`}
+            height="92"
+          />
+
+          <Rect
+            x={`${
+              loaderWidth -
+              (2 * loaderWidth) / 2 -
+              informationViewCardPadding +
+              horizontalLoaderOffset / 2
+            }`}
+            y="345"
+            rx="25"
+            ry="25"
+            width={`${loaderWidth / 2}`}
+            height="105"
+          />
+          <Rect
+            x={`${loaderWidth - loaderWidth / 2 + horizontalLoaderOffset / 2}`}
+            y="345"
+            rx="25"
+            ry="25"
+            width={`${loaderWidth / 2}`}
+            height="105"
+          />
+
           <Circle cx="36" cy="496" r="19" />
-          <Circle cx="348" cy="498" r="25" />
-          <Circle cx="38" cy="775" r="19" />
-          <Circle cx="349" cy="775" r="25" />
-          <Rect x="10" y="546" rx="10" ry="10" width="368" height="6" />
+          <Circle cx={`${loaderWidth - loaderWidth / 16}`} cy="496" r="25" />
+          <Circle cx="36" cy="775" r="19" />
+          <Circle cx={`${loaderWidth - loaderWidth / 16}`} cy="775" r="25" />
 
+          <Rect
+            x="10"
+            y="546"
+            rx="10"
+            ry="10"
+            width={`${loaderWidth}`}
+            height="6"
+          />
+
+          <Rect x="32" y="567" rx="3" ry="3" width="113" height="10" />
+          <Rect x="152" y="567" rx="3" ry="3" width="139" height="10" />
           <Rect x="121" y="589" rx="3" ry="3" width="42" height="10" />
           <Rect x="170" y="589" rx="3" ry="3" width="58" height="10" />
           <Rect x="32" y="589" rx="3" ry="3" width="81" height="10" />
           <Rect x="17" y="609" rx="3" ry="3" width="30" height="10" />
-          <Rect x="32" y="567" rx="3" ry="3" width="113" height="10" />
-          <Rect x="152" y="567" rx="3" ry="3" width="139" height="10" />
           <Rect x="23" y="628" rx="3" ry="3" width="54" height="10" />
           <Rect x="85" y="628" rx="3" ry="3" width="113" height="10" />
+          <Rect x="37" y="647" rx="3" ry="3" width="113" height="10" />
+          <Rect x="158" y="647" rx="3" ry="3" width="139" height="10" />
           <Rect x="125" y="670" rx="3" ry="3" width="42" height="10" />
           <Rect x="174" y="670" rx="3" ry="3" width="58" height="10" />
           <Rect x="37" y="670" rx="3" ry="3" width="81" height="10" />
           <Rect x="23" y="689" rx="3" ry="3" width="30" height="10" />
-          <Rect x="37" y="647" rx="3" ry="3" width="113" height="10" />
-          <Rect x="158" y="647" rx="3" ry="3" width="139" height="10" />
 
-          <Rect x="15" y="820" rx="10" ry="10" width="368" height="6" />
-          <Rect x="68" y="483" rx="15" ry="15" width="244" height="29" />
-          <Rect x="69" y="760" rx="15" ry="15" width="244" height="29" />
+          <Rect
+            x="15"
+            y="820"
+            rx="10"
+            ry="10"
+            width={`${loaderWidth}`}
+            height="6"
+          />
+
+          <Rect
+            x={`${loaderWidth / 6}`}
+            y="483"
+            rx="15"
+            ry="15"
+            width={`${loaderWidth - loaderWidth / 3}`}
+            height="29"
+          />
+          <Rect
+            x={`${loaderWidth / 6}`}
+            y="760"
+            rx="15"
+            ry="15"
+            width={`${loaderWidth - loaderWidth / 3}`}
+            height="29"
+          />
         </ContentLoader>
       ) : (
         <ContentLoader
@@ -72,7 +240,7 @@ export const HotspotLoader = () => {
           width={width}
           height={loaderHeight}
           viewBox={`0 0 ${width + horizontalLoaderOffset} ${loaderHeight}`}
-          backgroundColor="#d9dcde"
+          backgroundColor="#f0eded"
           foregroundColor="#ffffff"
         >
           <Rect
@@ -96,11 +264,11 @@ export const HotspotLoader = () => {
             y={`${largeScreenTopPosition + 50}`}
             rx="15"
             ry="15"
-            width={`${width / 2.5}`}
+            width={`${width / 2}`}
             height="28"
           />
 
-          <Rect x="10" y="135" rx="15" ry="15" width={`${width}`} height="10" />
+          <Rect x="10" y="135" rx="15" ry="15" width={`${width}`} height="4" />
           {Array.from({ length: 5 }, (_, i) => (
             <Rect
               x={`${
@@ -219,7 +387,7 @@ export const HotspotLoader = () => {
             rx="10"
             ry="10"
             width={loaderWidth}
-            height="6"
+            height="4"
           />
 
           <Circle cx="40" cy={`${largeScreenTopPosition + 600}`} r="19" />

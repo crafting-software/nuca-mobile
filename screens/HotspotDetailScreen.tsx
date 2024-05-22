@@ -258,7 +258,7 @@ export const HotspotDetailScreen = ({
 
   const [newSterilizedCats, setNewSterilizedCats] = useState<Cat[]>([]);
   const [newUnsterilizedCat, setNewUnsterilizedCat] = useState<Cat[]>([]);
-  const hideLoader = debounce(() => setShowLoader(false), 500);
+  const hideLoader = debounce(() => setShowLoader(false), 250);
 
   const loadHotspotDetails = async () => {
     setShowLoader(true);
