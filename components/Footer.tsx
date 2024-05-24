@@ -1,4 +1,4 @@
-import { Image, StyleSheet, View } from 'react-native';
+import { Image, Platform, StyleSheet, View } from 'react-native';
 import catLady2 from '../assets/cat-lady2.png';
 import catLady3 from '../assets/cat-lady3.png';
 import catLady3Web from '../assets/cat-lady3W.png';
@@ -20,6 +20,14 @@ const getFooterStyles = (_theme: NucaCustomTheme) =>
       minHeight: 430,
       flex: 1,
       width: undefined,
+    },
+    zoomedImage: {
+      paddingTop: 12,
+      height: 375,
+      minHeight: 430,
+      flex: 1,
+      width: undefined,
+      transform: [{ scale: 1.4 }],
     },
   });
 
@@ -59,6 +67,15 @@ export const FooterView = ({
     }
   }
 
+  function getStyle(screen: FooterScreens) {
+    switch (screen) {
+      case FooterScreens.HotspotDetailScreen:
+        return styles.image;
+      default:
+        return Platform.OS === 'web' ? styles.zoomedImage : styles.image;
+    }
+  }
+
   return (
     <View style={styles.imageView}>
       <Image
@@ -67,7 +84,7 @@ export const FooterView = ({
             ? getSmallScreenImage(screen)
             : getWideScreenImage(screen)
         }
-        style={styles.image}
+        style={getStyle(screen)}
         resizeMode={isSmallScreen() ? 'contain' : 'cover'}
       />
     </View>
