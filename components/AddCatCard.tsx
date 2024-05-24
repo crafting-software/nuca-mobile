@@ -446,7 +446,7 @@ export const AddCatCard = ({
         <SelectDropdown
           data={['M', 'F']}
           defaultValue={localCat.sex}
-          renderButton={(selectedItem: any, isOpened: boolean) => (
+          renderButton={(selectedItem: string, isOpened: boolean) => (
             <View style={styles.genderDropdownButtonContainer}>
               <TextInput.Icon
                 icon={isOpened ? 'chevron-up' : 'chevron-down'}
@@ -458,7 +458,7 @@ export const AddCatCard = ({
               </View>
             </View>
           )}
-          renderItem={(item, _index, isSelected) => (
+          renderItem={(item: string, _index: number, isSelected: boolean) => (
             <View style={styles.statusRow}>
               <Text style={styles.genderRowText}>
                 {isSelected ? capitalize(item) : item}

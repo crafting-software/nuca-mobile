@@ -172,8 +172,8 @@ const getStyles = (theme: NucaCustomTheme, _insets: EdgeInsets) =>
     },
     textInputStyle: {
       borderRadius: theme.roundness,
-      backgroundColor: '#ffffff',
-      color: '#000',
+      backgroundColor: theme.colors.background,
+      color: theme.colors.placeholder,
       paddingLeft: 18,
     },
     rightButtonsContainerStyle: {
@@ -182,11 +182,11 @@ const getStyles = (theme: NucaCustomTheme, _insets: EdgeInsets) =>
       alignSelf: 'center',
     },
     inputContainerStyle: {
-      backgroundColor: '#ffffff',
+      backgroundColor: theme.colors.background,
       borderRadius: 25,
     },
     suggestionsListContainerStyle: {
-      backgroundColor: '#ffffff',
+      backgroundColor: theme.colors.background,
       borderRadius: 25,
     },
     containerStyle: {
