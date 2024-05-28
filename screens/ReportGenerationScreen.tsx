@@ -44,8 +44,10 @@ const getStyles = (theme: NucaCustomTheme) =>
       height: '1000%',
     },
     contentContainer: {
+      alignItems: 'stretch',
       padding: 20,
       width: isSmallScreen() ? '100%' : '85%',
+      marginLeft: isSmallScreen() ? 0 : '7.5%',
     },
     screenTitleContainer: {
       flexDirection: 'row',
@@ -84,7 +86,7 @@ const getStyles = (theme: NucaCustomTheme) =>
     },
     titleRow: {
       flexDirection: 'row',
-      alignItems: 'baseline',
+      alignItems: 'center',
       paddingBottom: 12,
     },
   });
@@ -101,71 +103,65 @@ export const ReportGenerationScreen = (
       <Appbar forDetailScreen />
       <View style={styles.container}>
         <ScrollView style={styles.scrollView}>
-          <View
-            style={{
-              alignItems: 'center',
-            }}
-          >
-            <View style={styles.contentContainer}>
-              <View style={styles.screenTitleContainer}>
-                <View style={styles.titleRow}>
-                  <Headline style={styles.screenTitleIcon}>
-                    <View>
-                      <Icon source={'file-document-outline'} size={22} />
-                    </View>
-                  </Headline>
-                  <Caption style={styles.screenTitleLabel}>
-                    Generează raport
-                  </Caption>
-                </View>
-              </View>
-
-              <View style={styles.pickerContainer}>
-                <View style={styles.datePickerContainer}>
-                  <Caption style={styles.textInputTitle}>De la</Caption>
-                  <DatePickerInput
-                    locale="en"
-                    value={new Date()}
-                    onChange={_selectedDate => {}}
-                    mode="outlined"
-                    inputMode="start"
-                    withDateFormatInLabel={false}
-                    outlineColor={theme.colors.disabled}
-                  />
-                </View>
-                <View style={styles.datePickerContainer}>
-                  <Caption style={styles.textInputTitle}>Până la</Caption>
-                  <DatePickerInput
-                    locale="en"
-                    value={new Date()}
-                    onChange={_selectedDate => {}}
-                    mode="outlined"
-                    inputMode="start"
-                    withDateFormatInLabel={false}
-                    outlineColor={theme.colors.disabled}
-                  />
-                </View>
-              </View>
-
-              <View
-                style={{
-                  justifyContent: 'flex-end',
-                  flexDirection: isSmallScreen() ? 'column' : 'row',
-                  marginTop: 54,
-                }}
-              >
-                <Button
-                  uppercase={false}
-                  style={styles.saveButton}
-                  contentStyle={styles.saveButtonContent}
-                  labelStyle={styles.saveButtonLabel}
-                  icon="file-document-outline"
-                  mode="contained"
-                  onPress={() => {}}
-                >
+          <View style={styles.contentContainer}>
+            <View style={styles.screenTitleContainer}>
+              <View style={styles.titleRow}>
+                <Headline style={styles.screenTitleIcon}>
+                  <View>
+                    <Icon source={'file-document-outline'} size={22} />
+                  </View>
+                </Headline>
+                <Caption style={styles.screenTitleLabel}>
                   Generează raport
-                </Button>
+                </Caption>
               </View>
+            </View>
+
+            <View style={styles.pickerContainer}>
+              <View style={styles.datePickerContainer}>
+                <Caption style={styles.textInputTitle}>De la</Caption>
+                <DatePickerInput
+                  locale="en"
+                  value={new Date()}
+                  onChange={_selectedDate => {}}
+                  mode="outlined"
+                  inputMode="start"
+                  withDateFormatInLabel={false}
+                  outlineColor={theme.colors.disabled}
+                />
+              </View>
+              <View style={styles.datePickerContainer}>
+                <Caption style={styles.textInputTitle}>Până la</Caption>
+                <DatePickerInput
+                  locale="en"
+                  value={new Date()}
+                  onChange={_selectedDate => {}}
+                  mode="outlined"
+                  inputMode="start"
+                  withDateFormatInLabel={false}
+                  outlineColor={theme.colors.disabled}
+                />
+              </View>
+            </View>
+
+            <View
+              style={{
+                justifyContent: 'flex-end',
+                flexDirection: isSmallScreen() ? 'column' : 'row',
+                marginTop: 54,
+              }}
+            >
+              <Button
+                uppercase={false}
+                style={styles.saveButton}
+                contentStyle={styles.saveButtonContent}
+                labelStyle={styles.saveButtonLabel}
+                icon="file-document-outline"
+                mode="contained"
+                onPress={() => {}}
+              >
+                Generează raport
+              </Button>
             </View>
           </View>
           <FooterView screen={FooterScreens.ReportGenerationScreen} />
