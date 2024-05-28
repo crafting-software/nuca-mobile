@@ -1,35 +1,18 @@
 import { useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
-import { Button, Caption, Headline, Icon } from 'react-native-paper';
+import { Caption, Headline, Icon } from 'react-native-paper';
 import { DatePickerInput } from 'react-native-paper-dates';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Appbar } from '../components/Appbar';
 import { FooterScreens, FooterView } from '../components/Footer';
 import { FullScreenActivityIndicator } from '../components/FullScreenActivityIndicator';
+import { NucaFormButton } from '../components/NucaFormButton';
 import { useNucaTheme as useTheme } from '../hooks/useNucaTheme';
 import { RootStackParamList } from '../types';
 import { isSmallScreen } from '../utils/helperFunc';
 
 const getStyles = (theme: NucaCustomTheme) =>
   StyleSheet.create({
-    saveButton: {
-      height: 64,
-      maxWidth: 340,
-      minWidth: isSmallScreen() ? 64 : 340,
-    },
-    saveButtonContent: {
-      height: 64,
-      alignItems: 'center',
-      justifyContent: 'center',
-      flexDirection: 'row-reverse',
-    },
-    saveButtonLabel: {
-      fontSize: 18,
-      marginStart: 8,
-      textAlignVertical: 'bottom',
-      fontFamily: 'Nunito_700Bold',
-      color: theme.colors.background,
-    },
     loadingContainer: {
       flex: 1,
       justifyContent: 'center',
@@ -151,17 +134,13 @@ export const ReportGenerationScreen = (
                 marginTop: 54,
               }}
             >
-              <Button
-                uppercase={false}
-                style={styles.saveButton}
-                contentStyle={styles.saveButtonContent}
-                labelStyle={styles.saveButtonLabel}
-                icon="file-document-outline"
-                mode="contained"
+              <NucaFormButton
+                label="Generează raport"
+                backgroundColor={theme.colors.primary}
+                labelColor={theme.colors.background}
+                iconName="file-document-outline"
                 onPress={() => {}}
-              >
-                Generează raport
-              </Button>
+              />
             </View>
           </View>
           <FooterView screen={FooterScreens.ReportGenerationScreen} />
