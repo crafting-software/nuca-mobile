@@ -10,6 +10,7 @@ import { NucaFormButton } from '../components/NucaFormButton';
 import { useNucaTheme as useTheme } from '../hooks/useNucaTheme';
 import { RootStackParamList } from '../types';
 import { isSmallScreen } from '../utils/helperFunc';
+import { saveReportAsCsvFile } from '../utils/reports';
 
 const getStyles = (theme: NucaCustomTheme) =>
   StyleSheet.create({
@@ -86,6 +87,8 @@ export const ReportGenerationScreen = (
   const theme = useTheme();
   const styles = getStyles(theme);
   const [isInProgress, _setIsInProgress] = useState(false);
+  const [checkInDate, setCheckInDate] = useState<Date>(new Date());
+  const [checkOutDate, setCheckOutDate] = useState<Date>(new Date());
 
   return (
     <>
@@ -115,8 +118,10 @@ export const ReportGenerationScreen = (
                 <Caption style={styles.textInputTitle}>De la</Caption>
                 <DatePickerInput
                   locale="en"
-                  value={new Date()}
-                  onChange={_selectedDate => {}}
+                  value={checkInDate}
+                  onChange={selectedDate =>
+                    setCheckInDate(selectedDate || new Date())
+                  }
                   mode="outlined"
                   inputMode="start"
                   withDateFormatInLabel={false}
@@ -127,8 +132,10 @@ export const ReportGenerationScreen = (
                 <Caption style={styles.textInputTitle}>Până la</Caption>
                 <DatePickerInput
                   locale="en"
-                  value={new Date()}
-                  onChange={_selectedDate => {}}
+                  value={checkOutDate}
+                  onChange={selectedDate =>
+                    setCheckOutDate(selectedDate || new Date())
+                  }
                   mode="outlined"
                   inputMode="start"
                   withDateFormatInLabel={false}
@@ -149,7 +156,13 @@ export const ReportGenerationScreen = (
                 backgroundColor={theme.colors.primary}
                 labelColor={theme.colors.background}
                 iconName="file-document-outline"
-                onPress={() => {}}
+                onPress={async () => {
+                  await saveReportAsCsvFile(
+                    checkInDate || new Date(),
+                    checkOutDate || new Date(),
+                    'nuca_sterilized_cats_report'
+                  );
+                }}
               />
             </View>
           </View>

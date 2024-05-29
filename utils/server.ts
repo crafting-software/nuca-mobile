@@ -108,7 +108,7 @@ export const makeRequest = async ({
     const data =
       contentType && contentType.includes('application/json')
         ? await response.json()
-        : response.text();
+        : await response.text();
 
     return { data };
   } catch (error) {
