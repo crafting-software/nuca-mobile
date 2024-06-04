@@ -177,15 +177,19 @@ export const ChooseLocationScreen = ({
             });
           }}
         >
-          <Caption style={styles.confirmAddressButtonLabel}>
-            CONFIRMĂ ADRESA
-          </Caption>
-          <View style={styles.confirmAddressButtonIconContainer}>
-            <TextInput.Icon
-              size={20}
-              icon={'check'}
-              color={theme.colors.background}
-            />
+          <View style={styles.confirmAddressButtonLabelContainer}>
+            <Caption style={styles.confirmAddressButtonLabel}>
+              CONFIRMĂ ADRESA
+            </Caption>
+            <View style={styles.confirmAddressButtonIconContainer}>
+              <TextInput.Icon
+                size={20}
+                icon={'check'}
+                color={theme.colors.success}
+                style={styles.confirmAddressButtonIcon}
+                disabled
+              />
+            </View>
           </View>
         </TouchableOpacity>
       ) : null}
@@ -221,7 +225,6 @@ const getStyles = (theme: NucaCustomTheme, insets: EdgeInsets) =>
       backgroundColor: theme.colors.text,
     },
     confirmAddressButton: {
-      flexDirection: 'row',
       position: 'absolute',
       bottom: Math.max(20, insets.bottom as number),
       left: 20,
@@ -243,11 +246,20 @@ const getStyles = (theme: NucaCustomTheme, insets: EdgeInsets) =>
       fontFamily: 'Nunito_700Bold',
       letterSpacing: 0.2,
     },
+    confirmAddressButtonLabelContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
     confirmAddressButtonIconContainer: {
       width: 20,
       alignItems: 'center',
       height: 20,
       marginBottom: 10,
+      marginLeft: 8,
+    },
+    confirmAddressButtonIcon: {
+      backgroundColor: theme.colors.text,
+      opacity: 100,
     },
     searchInput: {
       position: 'absolute',
