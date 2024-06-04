@@ -606,13 +606,21 @@ export const CatsView = ({
 }) => {
   const theme = useTheme();
   const styles = getStyles(theme);
-  const maxVisibleCat = 2;
-  const [visibleCat, setVisible] = useState<number>(maxVisibleCat);
+  const initialNumberOfVisibleCats = 2;
+  const [numberOfVisibleCats, setNumberOfVisibleCats] = useState<number>(
+    initialNumberOfVisibleCats
+  );
+
+  useEffect(() => {
+    if (numberOfVisibleCats <= 2) return;
+
+    setNumberOfVisibleCats(cats.length);
+  }, [cats]);
 
   return isSmallScreen() ? (
     <View>
       {cats
-        .slice(0, visibleCat)
+        .slice(0, numberOfVisibleCats)
         .map((cat, index) =>
           cat.isNew ? (
             <AddCatCard
@@ -631,20 +639,21 @@ export const CatsView = ({
             />
           )
         )}
-      {cats.length > maxVisibleCat && visibleCat === maxVisibleCat && (
-        <View style={{ alignItems: 'center' }}>
-          <Button
-            style={styles.moreButton}
-            contentStyle={styles.moreButtonContent}
-            labelStyle={styles.moreButtonLabel}
-            icon="arrow-down"
-            mode="contained"
-            onPress={() => setVisible(cats.length)}
-          >
-            vezi mai multe
-          </Button>
-        </View>
-      )}
+      {cats.length > initialNumberOfVisibleCats &&
+        numberOfVisibleCats === initialNumberOfVisibleCats && (
+          <View style={{ alignItems: 'center' }}>
+            <Button
+              style={styles.moreButton}
+              contentStyle={styles.moreButtonContent}
+              labelStyle={styles.moreButtonLabel}
+              icon="arrow-down"
+              mode="contained"
+              onPress={() => setNumberOfVisibleCats(cats.length)}
+            >
+              vezi mai multe
+            </Button>
+          </View>
+        )}
     </View>
   ) : (
     <View style={styles.catsWebViewContainer}>
