@@ -10,6 +10,7 @@ const getStyles = () =>
       minWidth: isSmallScreen() ? 64 : 340,
       marginBottom: 10,
       marginRight: isSmallScreen() ? 0 : 12,
+      zIndex: 2,
     },
     saveButtonContent: {
       height: 64,

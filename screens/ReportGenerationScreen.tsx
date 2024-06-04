@@ -24,13 +24,19 @@ const getStyles = (theme: NucaCustomTheme) =>
     },
     scrollView: {
       width: '100%',
-      height: '1000%',
+      height: '100%',
+    },
+    scrollViewContentContainer: {
+      flexGrow: 1,
+      justifyContent: 'flex-end',
     },
     contentContainer: {
       alignItems: 'stretch',
       padding: 20,
       width: isSmallScreen() ? '100%' : '85%',
       marginLeft: isSmallScreen() ? 0 : '7.5%',
+      position: 'relative',
+      zIndex: 1,
     },
     screenTitleContainer: {
       flexDirection: 'row',
@@ -85,7 +91,11 @@ export const ReportGenerationScreen = (
     <>
       <Appbar forDetailScreen />
       <View style={styles.container}>
-        <ScrollView style={styles.scrollView}>
+        <ScrollView
+          scrollEnabled={false}
+          style={styles.scrollView}
+          contentContainerStyle={styles.scrollViewContentContainer}
+        >
           <View style={styles.contentContainer}>
             <View style={styles.screenTitleContainer}>
               <View style={styles.titleRow}>
