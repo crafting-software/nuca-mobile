@@ -38,22 +38,25 @@ const RootNavigator = () => {
           <Stack.Screen
             name="Main"
             component={MapScreen}
-            options={{ headerShown: false }}
+            options={{ headerShown: false, title: 'NUCA' }}
           />
           <Stack.Screen
             name="AddHotspot"
             component={HotspotFormScreen}
-            options={{ headerShown: false }}
+            options={{ headerShown: false, title: 'Adaugă o locație | NUCA' }}
           />
           <Stack.Screen
             name="ChooseLocation"
             component={ChooseLocationScreen}
-            options={{ headerShown: false }}
+            options={{
+              headerShown: false,
+              title: 'Selectează o locație | NUCA',
+            }}
           />
           <Stack.Screen
             name="HotspotDetail"
             component={HotspotDetailScreen}
-            options={{ headerShown: false }}
+            options={{ headerShown: false, title: 'Detaliile locației | NUCA' }}
           />
           <Stack.Screen
             name="NotFound"
@@ -65,7 +68,7 @@ const RootNavigator = () => {
         <Stack.Screen
           name="Authentication"
           component={AuthenticationScreen}
-          options={{ headerShown: false }}
+          options={{ headerShown: false, title: 'Autentificare | NUCA' }}
         />
       )}
 
