@@ -75,6 +75,7 @@ const getStyles = (theme: NucaCustomTheme) =>
       fontSize: 15,
       fontFamily: 'Nunito_400Regular',
       flexWrap: 'wrap',
+      flexShrink: 1,
     },
     iconAndText: {
       width: '50%',
