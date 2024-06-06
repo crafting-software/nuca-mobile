@@ -7,7 +7,7 @@ import catLady4Web from '../assets/cat-lady4W.png';
 import catLady5 from '../assets/cat-lady5.png';
 import catLady5Web from '../assets/cat-lady5W.png';
 import { useNucaTheme as useTheme } from '../hooks/useNucaTheme';
-import { isSmallScreen } from '../utils/helperFunc';
+import { isSmallMobileScreen } from '../utils/helperFunc';
 
 const getFooterStyles = (_theme: NucaCustomTheme) =>
   StyleSheet.create({
@@ -18,7 +18,7 @@ const getFooterStyles = (_theme: NucaCustomTheme) =>
     image: {
       alignSelf: 'center',
       position: 'absolute',
-      bottom: isSmallScreen() ? '-20%' : 0,
+      bottom: isSmallMobileScreen() ? '-20%' : 0,
       paddingTop: 12,
       height: 430,
       zIndex: -1,
@@ -67,12 +67,12 @@ export const FooterView = ({
     <View style={styles.imageView}>
       <Image
         source={
-          isSmallScreen()
+          isSmallMobileScreen()
             ? getSmallScreenImage(screen)
             : getWideScreenImage(screen)
         }
         style={styles.image}
-        resizeMode={isSmallScreen() ? 'contain' : 'cover'}
+        resizeMode={isSmallMobileScreen() ? 'contain' : 'cover'}
       />
     </View>
   );
