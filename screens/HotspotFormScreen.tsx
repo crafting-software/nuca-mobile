@@ -7,6 +7,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   View,
+  Text,
 } from 'react-native';
 import {
   Button,
@@ -25,6 +26,7 @@ import { FooterScreens, FooterView } from '../components/Footer';
 import { FullScreenActivityIndicator } from '../components/FullScreenActivityIndicator';
 import { InputField } from '../components/InputField';
 import { NucaModal } from '../components/NucaModal';
+import { VolunteerDropdown } from '../components/VolunteerDropdown';
 import {
   allowedNumberOfCharactersOverLimit,
   maximumAddressDetailsLength,
@@ -49,7 +51,6 @@ import { Region, RootStackParamList, RootStackScreenProps } from '../types';
 import SnackbarManager from '../utils/SnackbarManager';
 import { isSmallScreen } from '../utils/helperFunc';
 import { deleteHotspot, formatHotspotAddress } from '../utils/hotspots';
-import { loadUsersRequest } from '../utils/users';
 
 const getStyles = (theme: NucaCustomTheme) =>
   StyleSheet.create({
@@ -211,6 +212,8 @@ const getStyles = (theme: NucaCustomTheme) =>
       borderRadius: theme.roundness,
       height: 60,
       backgroundColor: theme.colors.background,
+      justifyContent: 'center',
+      alignItems: 'flex-start',
       borderWidth: 1,
       borderColor: theme.colors.disabled,
       marginTop: 5,
@@ -218,18 +221,43 @@ const getStyles = (theme: NucaCustomTheme) =>
     dropdownText: {
       fontSize: 15,
       textAlign: 'left',
-      paddingHorizontal: 8,
+      paddingHorizontal: 20,
       fontFamily: 'Nunito_400Regular',
       color: theme.colors.text,
     },
     statusDropdown: {
       borderRadius: theme.roundness,
     },
+    statusDropdownButtonContainer: {
+      flexDirection: 'row',
+      justifyContent: 'flex-end',
+      alignItems: 'center',
+      width: '100%',
+    },
+    statusButtonText: {
+      fontSize: 15,
+      textAlign: 'left',
+      justifyContent: 'center',
+      paddingHorizontal: 8,
+      fontFamily: 'Nunito_400Regular',
+      color: theme.colors.text,
+    },
+    statusRow: {
+      borderTopWidth: 0.2,
+      color: theme.colors.text,
+    },
     statusRowText: {
       textAlign: 'left',
+      justifyContent: 'center',
       paddingHorizontal: 18,
+      paddingVertical: 18,
       fontSize: 15,
       fontFamily: 'Nunito_400Regular',
+    },
+    arrowIcon: {
+      alignItems: 'center',
+      marginRight: 25,
+      marginTop: '50%',
     },
     imageView: {
       marginTop: 32,
@@ -247,6 +275,23 @@ const getStyles = (theme: NucaCustomTheme) =>
       lineHeight: 26,
       flexShrink: 1,
       marginRight: 20,
+    },
+    volunteerDropdownButtonContainer: {
+      flexDirection: 'row',
+      justifyContent: 'flex-end',
+      alignItems: 'center',
+      width: '100%',
+    },
+    volunteerDropdownButton: {
+      width: '100%',
+      borderRadius: theme.roundness,
+      height: 60,
+      backgroundColor: 'white',
+      justifyContent: 'center',
+      alignItems: 'flex-start',
+      borderWidth: 1,
+      borderColor: theme.colors.disabled,
+      paddingLeft: 10,
     },
     separator: {
       borderColor: theme.colors.disabled,
@@ -274,7 +319,6 @@ export const HotspotFormScreen = ({
   const theme = useTheme();
   const styles = getStyles(theme);
 
-  const [users, setUsers] = useState<User[]>([]);
   const isUpdate = route.params.isUpdate;
   const location = route.params.location;
 
@@ -291,11 +335,6 @@ export const HotspotFormScreen = ({
     setConfirmationModalVisibility(true);
     return true;
   };
-  const loadUsers = async () => {
-    const { success, users } = await loadUsersRequest();
-    if (!success) alert('Failed to load users');
-    setUsers(users);
-  };
 
   const initializeTemporaryHotspotDetails = () =>
     setTemporaryHotspotDetails(
@@ -304,7 +343,6 @@ export const HotspotFormScreen = ({
 
   useEffect(() => {
     initializeTemporaryHotspotDetails();
-    loadUsers();
 
     const backHandler = BackHandler.addEventListener(
       'hardwareBackPress',
@@ -438,32 +476,35 @@ export const HotspotFormScreen = ({
               />
               <Caption style={styles.textInputTitle}>STATUS</Caption>
               <SelectDropdown
-                defaultButtonText="Alege status"
                 data={hotspotStatusList}
-                buttonStyle={styles.dropdownButton}
-                buttonTextStyle={styles.dropdownText}
-                dropdownStyle={styles.statusDropdown}
-                rowTextStyle={styles.statusRowText}
-                dropdownIconPosition="right"
-                renderDropdownIcon={(_selectedItem, _index) => (
-                  <TextInput.Icon
-                    icon="chevron-down"
-                    style={{ marginRight: 40, backgroundColor: 'transparent' }}
-                  />
+                defaultValue={temporaryHotspotDetails.status}
+                renderButton={(selectedItem: any, isOpened: boolean) => (
+                  <View style={styles.statusDropdownButtonContainer}>
+                    <View style={styles.dropdownButton}>
+                      <Text style={styles.dropdownText}>
+                        {capitalize(selectedItem)}
+                      </Text>
+                    </View>
+                    <TextInput.Icon
+                      icon={isOpened ? 'chevron-up' : 'chevron-down'}
+                      color={theme.colors.text}
+                      style={styles.arrowIcon}
+                      pointerEvents="none"
+                    />
+                  </View>
                 )}
+                renderItem={(item, _index, _isSelected) => (
+                  <View style={styles.statusRow}>
+                    <Text style={styles.statusRowText}>{capitalize(item)}</Text>
+                  </View>
+                )}
+                dropdownStyle={styles.statusDropdown}
                 onSelect={(selectedItem: HotspotStatus) =>
                   setTemporaryHotspotDetails({
                     ...temporaryHotspotDetails,
                     status: selectedItem,
                   })
                 }
-                buttonTextAfterSelection={(selectedItem: HotspotStatus) =>
-                  capitalize(selectedItem as HotspotStatus)
-                }
-                rowTextForSelection={(item: HotspotStatus) =>
-                  capitalize(item as HotspotStatus)
-                }
-                defaultValue={temporaryHotspotDetails.status}
               />
               <InputField
                 multiline={true}
@@ -565,31 +606,14 @@ export const HotspotFormScreen = ({
                 }
               />
               <Caption style={styles.textInputTitle}>VOLUNTAR</Caption>
-              <SelectDropdown
-                defaultButtonText={
-                  temporaryHotspotDetails.volunteer?.name || 'Alege voluntar'
-                }
-                data={users}
-                buttonStyle={styles.dropdownButton}
-                buttonTextStyle={styles.dropdownText}
-                dropdownStyle={styles.statusDropdown}
-                rowTextStyle={styles.statusRowText}
-                dropdownIconPosition="right"
-                renderDropdownIcon={() => (
-                  <TextInput.Icon
-                    icon="chevron-down"
-                    color={theme.colors.text}
-                    style={{ marginRight: 40, backgroundColor: 'transparent' }}
-                  />
-                )}
-                onSelect={(user: User) =>
+              <VolunteerDropdown
+                volunteer={hotspotDetails.volunteer}
+                onSelect={(selectedVolunteer?: User) =>
                   setTemporaryHotspotDetails({
                     ...temporaryHotspotDetails,
-                    volunteer: user,
+                    volunteer: selectedVolunteer,
                   })
                 }
-                rowTextForSelection={(user: User) => user.name}
-                buttonTextAfterSelection={(user: User) => user.name}
               />
               <View style={styles.separator} />
               <View
