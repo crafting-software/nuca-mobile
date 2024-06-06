@@ -31,7 +31,7 @@ export const loadHotspots = async (): Promise<{
   return { success: true, hotspots: data.map(castToHotspot) };
 };
 
-export const loadHotspotDetails = async (
+export const loadHotspotDetailsRequest = async (
   hotspotId: string
 ): Promise<{
   success: boolean;

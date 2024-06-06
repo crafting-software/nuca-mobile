@@ -1,3 +1,4 @@
+import { debounce } from 'lodash';
 import { useContext, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
@@ -15,6 +16,7 @@ import { Appbar } from '../components/Appbar';
 import { CatCard } from '../components/CatCard';
 import { FooterScreens, FooterView } from '../components/Footer';
 import { FullScreenActivityIndicator } from '../components/FullScreenActivityIndicator';
+import { HotspotLoader } from '../components/HotspotLoader';
 import { HotspotContext } from '../context/HotspotDetailContext';
 import { useHotspotSave } from '../hooks/useHotspotSave';
 import { useNucaTheme as useTheme } from '../hooks/useNucaTheme';
@@ -28,7 +30,10 @@ import { Region, RootStackParamList } from '../types';
 import SnackbarManager from '../utils/SnackbarManager';
 import { addCat, deleteCatRequest } from '../utils/cats';
 import { isSmallMobileScreen, isSmallScreen } from '../utils/helperFunc';
-import { formatHotspotAddress, loadHotspotDetails } from '../utils/hotspots';
+import {
+  formatHotspotAddress,
+  loadHotspotDetailsRequest,
+} from '../utils/hotspots';
 
 const textSizes = isSmallMobileScreen()
   ? { title: 10, subtitle: 12 }
@@ -247,27 +252,33 @@ export const HotspotDetailScreen = ({
   const styles = getStyles(theme);
   const navigation = useNavigation();
   const [isInProgress, setIsInProgress] = useState(false);
+  const [showLoader, setShowLoader] = useState(true);
   const { hotspotDetails, setHotspotDetails } = useContext(HotspotContext);
   const [region, setRegion] = useState<Region>();
 
   const [newSterilizedCats, setNewSterilizedCats] = useState<Cat[]>([]);
   const [newUnsterilizedCat, setNewUnsterilizedCat] = useState<Cat[]>([]);
+  const hideLoader = debounce(() => setShowLoader(false), 250);
+
+  const loadHotspotDetails = async () => {
+    setShowLoader(true);
+    const { success, hotspotDetails: hd } = await loadHotspotDetailsRequest(
+      route.params.hotspotId
+    );
+    if (!success) alert('Failed to load hotspot details');
+    if (hd) setHotspotDetails(hd);
+    setRegion({
+      latitude: hd?.latitude!,
+      longitude: hd?.longitude!,
+      latitudeDelta: 0.0922,
+      longitudeDelta: 0.0421,
+    });
+
+    hideLoader();
+  };
 
   useEffect(() => {
-    const load = async () => {
-      const { success, hotspotDetails: hd } = await loadHotspotDetails(
-        route.params.hotspotId
-      );
-      if (!success) alert('Failed to load hotspot details');
-      if (hd) setHotspotDetails(hd);
-      setRegion({
-        latitude: hd?.latitude!,
-        longitude: hd?.longitude!,
-        latitudeDelta: 0.0922,
-        longitudeDelta: 0.0421,
-      });
-    };
-    load();
+    loadHotspotDetails();
   }, []);
 
   if (!hotspotDetails)
@@ -368,102 +379,106 @@ export const HotspotDetailScreen = ({
   return (
     <>
       <Appbar forDetailScreen />
-      <View style={styles.container}>
-        <ScrollView style={styles.scrollView}>
-          <View
-            style={{
-              alignItems: 'center',
-            }}
-          >
-            <View style={styles.contentCotainer}>
-              <View style={styles.addressContainer}>
-                <Title style={styles.addressTitle}>{address}</Title>
-                <Button
-                  style={styles.editButton}
-                  contentStyle={styles.buttonContent}
-                  labelStyle={styles.buttonLabel}
-                  icon="pencil-outline"
-                  mode="contained"
-                  onPress={() => {
-                    navigation.navigate('AddHotspot', {
-                      region: region!,
-                      isUpdate: true,
-                    });
-                  }}
-                  compact
-                >
-                  Editează
-                </Button>
-              </View>
-              <Caption style={styles.subTitle}>
-                {hotspotDetails.description}
-              </Caption>
-              <View style={styles.separator} />
-              {!!hotspotDetails.notes && (
-                <Caption style={styles.notes}>{hotspotDetails.notes}</Caption>
-              )}
-              <SummaryView hotspotDetails={hotspotDetails} />
-              <View style={styles.catCategoriesContainer}>
-                <Avatar.Icon
-                  size={24}
-                  icon="close"
-                  color={theme.colors.background}
-                  style={styles.catCategoryTitleIcon}
-                />
-
-                <Caption style={styles.catCategoryTitleLabel}>
-                  Pisici nesterilizate
+      {showLoader ? (
+        <HotspotLoader />
+      ) : (
+        <View style={styles.container}>
+          <ScrollView style={styles.scrollView}>
+            <View
+              style={{
+                alignItems: 'center',
+              }}
+            >
+              <View style={styles.contentCotainer}>
+                <View style={styles.addressContainer}>
+                  <Title style={styles.addressTitle}>{address}</Title>
+                  <Button
+                    style={styles.editButton}
+                    contentStyle={styles.buttonContent}
+                    labelStyle={styles.buttonLabel}
+                    icon="pencil-outline"
+                    mode="contained"
+                    onPress={() => {
+                      navigation.navigate('AddHotspot', {
+                        region: region!,
+                        isUpdate: true,
+                      });
+                    }}
+                    compact
+                  >
+                    Editează
+                  </Button>
+                </View>
+                <Caption style={styles.subTitle}>
+                  {hotspotDetails.description}
                 </Caption>
-                <FAB
-                  color={theme.colors.background}
-                  icon="plus"
-                  style={styles.catCategoryAddButton}
-                  size="small"
-                  onPress={() => {
-                    setNewUnsterilizedCat([defaultUnSterilizedCat]);
-                  }}
-                />
-              </View>
-              <CatsView
-                cats={newUnsterilizedCat.concat(
-                  hotspotDetails.unsterilizedCats
+                <View style={styles.separator} />
+                {!!hotspotDetails.notes && (
+                  <Caption style={styles.notes}>{hotspotDetails.notes}</Caption>
                 )}
-                isEditMode={true}
-                deleteFunction={deleteCat}
-                addNewCat={addNewCat}
-              />
-              <View style={styles.separator} />
-              <View style={styles.catCategoriesContainer}>
-                <Avatar.Icon
-                  size={24}
-                  icon="check"
-                  color={theme.colors.background}
-                  style={styles.catCategoryTitleIcon}
+                <SummaryView hotspotDetails={hotspotDetails} />
+                <View style={styles.catCategoriesContainer}>
+                  <Avatar.Icon
+                    size={24}
+                    icon="close"
+                    color={theme.colors.background}
+                    style={styles.catCategoryTitleIcon}
+                  />
+
+                  <Caption style={styles.catCategoryTitleLabel}>
+                    Pisici nesterilizate
+                  </Caption>
+                  <FAB
+                    color={theme.colors.background}
+                    icon="plus"
+                    style={styles.catCategoryAddButton}
+                    size="small"
+                    onPress={() => {
+                      setNewUnsterilizedCat([defaultUnSterilizedCat]);
+                    }}
+                  />
+                </View>
+                <CatsView
+                  cats={newUnsterilizedCat.concat(
+                    hotspotDetails.unsterilizedCats
+                  )}
+                  isEditMode={true}
+                  deleteFunction={deleteCat}
+                  addNewCat={addNewCat}
                 />
-                <Caption style={styles.catCategoryTitleLabel}>
-                  Pisici sterilizate
-                </Caption>
-                <FAB
-                  color={theme.colors.background}
-                  icon="plus"
-                  style={styles.catCategoryAddButton}
-                  size="small"
-                  onPress={() => {
-                    setNewSterilizedCats([defaultSterilizedCat]);
-                  }}
+                <View style={styles.separator} />
+                <View style={styles.catCategoriesContainer}>
+                  <Avatar.Icon
+                    size={24}
+                    icon="check"
+                    color={theme.colors.background}
+                    style={styles.catCategoryTitleIcon}
+                  />
+                  <Caption style={styles.catCategoryTitleLabel}>
+                    Pisici sterilizate
+                  </Caption>
+                  <FAB
+                    color={theme.colors.background}
+                    icon="plus"
+                    style={styles.catCategoryAddButton}
+                    size="small"
+                    onPress={() => {
+                      setNewSterilizedCats([defaultSterilizedCat]);
+                    }}
+                  />
+                </View>
+                <CatsView
+                  cats={newSterilizedCats.concat(hotspotDetails.sterilizedCats)}
+                  isEditMode={true}
+                  deleteFunction={deleteCat}
+                  addNewCat={addNewCat}
                 />
               </View>
-              <CatsView
-                cats={newSterilizedCats.concat(hotspotDetails.sterilizedCats)}
-                isEditMode={true}
-                deleteFunction={deleteCat}
-                addNewCat={addNewCat}
-              />
             </View>
-          </View>
-          <FooterView screen={FooterScreens.HotspotDetailScreen} />
-        </ScrollView>
-      </View>
+            <FooterView screen={FooterScreens.HotspotDetailScreen} />
+          </ScrollView>
+        </View>
+      )}
       {isInProgress && <FullScreenActivityIndicator />}
     </>
   );
