@@ -9,13 +9,7 @@ import {
   View,
   Text,
 } from 'react-native';
-import {
-  Button,
-  Caption,
-  Headline,
-  TextInput,
-  Title,
-} from 'react-native-paper';
+import { Caption, Headline, TextInput, Title } from 'react-native-paper';
 import SelectDropdown from 'react-native-select-dropdown';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -25,6 +19,7 @@ import { Appbar } from '../components/Appbar';
 import { FooterScreens, FooterView } from '../components/Footer';
 import { FullScreenActivityIndicator } from '../components/FullScreenActivityIndicator';
 import { InputField } from '../components/InputField';
+import { NucaFormButton } from '../components/NucaFormButton';
 import { NucaModal } from '../components/NucaModal';
 import { VolunteerDropdown } from '../components/VolunteerDropdown';
 import {
@@ -168,39 +163,9 @@ const getStyles = (theme: NucaCustomTheme) =>
       margin: 1,
       right: 0,
     },
-    saveButton: {
-      height: 64,
-      maxWidth: 340,
-      minWidth: isSmallScreen() ? 64 : 340,
-    },
-    deleteButton: {
-      height: 64,
-      backgroundColor: theme.colors.surface,
-      color: 'black',
-      minWidth: isSmallScreen() ? 64 : 340,
-      maxWidth: 340,
-      marginRight: isSmallScreen() ? 0 : 12,
-      marginBottom: 10,
-    },
-    saveButtonContent: {
-      height: 64,
-      alignItems: 'center',
-      justifyContent: 'center',
-      flexDirection: 'row-reverse',
-    },
-    saveButtonLabel: {
-      color: theme.colors.background,
-      fontSize: 18,
-      fontFamily: 'Nunito_700Bold',
-    },
     snackLabel: {
       color: theme.colors.background,
       fontSize: 16,
-      fontFamily: 'Nunito_700Bold',
-    },
-    deleteButtonLabel: {
-      color: theme.colors.text,
-      fontSize: 18,
       fontFamily: 'Nunito_700Bold',
     },
     catLadyImage: {
@@ -624,29 +589,21 @@ export const HotspotFormScreen = ({
                 }}
               >
                 {isUpdate && (
-                  <Button
-                    uppercase={false}
-                    style={styles.deleteButton}
-                    contentStyle={styles.saveButtonContent}
-                    labelStyle={styles.deleteButtonLabel}
-                    icon="close"
-                    mode="contained"
+                  <NucaFormButton
+                    label="Șterge adresa"
+                    iconName="close"
+                    backgroundColor={theme.colors.surface}
+                    labelColor={theme.colors.text}
                     onPress={deleteH}
-                  >
-                    Șterge adresa
-                  </Button>
+                  />
                 )}
-                <Button
-                  uppercase={false}
-                  style={styles.saveButton}
-                  contentStyle={styles.saveButtonContent}
-                  labelStyle={styles.saveButtonLabel}
-                  icon="check"
-                  mode="contained"
+                <NucaFormButton
+                  label="Salvează"
+                  iconName="check"
+                  backgroundColor={theme.colors.primary}
+                  labelColor={theme.colors.background}
                   onPress={saveAndNavigateToDetailScreen}
-                >
-                  Salvează
-                </Button>
+                />
               </View>
             </View>
           </View>

@@ -51,13 +51,19 @@ export const Appbar = ({
       >
         <Menu.Item
           leadingIcon="file-chart-outline"
-          onPress={() => {}}
+          onPress={() => {
+            navigation.navigate('ReportGeneration');
+            setIsMenuOpen(false);
+          }}
           title="Generare raport"
         />
         <Divider />
         <Menu.Item
           leadingIcon="exit-to-app"
-          onPress={signOut}
+          onPress={() => {
+            signOut();
+            setIsMenuOpen(false);
+          }}
           title="Ieșire din cont"
         />
       </Menu>

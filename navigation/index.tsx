@@ -10,6 +10,7 @@ import { HotspotFormScreen } from '../screens/HotspotFormScreen';
 import { MapScreen } from '../screens/MapScreen';
 import { ModalScreen } from '../screens/ModalScreen';
 import { NotFoundScreen } from '../screens/NotFoundScreen';
+import { ReportGenerationScreen } from '../screens/ReportGenerationScreen';
 import { RootStackParamList } from '../types';
 import LinkingConfiguration from './LinkingConfiguration';
 
@@ -53,6 +54,11 @@ const RootNavigator = () => {
           <Stack.Screen
             name="HotspotDetail"
             component={HotspotDetailScreen}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="ReportGeneration"
+            component={ReportGenerationScreen}
             options={{ headerShown: false }}
           />
           <Stack.Screen

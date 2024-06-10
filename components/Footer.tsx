@@ -4,21 +4,26 @@ import catLady3 from '../assets/cat-lady3.png';
 import catLady3Web from '../assets/cat-lady3W.png';
 import catLady4 from '../assets/cat-lady4.png';
 import catLady4Web from '../assets/cat-lady4W.png';
+import catLady5 from '../assets/cat-lady5.png';
 import catLady5Web from '../assets/cat-lady5W.png';
 import { useNucaTheme as useTheme } from '../hooks/useNucaTheme';
-import { isSmallScreen } from '../utils/helperFunc';
+import { isSmallMobileScreen } from '../utils/helperFunc';
 
 const getFooterStyles = (_theme: NucaCustomTheme) =>
   StyleSheet.create({
     imageView: {
       marginTop: 32,
+      flex: 1,
     },
     image: {
+      alignSelf: 'center',
+      position: 'absolute',
+      bottom: isSmallMobileScreen() ? '-20%' : 0,
       paddingTop: 12,
-      height: 375,
-      minHeight: 430,
+      height: 430,
+      zIndex: -1,
+      width: '100%',
       flex: 1,
-      width: undefined,
     },
   });
 
@@ -38,6 +43,8 @@ export const FooterView = ({
         return catLady3;
       case FooterScreens.HotspotFormScreen:
         return isUpdate ? catLady4 : catLady2;
+      case FooterScreens.ReportGenerationScreen:
+        return catLady5;
       default:
         throw new Error(`Non-existent image in switch: ${screen}`);
     }
@@ -49,6 +56,8 @@ export const FooterView = ({
         return catLady3Web;
       case FooterScreens.HotspotFormScreen:
         return isUpdate ? catLady4Web : catLady5Web;
+      case FooterScreens.ReportGenerationScreen:
+        return catLady5Web;
       default:
         throw new Error(`Non-existent image in switch: ${screen}`);
     }
@@ -58,12 +67,12 @@ export const FooterView = ({
     <View style={styles.imageView}>
       <Image
         source={
-          isSmallScreen()
+          isSmallMobileScreen()
             ? getSmallScreenImage(screen)
             : getWideScreenImage(screen)
         }
         style={styles.image}
-        resizeMode={isSmallScreen() ? 'contain' : 'cover'}
+        resizeMode={isSmallMobileScreen() ? 'contain' : 'cover'}
       />
     </View>
   );
@@ -72,4 +81,5 @@ export const FooterView = ({
 export enum FooterScreens {
   HotspotDetailScreen,
   HotspotFormScreen,
+  ReportGenerationScreen,
 }

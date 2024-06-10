@@ -71,14 +71,6 @@ const getStyles = (theme: NucaCustomTheme) =>
       marginRight: 8,
       marginTop: 6,
     },
-    saveButton: {
-      height: 66,
-      width: '100%',
-      backgroundColor: theme.colors.accent,
-      borderRadius: 0,
-      borderBottomLeftRadius: 30,
-      borderBottomRightRadius: 30,
-    },
     buttonContent: {
       height: 66,
       alignItems: 'center',

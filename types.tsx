@@ -37,6 +37,7 @@ export type RootStackParamList = {
   HotspotDetail: { hotspotId: string };
   NotFound: undefined;
   ChooseLocation: { region: Region; location?: Location };
+  ReportGeneration: undefined;
 };
 
 export type RootStackScreenProps<Screen extends keyof RootStackParamList> =
