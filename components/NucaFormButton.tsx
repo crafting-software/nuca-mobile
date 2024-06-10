@@ -31,7 +31,7 @@ type NucaFormButtonProps = {
   iconName: string;
   backgroundColor: string;
   labelColor: string;
-  onPress: () => any;
+  onPress: () => void;
 };
 
 export const NucaFormButton = ({
