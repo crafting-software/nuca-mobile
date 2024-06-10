@@ -17,8 +17,8 @@ const getFooterStyles = (_theme: NucaCustomTheme) =>
     },
     image: {
       alignSelf: 'center',
-      position: 'absolute',
-      bottom: isSmallMobileScreen() ? '-20%' : 0,
+      position: 'relative',
+      bottom: 0,
       paddingTop: 12,
       height: 430,
       zIndex: -1,
