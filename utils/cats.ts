@@ -36,11 +36,9 @@ export const updateCat = async (
     sendAsFormData: true,
   });
 
-  if (error) {
-    console.error('update cat failed', error);
-    return { success: false };
-  }
-  return { success: true, cat: castToCat(data.data) };
+  return error
+    ? { success: false }
+    : { success: true, cat: castToCat(data.data) };
 };
 
 export const deleteCatRequest = async (
