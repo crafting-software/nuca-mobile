@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { Caption, Headline, Icon } from 'react-native-paper';
 import { DatePickerInput } from 'react-native-paper-dates';
@@ -9,6 +9,7 @@ import { FullScreenActivityIndicator } from '../components/FullScreenActivityInd
 import { NucaFormButton } from '../components/NucaFormButton';
 import { useNucaTheme as useTheme } from '../hooks/useNucaTheme';
 import { RootStackParamList } from '../types';
+import SnackbarManager from '../utils/SnackbarManager';
 import { isSmallScreen } from '../utils/helperFunc';
 import { saveReportAsCsvFile } from '../utils/reports';
 
@@ -90,6 +91,16 @@ export const ReportGenerationScreen = (
   const [checkInDate, setCheckInDate] = useState<Date>(new Date());
   const [checkOutDate, setCheckOutDate] = useState<Date>(new Date());
 
+  useEffect(() => {
+    if (checkInDate <= checkOutDate) return;
+
+    SnackbarManager.error(
+      'ReportGenerationScreen.tsx',
+      'Data de start a intervalului asociat cu raportul trebuie sǎ fie înaintea datei de sfârşit.'
+    );
+    setCheckInDate(checkOutDate);
+  }, [checkInDate, checkOutDate]);
+
   return (
     <>
       <Appbar forDetailScreen />
@@ -158,8 +169,8 @@ export const ReportGenerationScreen = (
                 iconName="file-document-outline"
                 onPress={async () => {
                   await saveReportAsCsvFile(
-                    checkInDate || new Date(),
-                    checkOutDate || new Date(),
+                    checkInDate,
+                    checkOutDate,
                     'nuca_sterilized_cats_report'
                   );
                 }}

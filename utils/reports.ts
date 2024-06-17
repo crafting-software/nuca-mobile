@@ -1,6 +1,7 @@
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import moment from 'moment';
+import { clickEventTimeoutSeconds } from '../constants/reports';
 import { CatSterilizationReport, castToReport } from '../models/Report';
 import { isWeb } from '../utils/platform';
 import SnackbarManager from './SnackbarManager';
@@ -53,7 +54,7 @@ const saveReportAsCsvFileOnWeb = async (
     hiddenDownloadAnchor.addEventListener('click', _e => {
       setTimeout(
         () => URL.revokeObjectURL(hiddenDownloadAnchor.href),
-        30 * 1000
+        clickEventTimeoutSeconds * 1000
       );
     });
     hiddenDownloadAnchor.click();
